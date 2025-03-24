@@ -1,16 +1,16 @@
 {
   "version": 2,
-  "name": "Beautinique E-Commerce Backend",
+  "name": "bq-backend",
   "builds": [
     {
-      "src": "src/index.ts",
+      "src": "dist/index.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/"
+      "dest": "dist/index.js"
     }
   ]
 }
