@@ -1,8 +1,14 @@
 import "dotenv/config";
 import express, { Request, Response } from "express";
 import cors from "cors";
-import connectDB from "./configs/db.config";
-import { SuccessResponse } from "./utils";
+import connectDB from "configs/db.config";
+import errorHandler from "middlewares/errorHandler.middleware";
+import notFoundHandler from "middlewares/notFoundHandler.middleware";
+import authRouter from "routes/auth.routes";
+import blogRouter from "routes/blog.routes";
+import mediaRouter from "routes/mediaFiles.routes";
+import userRouter from "routes/user.routes";
+import { SuccessResponse } from "utils";
 
 const app = express();
 const PORT = process.env.PORT || 5454;
@@ -38,27 +44,21 @@ app.get("/", (_: Request, res: Response) => {
 });
 
 // Auth routes
-import authRouter from "./routes/auth.routes";
 app.use("/api/auth", authRouter);
 
 // User routes
-import userRouter from "./routes/user.routes";
 app.use("/api/user", userRouter);
 
 // Media routes
-import mediaRouter from "./routes/mediaFiles.routes";
 app.use("/api/media", mediaRouter);
 
 // Blog routes
-import blogRouter from "./routes/blog.routes";
 app.use("/api/blogs", blogRouter);
 
 // Catch undefined routes or routes that don't exist
-import notFoundHandler from "./middlewares/notFoundHandler.middleware";
 app.use(notFoundHandler);
 
 // Error handling middleware
-import errorHandler from "./middlewares/errorHandler.middleware";
 app.use(errorHandler);
 
 // Start the server

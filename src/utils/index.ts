@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AppError, AppSuccess } from "../constructors";
+import { AppSuccess, AppError } from "constructors/index";
 import { ObjectSchema } from "joi";
 import { Types } from "mongoose";
 

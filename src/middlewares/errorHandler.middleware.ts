@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AppError } from "../constructors";
+import { AppError } from "constructors/index";
 
 // Error Handling in Development
 const handleDevelopmentError = (err: AppError, res: Response) => {

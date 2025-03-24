@@ -1,8 +1,9 @@
 import jwt from "jsonwebtoken";
-import { AppError } from "../constructors";
 import { NextFunction } from "express";
 import { Types } from "mongoose";
-import { CatchErrorResponse } from "../utils";
+import { AppError } from "constructors/index";
+import { CatchErrorResponse } from "utils/index";
+
 const generateToken = async (userId: Types.ObjectId, next: NextFunction) => {
   try {
     const token = jwt.sign({ userId }, process.env.JWT_SECRET as string, {

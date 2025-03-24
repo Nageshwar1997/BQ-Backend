@@ -1,9 +1,9 @@
 import { UploadApiResponse } from "cloudinary";
 import { Readable } from "stream";
-import myCloudinary from "../configs/cloudinary/cloudinary.config";
-import cloudinaryConnection from "../configs/cloudinary/cloudinary.connection";
-import { AppError } from "../constructors";
-import { FileUploaderProps } from "../types";
+import myCloudinary from "configs/cloudinary/cloudinary.config";
+import cloudinaryConnection from "configs/cloudinary/cloudinary.connection";
+import { AppError } from "constructors/index";
+import { FileUploaderProps } from "types/index";
 
 // Function to handle profile picture upload to Cloudinary
 const imageUploader = async ({ file, folder = "" }: FileUploaderProps) => {

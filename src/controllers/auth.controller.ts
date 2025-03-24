@@ -1,10 +1,10 @@
 import bcrypt from "bcryptjs";
 import { NextFunction, Request, Response } from "express";
-import generateToken from "../providers/jwt.provider";
-import { AppError } from "../constructors";
-import { CatchErrorResponse, SuccessResponse } from "../utils";
-import { User } from "../models";
-import { imageUploader } from "../utils/mediaUploader";
+import generateToken from "providers/jwt.provider";
+import { AppError } from "constructors/index";
+import { CatchErrorResponse, SuccessResponse } from "utils/index";
+import { User } from "models/index";
+import { imageUploader } from "utils/mediaUploader";
 import { Types } from "mongoose";
 
 const registerController = async (

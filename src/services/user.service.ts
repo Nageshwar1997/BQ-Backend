@@ -1,11 +1,13 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { AppError } from "../constructors";
 import { NextFunction, Request } from "express";
-import { CatchErrorResponse } from "../utils";
+import { AppError } from "constructors/index";
+import { CatchErrorResponse } from "utils/index";
+
 // Define an interface for the token payload
 interface DecodedToken extends JwtPayload {
   userId: string; // Assuming userId is a string
 }
+
 export const getUserIdFromToken = (req: Request, next: NextFunction) => {
   try {
     const token = req.get("Authorization");

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import upload from "../configs/upload.multer.config";
+import upload from "configs/upload.multer.config";
 import {
   removeMultipleImageUrls,
   removeSingleImageUrl,
@@ -7,8 +7,8 @@ import {
   uploadSingleImage,
   uploadHomeVideo,
   getAllHomeVideos,
-} from "../controllers/mediaFiles.controller";
-import isAuthorized from "../middlewares/authorization.middleware";
+} from "controllers/mediaFiles.controller";
+import isAuthorized from "middlewares/authorization.middleware";
 
 const mediaRouter = Router();
 

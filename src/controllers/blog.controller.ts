@@ -1,15 +1,18 @@
 import { NextFunction, Request, Response } from "express";
-import { Blog } from "../models";
-import { CatchErrorResponse, isValidMongoId, SuccessResponse } from "../utils";
-import { AppError } from "../constructors";
-
-import { imageRemover, imageUploader } from "../utils/mediaUploader";
-import { AuthorizedRequest } from "../types";
-import { BLOGS_THUMBNAILS, MAX_IMAGE_FILE_SIZE } from "../constants";
+import { Blog } from "models/index";
 import {
-  editBlogValidationSchema,
+  SuccessResponse,
+  CatchErrorResponse,
+  isValidMongoId,
+} from "utils/index";
+import { AppError } from "constructors/index";
+import { imageUploader, imageRemover } from "utils/mediaUploader";
+import { AuthorizedRequest } from "types/index";
+import { BLOGS_THUMBNAILS, MAX_IMAGE_FILE_SIZE } from "constants/index";
+import {
   uploadBlogValidationSchema,
-} from "../validations/blog.validation";
+  editBlogValidationSchema,
+} from "validations/blog.validation";
 
 const uploadBlog = async (
   req: AuthorizedRequest,

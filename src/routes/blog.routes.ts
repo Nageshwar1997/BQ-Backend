@@ -4,11 +4,11 @@ import {
   getAllBlogs,
   getBlogById,
   uploadBlog,
-} from "../controllers/blog.controller";
-import isAuthorized from "../middlewares/authorization.middleware";
-import { validateImageFiles } from "../middlewares/fileValidation.middleware";
-import { BLOGS_THUMBNAILS } from "../constants";
-import isAuthenticated from "../middlewares/authentication.middleware";
+} from "controllers/blog.controller";
+import isAuthorized from "middlewares/authorization.middleware";
+import { validateImageFiles } from "middlewares/fileValidation.middleware";
+import { BLOGS_THUMBNAILS } from "constants/index";
+import isAuthenticated from "middlewares/authentication.middleware";
 
 const blogRouter = Router();
 

@@ -1,9 +1,9 @@
 import { NextFunction, Response } from "express";
-import { AppError } from "../constructors";
-import { getUserIdFromToken } from "../services/user.service";
-import { CatchErrorResponse, isValidMongoId } from "../utils";
-import { User } from "../models";
-import { AuthorizedRequest } from "../types";
+import { AppError } from "constructors/index";
+import { getUserIdFromToken } from "services/user.service";
+import { isValidMongoId, CatchErrorResponse } from "utils/index";
+import { User } from "models/index";
+import { AuthorizedRequest } from "types/index";
 
 const isAuthorized =
   (allowedRoles: string[]) =>

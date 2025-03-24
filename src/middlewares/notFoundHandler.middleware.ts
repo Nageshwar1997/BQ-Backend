@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../constructors";
+import { AppError } from "constructors/index";
 
 // Middleware to handle undefined routes
 const notFoundHandler = (req: Request, _: Response, next: NextFunction) => {
