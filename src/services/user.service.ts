@@ -1,7 +1,7 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { NextFunction, Request } from "express";
-import { AppError } from "constructors/index";
-import { CatchErrorResponse } from "utils/index";
+import { AppError } from "../constructors";
+import { CatchErrorResponse } from "../utils";
 
 // Define an interface for the token payload
 interface DecodedToken extends JwtPayload {

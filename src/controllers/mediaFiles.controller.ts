@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from "express";
-import { AppError } from "constructors/index";
-import { SuccessResponse, CatchErrorResponse } from "utils/index";
+import { AppError } from "../constructors";
+import { HomeVideo } from "../models";
+import { AuthorizedRequest } from "../types";
+import { SuccessResponse, CatchErrorResponse } from "../utils";
 import {
   imageUploader,
   imageRemover,
   videoUploader,
-} from "utils/mediaUploader";
-import { HomeVideo } from "models/index";
-import { AuthorizedRequest } from "types/index";
+} from "../utils/mediaUploader";
 
 export const uploadImages = async (
   req: Request,

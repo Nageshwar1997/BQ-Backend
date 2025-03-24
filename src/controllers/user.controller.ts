@@ -1,12 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { AppError } from "constructors/index";
-import {
-  isValidMongoId,
-  SuccessResponse,
-  CatchErrorResponse,
-} from "utils/index";
-import { User } from "models/index";
-import { getUserIdFromToken } from "services/user.service";
+import { AppError } from "../constructors";
+import { User } from "../models";
+import { getUserIdFromToken } from "../services/user.service";
+import { isValidMongoId, SuccessResponse, CatchErrorResponse } from "../utils";
 
 export const getUserById = async (
   req: Request,

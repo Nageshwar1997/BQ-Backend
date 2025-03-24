@@ -1,14 +1,14 @@
 import { Router } from "express";
+import { BLOGS_THUMBNAILS } from "../constants";
 import {
-  editBlog,
   getAllBlogs,
   getBlogById,
   uploadBlog,
-} from "controllers/blog.controller";
-import isAuthorized from "middlewares/authorization.middleware";
-import { validateImageFiles } from "middlewares/fileValidation.middleware";
-import { BLOGS_THUMBNAILS } from "constants/index";
-import isAuthenticated from "middlewares/authentication.middleware";
+  editBlog,
+} from "../controllers/blog.controller";
+import isAuthenticated from "../middlewares/authentication.middleware";
+import isAuthorized from "../middlewares/authorization.middleware";
+import { validateImageFiles } from "../middlewares/fileValidation.middleware";
 
 const blogRouter = Router();
 

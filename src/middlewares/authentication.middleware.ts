@@ -1,9 +1,9 @@
 import { NextFunction, Response } from "express";
-import { AppError } from "constructors/index";
-import { getUserIdFromToken } from "services/user.service";
-import { isValidMongoId, CatchErrorResponse } from "utils/index";
-import { User } from "models/index";
-import { AuthenticatedRequest } from "types/index";
+import { AppError } from "../constructors";
+import { User } from "../models";
+import { getUserIdFromToken } from "../services/user.service";
+import { AuthenticatedRequest } from "../types";
+import { isValidMongoId, CatchErrorResponse } from "../utils";
 
 const isAuthenticated = async (
   req: AuthenticatedRequest,

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { AppSuccess, AppError } from "constructors/index";
 import { ObjectSchema } from "joi";
 import { Types } from "mongoose";
+import { AppSuccess, AppError } from "../constructors";
 
 export const SuccessResponse = (
   res: Response,

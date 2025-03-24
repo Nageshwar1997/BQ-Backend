@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { MulterError } from "multer";
-import upload from "configs/upload.multer.config";
-import { AppError } from "constructors/index";
-import { CatchErrorResponse } from "utils/index";
+import upload from "../configs/upload.multer.config";
+import { AppError } from "../constructors";
+import { CatchErrorResponse } from "../utils";
 
 export const validateImageFiles =
   (fields: { name: string; maxCount: number }[]) =>
