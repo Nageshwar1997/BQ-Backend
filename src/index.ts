@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express, { Request, Response } from "express";
 import cors from "cors";
-import connectDB from "configs/db.config";
+import connectDB from "./configs/db.config";
 import errorHandler from "middlewares/errorHandler.middleware";
 import notFoundHandler from "middlewares/notFoundHandler.middleware";
 import authRouter from "routes/auth.routes";
