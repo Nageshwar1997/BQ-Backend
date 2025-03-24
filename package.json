@@ -6,7 +6,7 @@
     "build": "tsc",
     "vercel-build": "tsc",
     "dev": "ts-node-dev --respawn --transpile-only --require tsconfig-paths/register src/index.ts",
-    "start": "node -r tsconfig-paths/register dist/index.js"
+    "start": "node dist/index.js"
   },
   "repository": {
     "type": "git",
