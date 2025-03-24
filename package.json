@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "bq-backend",
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
@@ -8,9 +8,9 @@
     "dev": "nodemon src/index.ts"
   },
   "keywords": [],
-  "author": "",
+  "author": "Nageshwar",
   "license": "ISC",
-  "description": "",
+  "description": "Beautinique E-Commerce Backend",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.41.3",
