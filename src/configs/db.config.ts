@@ -1,5 +1,4 @@
 import { connect } from "mongoose";
-import { AppError } from "../constructors";
 
 const connectDB = async () => {
   const MONGODB_URI = process.env.MONGODB_URI;
