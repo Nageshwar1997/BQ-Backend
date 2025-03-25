@@ -5,6 +5,7 @@ import connectDB from "./configs/db.config";
 import { SuccessResponse } from "./utils";
 import errorHandler from "./middlewares/errorHandler.middleware";
 import notFoundHandler from "./middlewares/notFoundHandler.middleware";
+import mediaRouter from "./routes/mediaFiles.routes";
 
 const app = express();
 const PORT = process.env.PORT || 5454;
@@ -42,6 +43,8 @@ app.use(
 app.get("/", (_: Request, res: Response) => {
   SuccessResponse(res, 200, "Welcome to the MERN Beautinique API");
 });
+
+app.use("/api/media", mediaRouter);
 
 // Catch undefined routes or routes that don't exist
 app.use(notFoundHandler);
