@@ -15,6 +15,7 @@ const allowedOrigins = [
   process.env.FRONTEND_LOCAL_HOST_ADMIN_URL,
   process.env.FRONTEND_CLIENT_PRODUCTION_URL,
   "http://localhost:5173",
+  "http://localhost:3002",
 ];
 
 app.use(
