@@ -14,14 +14,15 @@ const PORT = process.env.PORT || 5454;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const allowedOrigins = [
-  process.env.FRONTEND_LOCAL_HOST_CLIENT_URL,
-  process.env.FRONTEND_LOCAL_HOST_ADMIN_URL,
-  process.env.FRONTEND_LOCAL_HOST_MASTER_URL,
-  process.env.FRONTEND_LOCAL_HOST_PUBLIC_URL_1,
-  process.env.FRONTEND_LOCAL_HOST_PUBLIC_URL_2,
-  process.env.FRONTEND_PRODUCTION_CLIENT_URL,
-  process.env.FRONTEND_PRODUCTION_ADMIN_URL,
-  process.env.FRONTEND_PRODUCTION_MASTER_URL,
+  // process.env.FRONTEND_LOCAL_HOST_CLIENT_URL,
+  // process.env.FRONTEND_LOCAL_HOST_ADMIN_URL,
+  // process.env.FRONTEND_LOCAL_HOST_MASTER_URL,
+  // process.env.FRONTEND_LOCAL_HOST_PUBLIC_URL_1,
+  // process.env.FRONTEND_LOCAL_HOST_PUBLIC_URL_2,
+  // process.env.FRONTEND_PRODUCTION_CLIENT_URL,
+  // process.env.FRONTEND_PRODUCTION_ADMIN_URL,
+  // process.env.FRONTEND_PRODUCTION_MASTER_URL,
+  "https://bq-client-five.vercel.app",
 ];
 
 app.use(
