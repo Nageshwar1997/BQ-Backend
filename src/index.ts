@@ -13,31 +13,31 @@ const PORT = process.env.PORT || 5454;
 // Middleware to parse JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// const allowedOrigins = [
-//   process.env.FRONTEND_LOCAL_HOST_CLIENT_URL,
-//   process.env.FRONTEND_LOCAL_HOST_ADMIN_URL,
-//   process.env.FRONTEND_LOCAL_HOST_MASTER_URL,
-//   process.env.FRONTEND_LOCAL_HOST_PUBLIC_URL_1,
-//   process.env.FRONTEND_LOCAL_HOST_PUBLIC_URL_2,
-//   process.env.FRONTEND_PRODUCTION_CLIENT_URL,
-//   process.env.FRONTEND_PRODUCTION_ADMIN_URL,
-//   process.env.FRONTEND_PRODUCTION_MASTER_URL,
-// ];
+const allowedOrigins = [
+  process.env.FRONTEND_LOCAL_HOST_CLIENT_URL,
+  process.env.FRONTEND_LOCAL_HOST_ADMIN_URL,
+  process.env.FRONTEND_LOCAL_HOST_MASTER_URL,
+  process.env.FRONTEND_LOCAL_HOST_PUBLIC_URL_1,
+  process.env.FRONTEND_LOCAL_HOST_PUBLIC_URL_2,
+  process.env.FRONTEND_PRODUCTION_CLIENT_URL,
+  process.env.FRONTEND_PRODUCTION_ADMIN_URL,
+  process.env.FRONTEND_PRODUCTION_MASTER_URL,
+];
 
-// app.use(
-//   cors({
-//     origin: (origin, callback) => {
-//       if (!origin || allowedOrigins?.includes(origin)) {
-//         callback(null, true);
-//       } else {
-//         callback(new Error("Not allowed by CORS"));
-//       }
-//     },
-//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-//     allowedHeaders: ["Content-Type", "Authorization"],
-//     credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins?.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
 app.use(
   cors({
