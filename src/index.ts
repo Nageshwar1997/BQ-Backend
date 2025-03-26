@@ -5,7 +5,6 @@ import connectDB from "./configs/db.config";
 import { CatchErrorResponse, SuccessResponse } from "./utils";
 import errorHandler from "./middlewares/errorHandler.middleware";
 import notFoundHandler from "./middlewares/notFoundHandler.middleware";
-// import mediaRouter from "./routes/mediaFiles.routes";
 import { HomeVideo } from "./models";
 import { AppError } from "./constructors";
 
@@ -72,8 +71,6 @@ app.get("/", async (req: Request, res: Response, next: NextFunction) => {
     return CatchErrorResponse(error, next);
   }
 });
-
-// app.use("/api/media", mediaRouter);
 
 // Catch undefined routes or routes that don't exist
 app.use(notFoundHandler);
