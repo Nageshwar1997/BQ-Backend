@@ -2,13 +2,13 @@ import { Router } from "express";
 import {
   loginController,
   registerController,
-} from "../controllers/auth.controller";
-import upload from "../configs/upload.multer.config";
+} from "../../src/controllers/auth.controller";
+import upload from "../../src/configs/upload.multer.config";
 import {
   loginUserValidationSchema,
   registerUserValidationSchema,
-} from "../validations/user.validation";
-import { validateSchema } from "../utils";
+} from "../../src/validations/user.validation";
+import { validateSchema } from "../../src/utils";
 
 const authRouter = Router();
 

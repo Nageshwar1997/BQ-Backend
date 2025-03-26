@@ -1,12 +1,11 @@
 import "dotenv/config";
-import express, { NextFunction, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import connectDB from "./configs/db.config";
-import { CatchErrorResponse, SuccessResponse } from "./utils";
+import { SuccessResponse } from "./utils";
 import errorHandler from "./middlewares/errorHandler.middleware";
 import notFoundHandler from "./middlewares/notFoundHandler.middleware";
-import { User } from "./models";
-import { AppError } from "./constructors";
+import mediaRouter from "./api/routes/mediaFiles.routes";
 
 const app = express();
 const PORT = process.env.PORT || 5454;
@@ -41,36 +40,11 @@ app.use(
 );
 
 // Home route
-app.get("/", async (req: Request, res: Response, next: NextFunction) => {
-  // SuccessResponse(res, 200, "Welcome to the MERN Beautinique API");
-  try {
-    const page = Number(req.query.page);
-    const limit = Number(req.query.limit);
-    const skip = (page - 1) * limit;
-
-    let videos;
-    if (page && limit) {
-      videos = await User.find().skip(skip).limit(limit).lean();
-    } else {
-      videos = await User.find().lean();
-    }
-
-    if (!videos) {
-      throw new AppError("Videos not found", 404);
-    }
-
-    const totalVideos = await User.countDocuments();
-
-    SuccessResponse(res, 200, "Videos retrieved successfully", {
-      videos,
-      totalVideos,
-      currentPage: page ? page : 1,
-      totalPages: page && limit ? Math.ceil(totalVideos / limit) : 1,
-    });
-  } catch (error) {
-    return CatchErrorResponse(error, next);
-  }
+app.get("/", (_: Request, res: Response) => {
+  SuccessResponse(res, 200, "Welcome to the MERN Beautinique API");
 });
+
+app.use("/api/media", mediaRouter);
 
 // Catch undefined routes or routes that don't exist
 app.use(notFoundHandler);
