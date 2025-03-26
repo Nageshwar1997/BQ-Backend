@@ -5,7 +5,7 @@ import connectDB from "./configs/db.config";
 import { CatchErrorResponse, SuccessResponse } from "./utils";
 import errorHandler from "./middlewares/errorHandler.middleware";
 import notFoundHandler from "./middlewares/notFoundHandler.middleware";
-import { HomeVideo } from "./models";
+import { User } from "./models";
 import { AppError } from "./constructors";
 
 const app = express();
@@ -50,16 +50,16 @@ app.get("/", async (req: Request, res: Response, next: NextFunction) => {
 
     let videos;
     if (page && limit) {
-      videos = await HomeVideo.find().skip(skip).limit(limit).lean();
+      videos = await User.find().skip(skip).limit(limit).lean();
     } else {
-      videos = await HomeVideo.find().lean();
+      videos = await User.find().lean();
     }
 
     if (!videos) {
       throw new AppError("Videos not found", 404);
     }
 
-    const totalVideos = await HomeVideo.countDocuments();
+    const totalVideos = await User.countDocuments();
 
     SuccessResponse(res, 200, "Videos retrieved successfully", {
       videos,
