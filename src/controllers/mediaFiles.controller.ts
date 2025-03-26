@@ -176,7 +176,7 @@ export const uploadHomeVideo = async (
 };
 
 export const getAllHomeVideos = async (
-  req: AuthorizedRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
