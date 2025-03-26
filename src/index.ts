@@ -39,7 +39,11 @@ app.use(express.urlencoded({ extended: true }));
 //   })
 // );
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 // Home route
 app.get("/", (_: Request, res: Response) => {
