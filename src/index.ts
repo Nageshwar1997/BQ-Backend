@@ -39,16 +39,14 @@ app.use(express.urlencoded({ extended: true }));
 //   })
 // );
 
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+app.use(cors());
 
 // Home route
-app.get("/", mediaRouter);
+app.get("/", (_: Request, res: Response) => {
+  SuccessResponse(res, 200, "Welcome to the MERN Beautinique API");
+});
 
-// app.use("/api/media", mediaRouter);
+app.use("/api/media", mediaRouter);
 
 // Catch undefined routes or routes that don't exist
 app.use(notFoundHandler);
