@@ -46,11 +46,9 @@ app.use(
 );
 
 // Home route
-app.get("/", (_: Request, res: Response) => {
-  SuccessResponse(res, 200, "Welcome to the MERN Beautinique API");
-});
+app.get("/", mediaRouter);
 
-app.use("/api/media", mediaRouter);
+// app.use("/api/media", mediaRouter);
 
 // Catch undefined routes or routes that don't exist
 app.use(notFoundHandler);
