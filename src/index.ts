@@ -5,7 +5,7 @@ import connectDB from "./configs/db.config";
 import { SuccessResponse } from "./utils";
 import errorHandler from "./middlewares/errorHandler.middleware";
 import notFoundHandler from "./middlewares/notFoundHandler.middleware";
-import mediaRouter from "./api/routes/mediaFiles.routes";
+import mediaRouter from "./routes/mediaFiles.routes";
 
 const app = express();
 const PORT = process.env.PORT || 5454;
