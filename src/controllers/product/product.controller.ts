@@ -54,12 +54,16 @@ export const addProduct = async (
   }
 };
 
-export const findProductsByCategory = async (
+export const getProductsByCategory = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
+    const page = Number(req.query.page);
+    const limit = Number(req.query.limit);
+    const skip = (page - 1) * limit;
+
     const { levelOne, levelTwo, levelThree } = req.body;
 
     // Step 1: Find Level-One Category
