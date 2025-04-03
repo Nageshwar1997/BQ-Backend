@@ -24,22 +24,22 @@ export const addProduct = async (
   try {
     const { title, levelOne, levelTwo, levelThree } = req.body;
 
-    // ✅ Find or Create Level-One Category
+    // Find or Create Level-One Category
     const levelOneCategory = await findOrCreateCategory(levelOne, null);
 
-    // ✅ Find or Create Level-Two Category (Parent must be Level-One)
+    // Find or Create Level-Two Category (Parent must be Level-One)
     const levelTwoCategory = await findOrCreateCategory(
       levelTwo,
       levelOneCategory._id.toString()
     );
 
-    // ✅ Find or Create Level-Three Category (Parent must be Level-Two)
+    // Find or Create Level-Three Category (Parent must be Level-Two)
     const levelThreeCategory = await findOrCreateCategory(
       levelThree,
       levelTwoCategory._id.toString()
     );
 
-    // ✅ Create the product with levelThree category
+    // Create the product with levelThree category
     const product = new Product({
       title,
       category: levelThreeCategory._id,
@@ -70,6 +70,7 @@ export const findProductsByCategory = async (
 
     let categoryIds: string[] = [levelOneCategory._id.toString()];
 
+    // Step 2: Prevent fetching Level-Three without Level-Two
     if (levelThree && !levelTwo) {
       throw new AppError(
         "Level-Two category is required to fetch Level-Three products",
@@ -78,7 +79,7 @@ export const findProductsByCategory = async (
     }
 
     if (levelTwo) {
-      // Step 2: Find Level-Two Category under Level-One
+      // Step 3: Find Level-Two Category under Level-One
       const levelTwoCategory = await Category.findOne({
         name: levelTwo,
         parentCategory: levelOneCategory._id,
@@ -91,7 +92,7 @@ export const findProductsByCategory = async (
       categoryIds.push(levelTwoCategory._id.toString());
 
       if (levelThree) {
-        // ✅ Step 3: Find Level-Three Category under Level-Two
+        // Step 4: Find Level-Three Category under Level-Two
         const levelThreeCategory = await Category.findOne({
           name: levelThree,
           parentCategory: levelTwoCategory._id,
@@ -104,9 +105,9 @@ export const findProductsByCategory = async (
           );
         }
 
-        categoryIds.push(levelThreeCategory._id.toString()); // ✅ Convert ObjectId to string
+        categoryIds.push(levelThreeCategory._id.toString());
       } else {
-        // ✅ Fetch all Level-Three categories under the selected Level-Two category
+        // Step 5: If Level-Three is not provided, get all Level-Three categories under Level-Two
         const levelThreeCategories = await Category.find({
           parentCategory: levelTwoCategory._id,
         });
@@ -117,7 +118,7 @@ export const findProductsByCategory = async (
         categoryIds.push(...levelThreeCategoryIds);
       }
     } else {
-      // ✅ Fetch all Level-Two categories under Level-One
+      // Step 6: If Level-Two is not provided, get all Level-Two categories under Level-One
       const levelTwoCategories = await Category.find({
         parentCategory: levelOneCategory._id,
       });
@@ -125,7 +126,7 @@ export const findProductsByCategory = async (
         cat._id.toString()
       );
 
-      // ✅ Fetch all Level-Three categories under Level-Two
+      // Step 7: Get all Level-Three categories under the fetched Level-Two categories
       const levelThreeCategories = await Category.find({
         parentCategory: { $in: levelTwoCategoryIds },
       });
@@ -133,11 +134,11 @@ export const findProductsByCategory = async (
         cat._id.toString()
       );
 
-      // ✅ Include all Level-Two and Level-Three categories in search
+      // Include Level-Two and Level-Three category IDs for product search
       categoryIds.push(...levelTwoCategoryIds, ...levelThreeCategoryIds);
     }
 
-    // ✅ Step 4: Fetch Products with Matching Categories
+    // Step 8: Fetch Products with Matching Categories and Populate Category Data
     const products = await Product.find({ category: { $in: categoryIds } })
       .populate({
         path: "category",
