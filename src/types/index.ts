@@ -51,13 +51,11 @@ export interface ProductProps {
   howToUse: string;
   ingredients: string;
   additionalDetails: string;
+  commonImages: string[];
+  shades: ShadeProps[];
   category: Schema.Types.ObjectId;
   seller: Schema.Types.ObjectId;
   ratings: Schema.Types.ObjectId[];
-  averageRating: number;
-  totalReviews: number;
   reviews: Schema.Types.ObjectId[];
   videos: ProductVideoProps[];
-  commonImages: string[];
-  shades: ShadeProps[];
 }

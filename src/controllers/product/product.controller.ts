@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { CatchErrorResponse, SuccessResponse } from "../../utils";
 import { Category, Product } from "../../models";
 import { AppError } from "../../constructors";
+import { AuthorizedRequest } from "../../types";
 
 const findOrCreateCategory = async (
   name: string,
@@ -16,40 +17,92 @@ const findOrCreateCategory = async (
   return category;
 };
 
-export const addProduct = async (
-  req: Request,
+export const uploadProduct = async (
+  req: AuthorizedRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { title, levelOne, levelTwo, levelThree } = req.body;
-
-    // Find or Create Level-One Category
-    const levelOneCategory = await findOrCreateCategory(levelOne, null);
-
-    // Find or Create Level-Two Category (Parent must be Level-One)
-    const levelTwoCategory = await findOrCreateCategory(
-      levelTwo,
-      levelOneCategory._id.toString()
-    );
-
-    // Find or Create Level-Three Category (Parent must be Level-Two)
-    const levelThreeCategory = await findOrCreateCategory(
-      levelThree,
-      levelTwoCategory._id.toString()
-    );
-
-    // Create the product with levelThree category
-    const product = new Product({
+    const {
       title,
-      category: levelThreeCategory._id,
+      brand,
+      sellingPrice,
+      originalPrice,
+      description,
+      howToUse,
+      ingredients,
+      additionalDetails,
+      levelOneCategory,
+      levelTwoCategory,
+      levelThreeCategory,
+    } = {
+      title: req.body.title.trim(),
+      brand: req.body.brand.trim(),
+      sellingPrice: req.body.sellingPrice,
+      originalPrice: req.body.originalPrice,
+      description: req.body.description.trim(),
+      howToUse: req.body.howToUse.trim(),
+      ingredients: req.body.ingredients.trim(),
+      additionalDetails: req.body.additionalDetails.trim(),
+      levelOneCategory: req.body.levelOneCategory.trim().toLowerCase(),
+      levelTwoCategory: req.body.levelTwoCategory.trim().toLowerCase(),
+      levelThreeCategory: req.body.levelThreeCategory.trim().toLowerCase(),
+    };
+
+    const isProductExist = await Product.findOne({
+      title: { $regex: `^${title}$`, $options: "i" },
     });
 
-    await product.save();
+    if (isProductExist) {
+      throw new AppError(`Product already exist with this title ${title}`, 400);
+    }
+
+    let category = null;
+
+    if (levelOneCategory && levelTwoCategory && levelThreeCategory) {
+      // Find or Create Level-One Category
+      const category_1 = await findOrCreateCategory(levelOneCategory, null);
+
+      // Find or Create Level-Two Category (Parent must be Level-One)
+      const category_2 = await findOrCreateCategory(
+        levelTwoCategory,
+        category_1._id.toString()
+      );
+
+      // Find or Create Level-Three Category (Parent must be Level-Two)
+      const category_3 = await findOrCreateCategory(
+        levelThreeCategory,
+        category_2._id.toString()
+      );
+
+      category = category_3._id;
+    } else {
+      throw new AppError("All categories are required", 400);
+    }
+
+    const cleanBody = {
+      title,
+      brand,
+      sellingPrice,
+      originalPrice,
+      description,
+      howToUse,
+      ingredients,
+      additionalDetails,
+      category,
+      seller: req.user?._id,
+      discount: Math.round(
+        ((originalPrice - sellingPrice) / originalPrice) * 100
+      ),
+    };
+
+    // Create the product with levelThree category
+    const product = await Product.create(cleanBody);
 
     console.log("PRODUCT", product);
     SuccessResponse(res, 201, "Product added successfully", { product });
   } catch (error) {
+    console.log("ERROR", error);
     return CatchErrorResponse(error, next);
   }
 };
