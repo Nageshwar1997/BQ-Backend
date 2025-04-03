@@ -6,7 +6,7 @@ export interface FileUploaderProps {
   folder?: string;
 }
 
-export interface IUser extends Document {
+export interface UserProps extends Document {
   firstName: string;
   lastName: string;
   email: string;
@@ -18,10 +18,10 @@ export interface IUser extends Document {
 
 // Interface for authenticated requests with user
 export interface AuthenticatedRequest extends Request {
-  user?: Omit<IUser, "password">; // User object without password
+  user?: Omit<UserProps, "password">; // User object without password
 }
 
 // Interface for authenticated requests with user
 export interface AuthorizedRequest extends Request {
-  user?: Omit<IUser, "password">; // User object without password
+  user?: Omit<UserProps, "password">; // User object without password
 }
