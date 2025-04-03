@@ -67,9 +67,17 @@ export const getProductsByCategory = async (
     const { levelOne, levelTwo, levelThree } = req.body;
 
     // Step 1: Find Level-One Category
-    const levelOneCategory = await Category.findOne({ name: levelOne });
+    if (!levelOne) {
+      throw new AppError("Level-One category is required", 400);
+    }
+
+    const levelOneCategory = await Category.findOne({
+      name: levelOne,
+    }).lean();
+
     if (!levelOneCategory) {
-      throw new AppError("Level-One category not found", 404);
+      SuccessResponse(res, 200, "No products found", { products: [] });
+      return;
     }
 
     let categoryIds: string[] = [levelOneCategory._id.toString()];
@@ -87,10 +95,11 @@ export const getProductsByCategory = async (
       const levelTwoCategory = await Category.findOne({
         name: levelTwo,
         parentCategory: levelOneCategory._id,
-      });
+      }).lean();
 
       if (!levelTwoCategory) {
-        throw new AppError("Level-Two category not found under Level-One", 404);
+        SuccessResponse(res, 200, "No products found", { products: [] });
+        return;
       }
 
       categoryIds.push(levelTwoCategory._id.toString());
@@ -100,13 +109,11 @@ export const getProductsByCategory = async (
         const levelThreeCategory = await Category.findOne({
           name: levelThree,
           parentCategory: levelTwoCategory._id,
-        });
+        }).lean();
 
         if (!levelThreeCategory) {
-          throw new AppError(
-            "Level-Three category not found under Level-Two",
-            404
-          );
+          SuccessResponse(res, 200, "No products found", { products: [] });
+          return;
         }
 
         categoryIds.push(levelThreeCategory._id.toString());
@@ -114,7 +121,7 @@ export const getProductsByCategory = async (
         // Step 5: If Level-Three is not provided, get all Level-Three categories under Level-Two
         const levelThreeCategories = await Category.find({
           parentCategory: levelTwoCategory._id,
-        });
+        }).lean();
 
         const levelThreeCategoryIds = levelThreeCategories.map((cat) =>
           cat._id.toString()
@@ -125,7 +132,7 @@ export const getProductsByCategory = async (
       // Step 6: If Level-Two is not provided, get all Level-Two categories under Level-One
       const levelTwoCategories = await Category.find({
         parentCategory: levelOneCategory._id,
-      });
+      }).lean();
       const levelTwoCategoryIds = levelTwoCategories.map((cat) =>
         cat._id.toString()
       );
@@ -133,7 +140,7 @@ export const getProductsByCategory = async (
       // Step 7: Get all Level-Three categories under the fetched Level-Two categories
       const levelThreeCategories = await Category.find({
         parentCategory: { $in: levelTwoCategoryIds },
-      });
+      }).lean();
       const levelThreeCategoryIds = levelThreeCategories.map((cat) =>
         cat._id.toString()
       );
@@ -143,20 +150,49 @@ export const getProductsByCategory = async (
     }
 
     // Step 8: Fetch Products with Matching Categories and Populate Category Data
-    const products = await Product.find({ category: { $in: categoryIds } })
-      .populate({
-        path: "category",
-        populate: {
-          path: "parentCategory",
-          populate: {
-            path: "parentCategory", // Recursively populate deeper levels
-          },
-        },
+    let products = null;
+
+    if (page && limit) {
+      products = await Product.find({
+        category: { $in: categoryIds },
       })
-      .lean();
+        .populate({
+          path: "category",
+          populate: {
+            path: "parentCategory",
+            populate: {
+              path: "parentCategory", // Recursively populate deeper levels
+            },
+          },
+        })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+    } else {
+      products = await Product.find({
+        category: { $in: categoryIds },
+      })
+        .populate({
+          path: "category",
+          populate: {
+            path: "parentCategory",
+            populate: {
+              path: "parentCategory", // Recursively populate deeper levels
+            },
+          },
+        })
+        .lean();
+    }
+
+    const totalProducts = await Product.countDocuments({
+      category: { $in: categoryIds },
+    }).lean();
 
     SuccessResponse(res, 200, "Products fetched successfully", {
       products,
+      totalProducts,
+      currentPage: page ? page : 1,
+      totalPages: page && limit ? Math.ceil(totalProducts / limit) : 1,
     });
   } catch (error) {
     console.error(error);
