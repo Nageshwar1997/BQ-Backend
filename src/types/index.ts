@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { Document } from "mongoose";
+import { Document, Schema } from "mongoose";
 
 export interface FileUploaderProps {
   file: Express.Multer.File;
@@ -24,4 +24,40 @@ export interface AuthenticatedRequest extends Request {
 // Interface for authenticated requests with user
 export interface AuthorizedRequest extends Request {
   user?: Omit<UserProps, "password">; // User object without password
+}
+
+interface ProductVideoProps {
+  title: string;
+  m3u8Url: string;
+  originalUrl: string;
+  thumbnail: string;
+  public_id: string;
+}
+
+export interface ShadeProps {
+  colorCode: string;
+  colorName: string;
+  shadeImages: string[];
+  stock: number;
+}
+
+export interface ProductProps {
+  title: string;
+  brand: string;
+  originalPrice: number;
+  sellingPrice: number;
+  discount: number;
+  description: string;
+  howToUse: string;
+  ingredients: string;
+  additionalDetails: string;
+  category: Schema.Types.ObjectId;
+  seller: Schema.Types.ObjectId;
+  ratings: Schema.Types.ObjectId[];
+  averageRating: number;
+  totalReviews: number;
+  reviews: Schema.Types.ObjectId[];
+  videos: ProductVideoProps[];
+  commonImages: string[];
+  shades: ShadeProps[];
 }
