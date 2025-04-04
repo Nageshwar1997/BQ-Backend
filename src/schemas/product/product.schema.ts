@@ -12,11 +12,11 @@ const productSchema = new Schema<ProductProps>(
     howToUse: { type: String, trim: true },
     ingredients: { type: String, trim: true },
     additionalDetails: { type: String, trim: true },
-    // commonImages: {
-    //   type: [String],
-    //   default: [],
-    // },
-    // shades: [{ type: Schema.Types.ObjectId, ref: "Shade" }],
+    commonImages: {
+      type: [String],
+      default: [],
+    },
+    shades: [{ type: Schema.Types.ObjectId, ref: "Shade" }],
     category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
     seller: { type: Schema.Types.ObjectId, ref: "User", required: true },
     // ratings: [{ type: Schema.Types.ObjectId, ref: "Rating" }],
@@ -33,9 +33,9 @@ const productSchema = new Schema<ProductProps>(
 productSchema.index({ title: 1 }, { unique: true });
 
 // Indexing for performance
-// productSchema.index({ category: 1 });
+productSchema.index({ category: 1 });
 productSchema.index({ brand: 1 });
-// productSchema.index({ seller: 1 });
+productSchema.index({ seller: 1 });
 productSchema.index({ sellingPrice: 1 });
 
 export default productSchema;
