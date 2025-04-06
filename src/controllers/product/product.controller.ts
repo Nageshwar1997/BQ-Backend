@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { CatchErrorResponse, SuccessResponse } from "../../utils";
-import { Category, Product } from "../../models";
+import { Category, Product, ProductShade } from "../../models";
 import { AppError } from "../../constructors";
 import { AuthorizedRequest } from "../../types";
 
@@ -38,8 +38,8 @@ export const uploadProduct = async (
     } = {
       title: req.body.title.trim(),
       brand: req.body.brand.trim(),
-      sellingPrice: req.body.sellingPrice,
-      originalPrice: req.body.originalPrice,
+      sellingPrice: Number(req.body.sellingPrice.trim()),
+      originalPrice: Number(req.body.originalPrice.trim()),
       description: req.body.description.trim(),
       howToUse: req.body.howToUse.trim(),
       ingredients: req.body.ingredients.trim(),
@@ -54,9 +54,13 @@ export const uploadProduct = async (
     });
 
     if (isProductExist) {
-      throw new AppError(`Product already exist with this title ${title}`, 400);
+      throw new AppError(
+        `Product already exists with this title ${title}`,
+        400
+      );
     }
 
+    // Category creation
     let category = null;
 
     if (levelOneCategory && levelTwoCategory && levelThreeCategory) {
@@ -74,12 +78,49 @@ export const uploadProduct = async (
         levelThreeCategory,
         category_2._id.toString()
       );
-
       category = category_3._id;
     } else {
       throw new AppError("All categories are required", 400);
     }
 
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    // COMMON IMAGES
+    const commonImageFiles = files?.["commonImages"] || [];
+    const commonImages = commonImageFiles.map(
+      (file: Express.Multer.File) => file.path
+    );
+
+    // console.log("commonImageFiles", commonImageFiles);
+    // console.log("CommonImages", commonImages);
+    const shadeFiles = files?.["shadeImages"] || [];
+    const shadesData = JSON.parse(req.body.shades || "[]"); // Dynamically parsed
+
+    // console.log("shadeFiles", shadeFiles);
+
+    const shadeIds = [];
+    const imagesPerShade = Math.floor(shadeFiles.length / shadesData.length); // Distribute images equally
+
+    for (let i = 0; i < shadesData.length; i++) {
+      const { colorName, colorCode, stock } = shadesData[i];
+
+      // Get images for this shade
+      const start = i * imagesPerShade;
+      const end = start + imagesPerShade;
+      const shadeImages = shadeFiles.slice(start, end).map((file) => file.path);
+
+      console.log("shadeImages", shadeImages);
+
+      const newShade = await ProductShade.create({
+        colorName,
+        colorCode,
+        stock,
+        shadeImages,
+      });
+
+      shadeIds.push(newShade._id);
+    }
+
+    // CLEAN PRODUCT BODY
     const cleanBody = {
       title,
       brand,
@@ -94,12 +135,13 @@ export const uploadProduct = async (
       discount: Math.round(
         ((originalPrice - sellingPrice) / originalPrice) * 100
       ),
+      commonImages,
+      shades: shadeIds,
     };
 
-    // Create the product with levelThree category
     const product = await Product.create(cleanBody);
 
-    console.log("PRODUCT", product);
+    // console.log("PRODUCT", product);
     SuccessResponse(res, 201, "Product added successfully", { product });
   } catch (error) {
     console.log("ERROR", error);
