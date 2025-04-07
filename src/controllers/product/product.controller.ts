@@ -38,8 +38,8 @@ export const uploadProduct = async (
     } = {
       title: req.body.title.trim(),
       brand: req.body.brand.trim(),
-      sellingPrice: Number(req.body.sellingPrice.trim()),
-      originalPrice: Number(req.body.originalPrice.trim()),
+      sellingPrice: req.body.sellingPrice,
+      originalPrice: req.body.originalPrice,
       description: req.body.description.trim(),
       howToUse: req.body.howToUse.trim(),
       ingredients: req.body.ingredients.trim(),

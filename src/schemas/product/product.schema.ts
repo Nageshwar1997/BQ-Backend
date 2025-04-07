@@ -5,13 +5,13 @@ const productSchema = new Schema<ProductProps>(
   {
     title: { type: String, required: true, trim: true },
     brand: { type: String, required: true, trim: true },
-    originalPrice: { type: Number, required: true, min: 0 },
-    sellingPrice: { type: Number, required: true, min: 0 },
+    originalPrice: { type: Number, required: true, min: 1, default: 1 },
+    sellingPrice: { type: Number, required: true, min: 1, default: 1 },
     discount: { type: Number, required: true, min: 0 },
     description: { type: String, required: true, trim: true },
-    howToUse: { type: String, trim: true },
-    ingredients: { type: String, trim: true },
-    additionalDetails: { type: String, trim: true },
+    howToUse: { type: String, trim: true, default: "" },
+    ingredients: { type: String, trim: true, default: "" },
+    additionalDetails: { type: String, trim: true, default: "" },
     commonImages: {
       type: [String],
       default: [],
@@ -29,8 +29,7 @@ const productSchema = new Schema<ProductProps>(
   }
 );
 
-// Unique index for title
-productSchema.index({ title: 1 }, { unique: true });
+productSchema.index({ title: 1 });
 
 // Indexing for performance
 productSchema.index({ category: 1 });

@@ -22,6 +22,7 @@ const allowedOrigins = [
   process.env.FRONTEND_PRODUCTION_CLIENT_URL,
   process.env.FRONTEND_PRODUCTION_ADMIN_URL,
   process.env.FRONTEND_PRODUCTION_MASTER_URL,
+  "http://localhost:3004",
 ];
 
 app.use(

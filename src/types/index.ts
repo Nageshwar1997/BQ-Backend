@@ -36,8 +36,8 @@ interface ProductVideoProps {
 
 export interface ShadeProps {
   colorCode: string;
-  colorName: string;
-  shadeImages: string[];
+  shadeName: string;
+  images: string[];
   stock: number;
 }
 

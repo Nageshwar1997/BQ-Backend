@@ -1,22 +1,14 @@
 import { Router } from "express";
-import {
-  uploadProduct,
-  getProductsByCategory,
-} from "../controllers/product/product.controller";
-import isAuthorized from "../middlewares/authorization.middleware";
+import { uploadProductController } from "../controllers/product/test.controller";
 import upload from "../configs/upload.multer.config";
+import isAuthenticated from "../middlewares/authentication.middleware";
 
 const productRouter = Router();
-
 productRouter.post(
   "/upload",
-  isAuthorized(["ADMIN", "MASTER"]),
-  upload.fields([
-    { name: "commonImages", maxCount: 10 },
-    { name: "shadeImages", maxCount: 20 },
-  ]),
-  uploadProduct
+  upload.any(),
+  isAuthenticated,
+  uploadProductController
 );
-productRouter.get("/all", getProductsByCategory);
 
 export default productRouter;

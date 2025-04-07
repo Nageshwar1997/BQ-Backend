@@ -1,8 +1,28 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { imageUploader } from "../../utils/mediaUploader";
 import { AppError } from "../../constructors";
+import { Category, Product, ProductShade } from "../../models";
+import { CatchErrorResponse, SuccessResponse } from "../../utils";
+import { AuthenticatedRequest } from "../../types";
 
-export const uploadProductController = async (req: Request, res: Response) => {
+const findOrCreateCategory = async (
+  name: string,
+  parentCategory: string | null
+) => {
+  let category = await Category.findOne({ name, parentCategory });
+
+  if (!category) {
+    category = await Category.create({ name, parentCategory });
+  }
+
+  return category;
+};
+
+export const uploadProductController = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const files = req.files as Express.Multer.File[];
     const body = req.body;
@@ -16,10 +36,32 @@ export const uploadProductController = async (req: Request, res: Response) => {
       howToUse,
       ingredients,
       additionalDetails,
-      levelOneCategory,
-      levelTwoCategory,
-      levelThreeCategory,
+      categoryLevelOne,
+      categoryLevelTwo,
+      categoryLevelThree,
     } = body;
+
+    let category = null;
+
+    if (categoryLevelOne && categoryLevelTwo && categoryLevelThree) {
+      // Find or Create Level-One Category
+      const category_1 = await findOrCreateCategory(categoryLevelOne, null);
+
+      // Find or Create Level-Two Category (Parent must be Level-One)
+      const category_2 = await findOrCreateCategory(
+        categoryLevelTwo,
+        category_1._id.toString()
+      );
+
+      // Find or Create Level-Three Category (Parent must be Level-Two)
+      const category_3 = await findOrCreateCategory(
+        categoryLevelThree,
+        category_2._id.toString()
+      );
+      category = category_3._id;
+    } else {
+      throw new AppError("All categories are required", 400);
+    }
 
     const shadesData = JSON.parse(JSON.stringify(body.shades || []));
     const shades = Array.isArray(shadesData) ? shadesData : [shadesData];
@@ -51,7 +93,7 @@ export const uploadProductController = async (req: Request, res: Response) => {
 
     // ✅ Upload shade images
     const enrichedShades = await Promise.all(
-      shades.map(async (shade, idx) => {
+      shades?.map(async (shade, idx) => {
         const shadeFiles = shadeImagesMap[idx] || [];
         const uploadedShadeImages = await Promise.all(
           shadeFiles.map((file) =>
@@ -70,6 +112,18 @@ export const uploadProductController = async (req: Request, res: Response) => {
       })
     );
 
+    console.log("enrichedShades", enrichedShades);
+
+    const shadesTest = await Promise.all(
+      enrichedShades.map(async (shade) => {
+        const Shade = await ProductShade.create(shade);
+
+        return Shade;
+      })
+    );
+
+    console.log("shadesTest", shadesTest);
+
     const finalData = {
       title,
       brand,
@@ -77,23 +131,22 @@ export const uploadProductController = async (req: Request, res: Response) => {
       howToUse,
       ingredients,
       additionalDetails,
-      categoryLevelOne: levelOneCategory,
-      categoryLevelTwo: levelTwoCategory,
-      categoryLevelThree: levelThreeCategory,
+      category,
+      discount: Math.round(
+        ((originalPrice - sellingPrice) / originalPrice) * 100
+      ),
+      seller: req.user?._id,
       originalPrice: parseFloat(originalPrice),
       sellingPrice: parseFloat(sellingPrice),
       commonImages: uploadedCommonImages.map((img) => img.secure_url),
-      shades: enrichedShades,
+      shades: shadesTest,
     };
 
-    console.log("✅ Final Product Data");
-    // console.dir(finalData, { depth: null });
+    const product = await Product.create(finalData);
 
-    res.status(200).json({ message: "Product uploaded", data: finalData });
+    SuccessResponse(res, 200, "Product uploaded", { product });
   } catch (error) {
     console.error("❌ Upload failed", error);
-    const message =
-      error instanceof AppError ? error.message : "Something went wrong";
-    res.status(500).json({ error: message });
+    return CatchErrorResponse(error, next);
   }
 };
