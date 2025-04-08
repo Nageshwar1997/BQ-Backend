@@ -3,6 +3,7 @@ import { Schema } from "mongoose";
 const categorySchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
+    level: { type: Number, required: true, default: 1 },
     parentCategory: {
       type: Schema.Types.ObjectId,
       ref: "Category",

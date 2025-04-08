@@ -7,12 +7,13 @@ import { AuthenticatedRequest } from "../../types";
 
 const findOrCreateCategory = async (
   name: string,
+  level: number,
   parentCategory: string | null
 ) => {
   let category = await Category.findOne({ name, parentCategory });
 
   if (!category) {
-    category = await Category.create({ name, parentCategory });
+    category = await Category.create({ name, parentCategory, level });
   }
 
   return category;
@@ -45,17 +46,19 @@ export const uploadProductController = async (
 
     if (categoryLevelOne && categoryLevelTwo && categoryLevelThree) {
       // Find or Create Level-One Category
-      const category_1 = await findOrCreateCategory(categoryLevelOne, null);
+      const category_1 = await findOrCreateCategory(categoryLevelOne, 1, null);
 
       // Find or Create Level-Two Category (Parent must be Level-One)
       const category_2 = await findOrCreateCategory(
         categoryLevelTwo,
+        2,
         category_1._id.toString()
       );
 
       // Find or Create Level-Three Category (Parent must be Level-Two)
       const category_3 = await findOrCreateCategory(
         categoryLevelThree,
+        3,
         category_2._id.toString()
       );
       category = category_3._id;
