@@ -119,13 +119,11 @@ export const uploadProductController = async (
 
     const shadesTest = await Promise.all(
       enrichedShades.map(async (shade) => {
-        const Shade = await ProductShade.create(shade);
+        const newShade = await ProductShade.create(shade);
 
-        return Shade;
+        return newShade;
       })
     );
-
-    console.log("shadesTest", shadesTest);
 
     const finalData = {
       title,
@@ -149,7 +147,6 @@ export const uploadProductController = async (
 
     SuccessResponse(res, 200, "Product uploaded", { product });
   } catch (error) {
-    console.error("❌ Upload failed", error);
     return CatchErrorResponse(error, next);
   }
 };
