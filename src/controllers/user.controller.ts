@@ -3,7 +3,7 @@ import { AppError } from "../constructors";
 import { CatchErrorResponse, isValidMongoId, SuccessResponse } from "../utils";
 import { User } from "../models";
 import { getUserIdFromToken } from "../services/user.service";
-export const getUserById = async (
+export const getUser = async (
   req: Request,
   res: Response,
   next: NextFunction

@@ -11,7 +11,7 @@ const router = Router();
 router.use("/auth", authRouter);
 
 // User routes
-router.use("/user", userRouter);
+router.use("/users", userRouter);
 
 // Media routes
 router.use("/media", mediaRouter);
