@@ -1,21 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { CatchErrorResponse, SuccessResponse } from "../../utils";
-import { Category, Product, ProductShade } from "../../models";
+import { Category, Product, Shade } from "../../models";
 import { AppError } from "../../constructors";
 import { AuthorizedRequest } from "../../types";
-
-const findOrCreateCategory = async (
-  name: string,
-  parentCategory: string | null
-) => {
-  let category = await Category.findOne({ name, parentCategory });
-
-  if (!category) {
-    category = await Category.create({ name, parentCategory });
-  }
-
-  return category;
-};
+import { imageRemover, imageUploader } from "../../utils/mediaUploader";
+import { uploadProductValidationSchema } from "../../validations/product/product.validation";
+import { findOrCreateCategory } from "../../services/product.service";
+import { addShadeValidationSchema } from "../../validations/product/shades.validation";
 
 export const uploadProduct = async (
   req: AuthorizedRequest,
@@ -23,59 +14,62 @@ export const uploadProduct = async (
   next: NextFunction
 ) => {
   try {
+    const files = req.files as Express.Multer.File[];
+    const body = req.body;
+    const user = req.user;
+
     const {
       title,
       brand,
-      sellingPrice,
       originalPrice,
+      sellingPrice,
       description,
       howToUse,
       ingredients,
       additionalDetails,
-      levelOneCategory,
-      levelTwoCategory,
-      levelThreeCategory,
-    } = {
-      title: req.body.title.trim(),
-      brand: req.body.brand.trim(),
-      sellingPrice: req.body.sellingPrice,
-      originalPrice: req.body.originalPrice,
-      description: req.body.description.trim(),
-      howToUse: req.body.howToUse.trim(),
-      ingredients: req.body.ingredients.trim(),
-      additionalDetails: req.body.additionalDetails.trim(),
-      levelOneCategory: req.body.levelOneCategory.trim().toLowerCase(),
-      levelTwoCategory: req.body.levelTwoCategory.trim().toLowerCase(),
-      levelThreeCategory: req.body.levelThreeCategory.trim().toLowerCase(),
-    };
+      categoryLevelOne,
+      categoryLevelTwo,
+      categoryLevelThree,
+    } = body;
 
-    const isProductExist = await Product.findOne({
-      title: { $regex: `^${title}$`, $options: "i" },
+    const { error } = uploadProductValidationSchema.validate({
+      title,
+      brand,
+      originalPrice,
+      sellingPrice,
+      description,
+      howToUse,
+      ingredients,
+      additionalDetails,
+      categoryLevelOne,
+      categoryLevelTwo,
+      categoryLevelThree,
     });
 
-    if (isProductExist) {
-      throw new AppError(
-        `Product already exists with this title ${title}`,
-        400
-      );
+    if (error) {
+      const errorMessage = error.details
+        .map((detail) => detail.message)
+        .join(", ");
+      throw new AppError(errorMessage, 400);
     }
 
-    // Category creation
     let category = null;
 
-    if (levelOneCategory && levelTwoCategory && levelThreeCategory) {
+    if (categoryLevelOne && categoryLevelTwo && categoryLevelThree) {
       // Find or Create Level-One Category
-      const category_1 = await findOrCreateCategory(levelOneCategory, null);
+      const category_1 = await findOrCreateCategory(categoryLevelOne, 1, null);
 
       // Find or Create Level-Two Category (Parent must be Level-One)
       const category_2 = await findOrCreateCategory(
-        levelTwoCategory,
+        categoryLevelTwo,
+        2,
         category_1._id.toString()
       );
 
       // Find or Create Level-Three Category (Parent must be Level-Two)
       const category_3 = await findOrCreateCategory(
-        levelThreeCategory,
+        categoryLevelThree,
+        3,
         category_2._id.toString()
       );
       category = category_3._id;
@@ -83,68 +77,117 @@ export const uploadProduct = async (
       throw new AppError("All categories are required", 400);
     }
 
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-    // COMMON IMAGES
-    const commonImageFiles = files?.["commonImages"] || [];
-    const commonImages = commonImageFiles.map(
-      (file: Express.Multer.File) => file.path
+    const shadesData = JSON.parse(JSON.stringify(body.shades || []));
+    const shades = Array.isArray(shadesData) ? shadesData : [shadesData];
+
+    const commonImages: Express.Multer.File[] = [];
+    const shadeImagesMap: Record<number, Express.Multer.File[]> = {};
+
+    files.forEach((file) => {
+      if (file.fieldname.startsWith("commonImages")) {
+        commonImages.push(file);
+      }
+
+      const shadeMatch = file.fieldname.match(/^shades\[(\d+)\]\[images\]/);
+      if (shadeMatch) {
+        const shadeIndex = parseInt(shadeMatch[1]);
+        if (!shadeImagesMap[shadeIndex]) {
+          shadeImagesMap[shadeIndex] = [];
+        }
+        shadeImagesMap[shadeIndex].push(file);
+      }
+    });
+
+    // Upload common images
+    const uploadedCommonImages = await Promise.all(
+      commonImages.map((file) =>
+        imageUploader({ file, folder: `Products/${title}/Common_Images` })
+      )
     );
 
-    // console.log("commonImageFiles", commonImageFiles);
-    // console.log("CommonImages", commonImages);
-    const shadeFiles = files?.["shadeImages"] || [];
-    const shadesData = JSON.parse(req.body.shades || "[]"); // Dynamically parsed
+    // Upload shade images
+    const enrichedShades = await Promise.all(
+      shades?.map(async (shade, idx) => {
+        const shadeFiles = shadeImagesMap[idx] || [];
+        const uploadedShadeImages = await Promise.all(
+          shadeFiles.map((file) =>
+            imageUploader({
+              file,
+              folder: `Products/${title}/Shades/${shade.shadeName}`,
+            })
+          )
+        );
 
-    // console.log("shadeFiles", shadeFiles);
+        const images = uploadedShadeImages.map((img) => img.secure_url);
 
-    const shadeIds = [];
-    const imagesPerShade = Math.floor(shadeFiles.length / shadesData.length); // Distribute images equally
+        return {
+          ...shade,
+          stock: Number(shade.stock),
+          images,
+        };
+      })
+    );
 
-    for (let i = 0; i < shadesData.length; i++) {
-      const { colorName, colorCode, stock } = shadesData[i];
-
-      // Get images for this shade
-      const start = i * imagesPerShade;
-      const end = start + imagesPerShade;
-      const shadeImages = shadeFiles.slice(start, end).map((file) => file.path);
-
-      console.log("shadeImages", shadeImages);
-
-      const newShade = await ProductShade.create({
-        colorName,
-        colorCode,
-        stock,
-        shadeImages,
-      });
-
-      shadeIds.push(newShade._id);
+    if (enrichedShades.length > 0) {
+      const { error } = addShadeValidationSchema.validate(enrichedShades);
+      if (error) {
+        const errorMessage = error.details
+          .map((detail) => detail.message)
+          .join(", ");
+        throw new AppError(errorMessage, 400);
+      }
     }
 
-    // CLEAN PRODUCT BODY
-    const cleanBody = {
+    const newShadeIds = await Promise.all(
+      enrichedShades.map(async (shade) => {
+        const newShade = await Shade.create(shade);
+        return newShade._id;
+      })
+    );
+
+    const finalData = {
       title,
       brand,
-      sellingPrice,
-      originalPrice,
       description,
       howToUse,
       ingredients,
       additionalDetails,
       category,
-      seller: req.user?._id,
       discount: Math.round(
         ((originalPrice - sellingPrice) / originalPrice) * 100
       ),
-      commonImages,
-      shades: shadeIds,
+      seller: user?._id,
+      originalPrice,
+      sellingPrice,
+      commonImages: uploadedCommonImages.map((img) => img.secure_url),
+      shades: newShadeIds,
     };
 
-    const product = await Product.create(cleanBody);
+    const product = await Product.create(finalData);
 
-    // console.log("PRODUCT", product);
-    SuccessResponse(res, 201, "Product added successfully", { product });
+    if (!product) {
+      // Rollback: Remove uploaded common images
+      await Promise.all(
+        uploadedCommonImages.map((img) => imageRemover(img.secure_url))
+      );
+
+      // Rollback: Remove uploaded shades
+      await Shade.deleteMany({
+        _id: { $in: newShadeIds },
+      });
+
+      // Rollback: Remove uploaded shade images
+      await Promise.all(
+        enrichedShades?.map((shade) =>
+          Promise.all(shade?.images?.map((img: string) => imageRemover(img)))
+        )
+      );
+
+      throw new AppError("Failed to upload product", 400);
+    }
+
+    SuccessResponse(res, 200, "Product uploaded successfully", { product });
   } catch (error) {
-    console.log("ERROR", error);
     return CatchErrorResponse(error, next);
   }
 };
@@ -290,7 +333,6 @@ export const getProductsByCategory = async (
       totalPages: page && limit ? Math.ceil(totalProducts / limit) : 1,
     });
   } catch (error) {
-    console.error(error);
     return CatchErrorResponse(error, next);
   }
 };
