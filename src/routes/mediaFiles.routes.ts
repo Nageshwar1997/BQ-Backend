@@ -26,10 +26,14 @@ mediaRouter.delete("/images", removeMultipleImageUrls);
 // For Single Video Upload
 mediaRouter.post(
   "/video/upload",
-  upload.single("video"),
+  upload.fields([
+    { name: "video", maxCount: 1 },
+    { name: "poster", maxCount: 1 },
+  ]),
   isAuthorized(["MASTER"]),
   uploadHomeVideo
 );
+
 mediaRouter.get("/videos/home", getAllHomeVideos);
 
 export default mediaRouter;
