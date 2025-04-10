@@ -1,22 +1,28 @@
+import { CloudinaryConfigOption } from "../../types";
 import myCloudinary from "./cloudinary.config";
 
-const cloudinaryConnection = async (isImageOrVideo: "image" | "video") => {
+const cloudinaryConnection = async (
+  isImageOrVideoOrProduct: CloudinaryConfigOption
+) => {
   try {
-    const cloudinary = myCloudinary(isImageOrVideo);
+    const cloudinary = myCloudinary(isImageOrVideoOrProduct);
 
     const res = await cloudinary.api.ping();
-    console.log(`Cloudinary ${isImageOrVideo} Connected ✅`, res);
+    console.log(`Cloudinary ${isImageOrVideoOrProduct} Connected ✅`, res);
     return {
       success: true,
       error: false,
-      message: `Cloudinary ${isImageOrVideo} Connected ✅`,
+      message: `Cloudinary ${isImageOrVideoOrProduct} Connected ✅`,
     };
   } catch (err) {
-    console.error(`Cloudinary ${isImageOrVideo} Connection Error ❌`, err);
+    console.error(
+      `Cloudinary ${isImageOrVideoOrProduct} Connection Error ❌`,
+      err
+    );
     return {
       success: false,
       error: true,
-      message: `Cloudinary ${isImageOrVideo} Connection Error ❌`,
+      message: `Cloudinary ${isImageOrVideoOrProduct} Connection Error ❌`,
     };
   }
 };

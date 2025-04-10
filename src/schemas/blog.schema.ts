@@ -1,6 +1,7 @@
 import { Schema } from "mongoose";
+import { BlogProps } from "../types";
 
-const blogSchema = new Schema(
+const blogSchema = new Schema<BlogProps>(
   {
     mainTitle: {
       type: String,

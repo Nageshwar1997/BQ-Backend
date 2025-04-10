@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
-import { IUser } from "../types";
+import { UserProps } from "../types";
 
-const userSchema = new Schema<IUser>(
+const userSchema = new Schema<UserProps>(
   {
     firstName: {
       type: String,

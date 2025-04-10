@@ -12,8 +12,13 @@ export const getUserIdFromToken = (req: Request, next: NextFunction) => {
     if (!token) {
       throw new AppError("Token not found", 401);
     }
+
+    const tokenWithoutBearer = token.startsWith("Bearer ")
+      ? token.slice(7)
+      : token;
+
     const decoded = jwt.verify(
-      token,
+      tokenWithoutBearer,
       process.env.JWT_SECRET as string
     ) as DecodedToken;
 

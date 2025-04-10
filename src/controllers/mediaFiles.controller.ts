@@ -4,12 +4,13 @@ import { CatchErrorResponse, SuccessResponse } from "../utils";
 import {
   imageRemover,
   imageUploader,
+  videoRemover,
   videoUploader,
 } from "../utils/mediaUploader";
 import { HomeVideo } from "../models";
 import { AuthorizedRequest } from "../types";
 
-export const uploadImages = async (
+export const uploadMultipleImages = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -25,6 +26,7 @@ export const uploadImages = async (
       const result = await imageUploader({
         file,
         folder: req?.body?.folderName,
+        cloudinaryConfigOption: "image",
       });
 
       return {
@@ -54,6 +56,7 @@ export const uploadSingleImage = async (
     const result = await imageUploader({
       file: req.file,
       folder: req?.body?.folderName,
+      cloudinaryConfigOption: "image",
     });
 
     SuccessResponse(res, 200, "Image uploaded successfully", {
@@ -72,7 +75,7 @@ export const removeSingleImageUrl = async (
   try {
     const ImgUrl = req.body.cloudUrl;
 
-    const { result } = await imageRemover(ImgUrl);
+    const { result } = await imageRemover(ImgUrl, "image");
 
     if (result !== "ok" || result === "not found") {
       throw new AppError("Image not found or already removed", 404);
@@ -97,7 +100,9 @@ export const removeMultipleImageUrls = async (
     }
 
     // Delete all images concurrently
-    const results = await Promise.all(imgUrls.map((url) => imageRemover(url)));
+    const results = await Promise.all(
+      imgUrls.map((url) => imageRemover(url, "image"))
+    );
 
     // Check if any deletions failed
     const failedDeletions = results.filter(
@@ -121,54 +126,108 @@ export const uploadHomeVideo = async (
 ) => {
   try {
     const { title } = req.body;
-    if (!title) {
-      throw new AppError("Title is required", 400);
+    if (!title) throw new AppError("Title is required", 400);
+
+    const files = req.files as {
+      video?: Express.Multer.File[];
+      poster?: Express.Multer.File[];
+    };
+
+    const videoFile = files?.video?.[0];
+    const posterFile = files?.poster?.[0];
+
+    if (!videoFile) {
+      throw new AppError("No video file uploaded", 400);
     }
 
-    const file = req.file as Express.Multer.File;
-
-    if (!file) {
-      throw new AppError("No file uploaded", 400);
+    if (!posterFile) {
+      throw new AppError("Poster file is required.", 400);
     }
 
-    if (!file.mimetype.startsWith("video/")) {
+    if (!videoFile.mimetype.startsWith("video/")) {
       throw new AppError("Invalid file type. Please upload a video file.", 400);
     }
-    // Validate allowed file extensions
-    const allowedExtensions = ["mp4", "webm"];
-    const fileExtension = file.originalname.split(".").pop()?.toLowerCase();
 
-    if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
+    if (!posterFile.mimetype.startsWith("image/")) {
+      throw new AppError("Poster must be an image file", 400);
+    }
+
+    const allowedVideoExtensions = ["mp4", "webm"];
+    const videoExtension = videoFile.originalname
+      .split(".")
+      .pop()
+      ?.toLowerCase();
+
+    if (!videoExtension || !allowedVideoExtensions.includes(videoExtension)) {
       throw new AppError(
-        `Invalid video format. Allowed formats: ${allowedExtensions.join(
+        `Invalid video format. Allowed formats: ${allowedVideoExtensions.join(
           ", "
         )}`,
         400
       );
     }
 
-    // Validate file size (max 20MB)
-    const MAX_SIZE = 50 * 1024 * 1024; // 20MB in bytes
-    if (file.size > MAX_SIZE) {
-      throw new AppError("File size exceeds the limit of 50MB.", 400);
-    }
-    const video = await videoUploader({ file, folder: "Home_Videos" });
+    const allowedImageExtensions = ["jpg", "jpeg", "png", "webp"];
+    const posterExtension = posterFile.originalname
+      .split(".")
+      .pop()
+      ?.toLowerCase();
 
-    if (!video) {
-      throw new AppError("Video upload failed", 500);
+    if (!posterExtension || !allowedImageExtensions.includes(posterExtension)) {
+      throw new AppError(
+        `Invalid poster format. Allowed formats: ${allowedImageExtensions.join(
+          ", "
+        )}`,
+        400
+      );
     }
+
+    const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
+    if (videoFile.size > MAX_VIDEO_SIZE) {
+      throw new AppError("Video file size exceeds 50MB.", 400);
+    }
+
+    const MAX_POSTER_SIZE = 2 * 1024 * 1024; // 2MB
+    if (posterFile.size > MAX_POSTER_SIZE) {
+      throw new AppError("Poster image size exceeds 2MB.", 400);
+    }
+
+    // Upload video
+    const video = await videoUploader({
+      file: videoFile,
+      folder: `Home/Videos/${title}`,
+      cloudinaryConfigOption: "video",
+    });
+    if (!video) throw new AppError("Video upload failed", 500);
+
+    const poster = await imageUploader({
+      file: posterFile,
+      folder: `Home/Videos/${title}`,
+      cloudinaryConfigOption: "video",
+    });
+    if (!poster) throw new AppError("Poster upload failed", 500);
 
     const user = req.user;
-    const homeVideo = await HomeVideo.create({
-      title,
-      m3u8Url: video.playback_url,
-      originalUrl: video.secure_url,
-      public_id: video.public_id,
-      duration: Math.round(video.duration),
-      user: user?._id,
-    });
+    let homeVideo;
+    try {
+      homeVideo = await HomeVideo.create({
+        title,
+        m3u8Url: video.playback_url,
+        originalUrl: video.secure_url,
+        public_id: video.public_id,
+        duration: Math.round(video.duration),
+        posterUrl: poster.secure_url,
+        user: user?._id,
+      });
+    } catch (dbError) {
+      // Clean up uploaded files from Cloudinary
+      await Promise.all([
+        videoRemover(video.playback_url, "video"),
+        imageRemover(poster.secure_url, "video"),
+      ]);
+      throw new AppError("Failed to save video metadata", 500);
+    }
 
-    // Success response
     SuccessResponse(res, 200, "Video uploaded successfully", { homeVideo });
   } catch (error) {
     return CatchErrorResponse(error, next);

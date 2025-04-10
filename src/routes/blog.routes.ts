@@ -16,7 +16,7 @@ blogRouter.get("/all", getAllBlogs);
 blogRouter.get("/blog/:id", getBlogById);
 blogRouter.post(
   "/blog/upload",
-  isAuthorized(["ADMIN", "USER", "MASTER"]),
+  isAuthorized(["ADMIN", "SELLER", "MASTER"]),
   validateImageFiles(
     BLOGS_THUMBNAILS.map((thumbnail) => ({ name: thumbnail, maxCount: 1 }))
   ),
@@ -24,7 +24,7 @@ blogRouter.post(
 );
 blogRouter.put(
   "/blog/edit/:id",
-  isAuthenticated,
+  isAuthorized(["ADMIN", "SELLER", "MASTER"]),
   validateImageFiles(
     BLOGS_THUMBNAILS.map((thumbnail) => ({ name: thumbnail, maxCount: 1 }))
   ),
