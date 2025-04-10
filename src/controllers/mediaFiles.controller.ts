@@ -4,6 +4,7 @@ import { CatchErrorResponse, SuccessResponse } from "../utils";
 import {
   imageRemover,
   imageUploader,
+  videoRemover,
   videoUploader,
 } from "../utils/mediaUploader";
 import { HomeVideo } from "../models";
@@ -201,15 +202,25 @@ export const uploadHomeVideo = async (
     if (!poster) throw new AppError("Poster upload failed", 500);
 
     const user = req.user;
-    const homeVideo = await HomeVideo.create({
-      title,
-      m3u8Url: video.playback_url,
-      originalUrl: video.secure_url,
-      public_id: video.public_id,
-      duration: Math.round(video.duration),
-      posterUrl: poster.secure_url,
-      user: user?._id,
-    });
+    let homeVideo;
+    try {
+      homeVideo = await HomeVideo.create({
+        title,
+        m3u8Url: video.playback_url,
+        originalUrl: video.secure_url,
+        public_id: video.public_id,
+        duration: Math.round(video.duration),
+        posterUrl: poster.secure_url,
+        user: user?._id,
+      });
+    } catch (dbError) {
+      // Clean up uploaded files from Cloudinary
+      await Promise.all([
+        videoRemover(video.playback_url),
+        imageRemover(poster.secure_url),
+      ]);
+      throw new AppError("Failed to save video metadata", 500);
+    }
 
     SuccessResponse(res, 200, "Video uploaded successfully", { homeVideo });
   } catch (error) {

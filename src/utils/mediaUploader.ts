@@ -172,4 +172,58 @@ const videoUploader = async ({ file, folder = "" }: FileUploaderProps) => {
   }
 };
 
-export { imageUploader, imageRemover, videoUploader };
+const videoRemover = async (videoUrl: string) => {
+  if (!videoUrl) {
+    throw new AppError("Video URL is required", 400);
+  }
+
+  // Updated regex to handle .mp4, .webm, and .m3u8
+  const regex = /\/v\d+\/(.+?)\.(mp4|webm|m3u8)$/;
+  const match = videoUrl.match(regex);
+
+  if (!match || !match[1]) {
+    throw new AppError("Invalid Cloudinary video URL", 400);
+  }
+
+  const publicId = match[1];
+
+  // Cloudinary Connectivity Test
+  const cloudinaryConnectionTest = await cloudinaryConnection("video");
+
+  if (cloudinaryConnectionTest.error) {
+    throw new AppError(cloudinaryConnectionTest.message, 500);
+  }
+
+  try {
+    const cloudinary = myCloudinary("video");
+
+    const result: UploadApiResponse = await new Promise((resolve, reject) => {
+      cloudinary.uploader.destroy(
+        publicId,
+        { resource_type: "video" },
+        (error, result) => {
+          if (error) {
+            return reject(
+              new AppError(
+                error.message || "Failed to remove video from Cloudinary",
+                500
+              )
+            );
+          }
+          resolve(result);
+        }
+      );
+    });
+
+    return result;
+  } catch (error) {
+    throw new AppError(
+      error instanceof Error
+        ? error.message
+        : "Unexpected error during video removal",
+      500
+    );
+  }
+};
+
+export { imageUploader, imageRemover, videoUploader, videoRemover };
