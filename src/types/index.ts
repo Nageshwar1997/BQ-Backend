@@ -6,13 +6,15 @@ export interface FileUploaderProps {
   folder?: string;
 }
 
+export type UserRoleType = "USER" | "SELLER" | "ADMIN" | "MASTER";
+
 export interface UserProps extends Document {
   firstName: string;
   lastName: string;
   email: string;
   phoneNumber: string;
   password: string;
-  role: "USER" | "SELLER" | "ADMIN" | "MASTER";
+  role: UserRoleType;
   profilePic?: string;
 }
 
@@ -24,6 +26,29 @@ export interface AuthenticatedRequest extends Request {
 // Interface for authenticated requests with user
 export interface AuthorizedRequest extends Request {
   user?: Omit<UserProps, "password">; // User object without password
+}
+
+export interface BlogProps {
+  mainTitle: string;
+  subTitle: string;
+  author: string;
+  description: string;
+  content: string;
+  tags: string[];
+  publishedDate: Date;
+  smallThumbnail: string;
+  largeThumbnail: string;
+  publisher: Schema.Types.ObjectId;
+}
+
+export interface HomeVideoProps {
+  title: string;
+  m3u8Url: string;
+  originalUrl: string;
+  posterUrl: string;
+  public_id: string;
+  duration: number;
+  user: Schema.Types.ObjectId;
 }
 
 interface ProductVideoProps {
@@ -41,6 +66,12 @@ export interface ShadeProps {
   stock: number;
 }
 
+export interface CategoryProps {
+  name: string;
+  level: number;
+  parentCategory?: Schema.Types.ObjectId | null;
+}
+
 export interface ProductProps {
   title: string;
   brand: string;
@@ -49,13 +80,13 @@ export interface ProductProps {
   discount: number;
   description: string;
   howToUse: string;
-  ingredients: string;
-  additionalDetails: string;
+  ingredients?: string;
+  additionalDetails?: string;
   commonImages: string[];
-  shades: ShadeProps[];
+  shades?: ShadeProps[];
   category: Schema.Types.ObjectId;
   seller: Schema.Types.ObjectId;
   ratings: Schema.Types.ObjectId[];
   reviews: Schema.Types.ObjectId[];
-  videos: ProductVideoProps[];
+  videos?: ProductVideoProps[];
 }
