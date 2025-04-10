@@ -1,6 +1,7 @@
 import { Schema } from "mongoose";
+import { HomeVideoProps } from "../types";
 
-const homeVideoSchema = new Schema(
+const homeVideoSchema = new Schema<HomeVideoProps>(
   {
     m3u8Url: {
       type: String,
@@ -8,6 +9,11 @@ const homeVideoSchema = new Schema(
       trim: true,
     },
     originalUrl: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    posterUrl: {
       type: String,
       required: true,
       trim: true,

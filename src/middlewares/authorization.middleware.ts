@@ -3,10 +3,10 @@ import { AppError } from "../constructors";
 import { getUserIdFromToken } from "../services/user.service";
 import { CatchErrorResponse, isValidMongoId } from "../utils";
 import { User } from "../models";
-import { AuthorizedRequest } from "../types";
+import { AuthorizedRequest, UserRoleType } from "../types";
 
 const isAuthorized =
-  (allowedRoles: string[]) =>
+  (allowedRoles: UserRoleType[]) =>
   async (req: AuthorizedRequest, _: Response, next: NextFunction) => {
     try {
       const userId = getUserIdFromToken(req, next);
