@@ -3,7 +3,7 @@ import upload from "../configs/upload.multer.config";
 import {
   removeMultipleImageUrls,
   removeSingleImageUrl,
-  uploadImages,
+  uploadMultipleImages,
   uploadSingleImage,
   uploadHomeVideo,
   getAllHomeVideos,
@@ -14,7 +14,7 @@ const mediaRouter = Router();
 
 // Image Upload
 // For Multiple Images Upload
-mediaRouter.post("/images", upload.array("images"), uploadImages);
+mediaRouter.post("/images", upload.array("images"), uploadMultipleImages);
 // For Single Image Upload
 mediaRouter.post("/image", upload.single("image"), uploadSingleImage);
 // For Single Image Remove

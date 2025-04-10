@@ -9,7 +9,7 @@ import {
 import { HomeVideo } from "../models";
 import { AuthorizedRequest } from "../types";
 
-export const uploadImages = async (
+export const uploadMultipleImages = async (
   req: Request,
   res: Response,
   next: NextFunction
