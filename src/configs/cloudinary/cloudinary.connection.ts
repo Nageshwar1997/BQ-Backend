@@ -1,7 +1,8 @@
+import { CloudinaryConfigOption } from "../../types";
 import myCloudinary from "./cloudinary.config";
 
 const cloudinaryConnection = async (
-  isImageOrVideoOrProduct: "image" | "video"
+  isImageOrVideoOrProduct: CloudinaryConfigOption
 ) => {
   try {
     const cloudinary = myCloudinary(isImageOrVideoOrProduct);

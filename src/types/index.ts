@@ -1,9 +1,11 @@
 import { Request } from "express";
 import { Document, Schema } from "mongoose";
 
+export type CloudinaryConfigOption = "image" | "video" | "product";
 export interface FileUploaderProps {
   file: Express.Multer.File;
   folder?: string;
+  cloudinaryConfigOption: CloudinaryConfigOption;
 }
 
 export type UserRoleType = "USER" | "SELLER" | "ADMIN" | "MASTER";

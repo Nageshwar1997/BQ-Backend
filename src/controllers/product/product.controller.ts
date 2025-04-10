@@ -101,7 +101,11 @@ export const uploadProduct = async (
     // Upload common images
     const uploadedCommonImages = await Promise.all(
       commonImages.map((file) =>
-        imageUploader({ file, folder: `Products/${title}/Common_Images` })
+        imageUploader({
+          file,
+          folder: `Products/${title}/Common_Images`,
+          cloudinaryConfigOption: "product",
+        })
       )
     );
 
@@ -114,6 +118,7 @@ export const uploadProduct = async (
             imageUploader({
               file,
               folder: `Products/${title}/Shades/${shade.shadeName}`,
+              cloudinaryConfigOption: "product",
             })
           )
         );
@@ -168,7 +173,9 @@ export const uploadProduct = async (
     if (!product) {
       // Rollback: Remove uploaded common images
       await Promise.all(
-        uploadedCommonImages.map((img) => imageRemover(img.secure_url))
+        uploadedCommonImages.map((img) =>
+          imageRemover(img.secure_url, "product")
+        )
       );
 
       // Rollback: Remove uploaded shades
@@ -179,7 +186,9 @@ export const uploadProduct = async (
       // Rollback: Remove uploaded shade images
       await Promise.all(
         enrichedShades?.map((shade) =>
-          Promise.all(shade?.images?.map((img: string) => imageRemover(img)))
+          Promise.all(
+            shade?.images?.map((img: string) => imageRemover(img, "product"))
+          )
         )
       );
 

@@ -73,6 +73,7 @@ const uploadBlog = async (
         const uploadResult = await imageUploader({
           file,
           folder: "Blogs",
+          cloudinaryConfigOption: "image",
         });
 
         thumbnails[item] = uploadResult.secure_url;
@@ -215,6 +216,7 @@ const editBlog = async (
           const uploadResult = await imageUploader({
             file,
             folder: "Blogs",
+            cloudinaryConfigOption: "image",
           });
 
           updateBody[item] = uploadResult.secure_url;
@@ -263,7 +265,9 @@ const editBlog = async (
     }
 
     if (uploadedKeys.length > 0) {
-      await Promise.all(uploadedKeys.map((key) => imageRemover(blog[key]))); // Removed old images
+      await Promise.all(
+        uploadedKeys.map((key) => imageRemover(blog[key], "image"))
+      ); // Removed old images
     }
     SuccessResponse(res, 201, "Blog edited successfully", {
       blog: updatedBlog,

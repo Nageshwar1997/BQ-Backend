@@ -3,10 +3,14 @@ import { Readable } from "stream";
 import myCloudinary from "../configs/cloudinary/cloudinary.config";
 import cloudinaryConnection from "../configs/cloudinary/cloudinary.connection";
 import { AppError } from "../constructors";
-import { FileUploaderProps } from "../types";
+import { CloudinaryConfigOption, FileUploaderProps } from "../types";
 
 // Function to handle profile picture upload to Cloudinary
-const imageUploader = async ({ file, folder = "" }: FileUploaderProps) => {
+const imageUploader = async ({
+  file,
+  folder = "",
+  cloudinaryConfigOption = "image",
+}: FileUploaderProps) => {
   const mainFolder = process.env.CLOUDINARY_MAIN_FOLDER;
   const subFolder = folder?.split(" ").join("_") || "Common_Folder";
 
@@ -18,14 +22,16 @@ const imageUploader = async ({ file, folder = "" }: FileUploaderProps) => {
     .join("")}`;
 
   // Cloudinary Connectivity Test
-  const cloudinaryConnectionTest = await cloudinaryConnection("image");
+  const cloudinaryConnectionTest = await cloudinaryConnection(
+    cloudinaryConfigOption
+  );
 
   if (cloudinaryConnectionTest.error) {
     throw new AppError(cloudinaryConnectionTest.message, 500);
   }
 
   try {
-    const cloudinary = myCloudinary("image");
+    const cloudinary = myCloudinary(cloudinaryConfigOption);
 
     const result: UploadApiResponse = await new Promise((resolve, reject) => {
       cloudinary.uploader
@@ -63,7 +69,10 @@ const imageUploader = async ({ file, folder = "" }: FileUploaderProps) => {
   }
 };
 
-const imageRemover = async (imageUrl: string) => {
+const imageRemover = async (
+  imageUrl: string,
+  cloudinaryConfigOption: CloudinaryConfigOption = "image"
+) => {
   if (!imageUrl) {
     throw new AppError("Image URL is required", 400);
   }
@@ -79,27 +88,33 @@ const imageRemover = async (imageUrl: string) => {
   const publicId = match[1];
 
   // Cloudinary Connectivity Test
-  const cloudinaryConnectionTest = await cloudinaryConnection("image");
+  const cloudinaryConnectionTest = await cloudinaryConnection(
+    cloudinaryConfigOption
+  );
 
   if (cloudinaryConnectionTest.error) {
     throw new AppError(cloudinaryConnectionTest.message, 500);
   }
 
   try {
-    const cloudinary = myCloudinary("image");
+    const cloudinary = myCloudinary(cloudinaryConfigOption);
 
     const result: UploadApiResponse = await new Promise((resolve, reject) => {
-      cloudinary.uploader.destroy(publicId, (error, result) => {
-        if (error) {
-          return reject(
-            new AppError(
-              error.message || "Failed to remove image from Cloudinary",
-              500
-            )
-          );
+      cloudinary.uploader.destroy(
+        publicId,
+        { resource_type: "image" },
+        (error, result) => {
+          if (error) {
+            return reject(
+              new AppError(
+                error.message || "Failed to remove image from Cloudinary",
+                500
+              )
+            );
+          }
+          resolve(result);
         }
-        resolve(result);
-      });
+      );
     });
 
     return result;
@@ -111,7 +126,11 @@ const imageRemover = async (imageUrl: string) => {
   }
 };
 
-const videoUploader = async ({ file, folder = "" }: FileUploaderProps) => {
+const videoUploader = async ({
+  file,
+  folder = "",
+  cloudinaryConfigOption = "video",
+}: FileUploaderProps) => {
   // Convert Buffer to Readable Stream
   const bufferStream = Readable.from(file.buffer);
 
@@ -126,14 +145,16 @@ const videoUploader = async ({ file, folder = "" }: FileUploaderProps) => {
     .join("")}`;
 
   // Cloudinary Connectivity Test
-  const cloudinaryConnectionTest = await cloudinaryConnection("video");
+  const cloudinaryConnectionTest = await cloudinaryConnection(
+    cloudinaryConfigOption
+  );
 
   if (cloudinaryConnectionTest.error) {
     throw new AppError(cloudinaryConnectionTest.message, 500);
   }
 
   try {
-    const cloudinary = myCloudinary("video");
+    const cloudinary = myCloudinary(cloudinaryConfigOption);
     const result: UploadApiResponse = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
@@ -172,7 +193,10 @@ const videoUploader = async ({ file, folder = "" }: FileUploaderProps) => {
   }
 };
 
-const videoRemover = async (videoUrl: string) => {
+const videoRemover = async (
+  videoUrl: string,
+  cloudinaryConfigOption: CloudinaryConfigOption = "video"
+) => {
   if (!videoUrl) {
     throw new AppError("Video URL is required", 400);
   }
@@ -188,14 +212,16 @@ const videoRemover = async (videoUrl: string) => {
   const publicId = match[1];
 
   // Cloudinary Connectivity Test
-  const cloudinaryConnectionTest = await cloudinaryConnection("video");
+  const cloudinaryConnectionTest = await cloudinaryConnection(
+    cloudinaryConfigOption
+  );
 
   if (cloudinaryConnectionTest.error) {
     throw new AppError(cloudinaryConnectionTest.message, 500);
   }
 
   try {
-    const cloudinary = myCloudinary("video");
+    const cloudinary = myCloudinary(cloudinaryConfigOption);
 
     const result: UploadApiResponse = await new Promise((resolve, reject) => {
       cloudinary.uploader.destroy(

@@ -1,8 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryConfigOption } from "../../types";
 
-const myCloudinary = (
-  isImageOrVideoOrProduct: "image" | "video" | "product"
-) => {
+const myCloudinary = (isImageOrVideoOrProduct: CloudinaryConfigOption) => {
   if (isImageOrVideoOrProduct === "image") {
     cloudinary.config({
       cloud_name: process.env.CLOUDINARY_IMAGE_CLOUD_NAME,

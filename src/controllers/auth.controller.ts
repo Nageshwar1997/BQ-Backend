@@ -39,6 +39,7 @@ const registerController = async (
       const imageResult = await imageUploader({
         file,
         folder: "Profile_Pictures",
+        cloudinaryConfigOption: "image",
       });
       profilePic = imageResult.secure_url ?? "";
     }

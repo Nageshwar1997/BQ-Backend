@@ -26,6 +26,7 @@ export const uploadMultipleImages = async (
       const result = await imageUploader({
         file,
         folder: req?.body?.folderName,
+        cloudinaryConfigOption: "image",
       });
 
       return {
@@ -55,6 +56,7 @@ export const uploadSingleImage = async (
     const result = await imageUploader({
       file: req.file,
       folder: req?.body?.folderName,
+      cloudinaryConfigOption: "image",
     });
 
     SuccessResponse(res, 200, "Image uploaded successfully", {
@@ -73,7 +75,7 @@ export const removeSingleImageUrl = async (
   try {
     const ImgUrl = req.body.cloudUrl;
 
-    const { result } = await imageRemover(ImgUrl);
+    const { result } = await imageRemover(ImgUrl, "image");
 
     if (result !== "ok" || result === "not found") {
       throw new AppError("Image not found or already removed", 404);
@@ -98,7 +100,9 @@ export const removeMultipleImageUrls = async (
     }
 
     // Delete all images concurrently
-    const results = await Promise.all(imgUrls.map((url) => imageRemover(url)));
+    const results = await Promise.all(
+      imgUrls.map((url) => imageRemover(url, "image"))
+    );
 
     // Check if any deletions failed
     const failedDeletions = results.filter(
@@ -191,13 +195,15 @@ export const uploadHomeVideo = async (
     // Upload video
     const video = await videoUploader({
       file: videoFile,
-      folder: "Home_Videos",
+      folder: `Home/Videos/${title}`,
+      cloudinaryConfigOption: "video",
     });
     if (!video) throw new AppError("Video upload failed", 500);
 
     const poster = await imageUploader({
       file: posterFile,
-      folder: "Home_Videos/Posters",
+      folder: `Home/Videos/${title}`,
+      cloudinaryConfigOption: "video",
     });
     if (!poster) throw new AppError("Poster upload failed", 500);
 
@@ -216,8 +222,8 @@ export const uploadHomeVideo = async (
     } catch (dbError) {
       // Clean up uploaded files from Cloudinary
       await Promise.all([
-        videoRemover(video.playback_url),
-        imageRemover(poster.secure_url),
+        videoRemover(video.playback_url, "video"),
+        imageRemover(poster.secure_url, "video"),
       ]);
       throw new AppError("Failed to save video metadata", 500);
     }
