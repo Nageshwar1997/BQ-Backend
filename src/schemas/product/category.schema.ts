@@ -1,6 +1,7 @@
 import { Schema } from "mongoose";
+import { CategoryProps } from "../../types";
 
-const categorySchema = new Schema(
+const categorySchema = new Schema<CategoryProps>(
   {
     name: { type: String, required: true, trim: true },
     level: { type: Number, required: true, default: 1 },
@@ -10,9 +11,7 @@ const categorySchema = new Schema(
       default: null,
     }, // Self-reference
   },
-  {
-    versionKey: false,
-  }
+  { versionKey: false, timestamps: true }
 );
 
 // Indexing for faster queries

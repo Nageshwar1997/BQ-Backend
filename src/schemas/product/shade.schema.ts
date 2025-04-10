@@ -8,7 +8,7 @@ const productShadeSchema = new Schema<ShadeProps>(
     images: [{ type: String }],
     stock: { type: Number, required: true, min: 1 },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 export default productShadeSchema;
