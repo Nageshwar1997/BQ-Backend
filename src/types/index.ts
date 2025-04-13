@@ -90,5 +90,4 @@ export interface ProductProps {
   seller: Schema.Types.ObjectId;
   ratings: Schema.Types.ObjectId[];
   reviews: Schema.Types.ObjectId[];
-  videos?: ProductVideoProps[];
 }

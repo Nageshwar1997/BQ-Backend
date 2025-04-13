@@ -19,9 +19,8 @@ const productSchema = new Schema<ProductProps>(
     shades: [{ type: Schema.Types.ObjectId, ref: "Shade" }],
     category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
     seller: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    // ratings: [{ type: Schema.Types.ObjectId, ref: "Rating" }],
-    // reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
-    // videos: [{ type: Schema.Types.ObjectId, ref: "ProductVideo" }],
+    ratings: [{ type: Schema.Types.ObjectId, ref: "Rating" }],
+    reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
   },
   {
     versionKey: false,
