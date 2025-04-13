@@ -9,10 +9,12 @@ import {
   CategoryProps,
   HomeVideoProps,
   ProductProps,
+  ReviewProps,
   ShadeProps,
   UserProps,
 } from "../types";
 import productShadeSchema from "../schemas/product/shade.schema";
+import reviewSchema from "../schemas/product/review.schema";
 
 const User = model<UserProps>("User", userSchema);
 const Blog = model<BlogProps>("Blog", blogSchema);
@@ -20,5 +22,6 @@ const HomeVideo = model<HomeVideoProps>("HomeVideo", homeVideoSchema);
 const Product = model<ProductProps>("Product", productSchema);
 const Category = model<CategoryProps>("Category", categorySchema);
 const Shade = model<ShadeProps>("Shade", productShadeSchema);
+const Review = model<ReviewProps>("Review", reviewSchema);
 
-export { User, Blog, HomeVideo, Product, Category, Shade };
+export { User, Blog, HomeVideo, Product, Category, Shade, Review };

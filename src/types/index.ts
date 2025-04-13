@@ -88,6 +88,13 @@ export interface ProductProps {
   shades?: ShadeProps[];
   category: Schema.Types.ObjectId;
   seller: Schema.Types.ObjectId;
-  ratings: Schema.Types.ObjectId[];
   reviews: Schema.Types.ObjectId[];
+}
+
+export interface ReviewProps {
+  rating: number;
+  review: string;
+  productId: Schema.Types.ObjectId;
+  userId: Schema.Types.ObjectId;
+  images: string[];
 }
