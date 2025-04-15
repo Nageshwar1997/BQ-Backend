@@ -14,13 +14,13 @@ const mediaRouter = Router();
 
 // Image Upload
 // For Multiple Images Upload
-mediaRouter.post("/images", upload.array("images"), uploadMultipleImages);
+mediaRouter.post("/images/upload", upload.array("images"), uploadMultipleImages);
 // For Single Image Upload
-mediaRouter.post("/image", upload.single("image"), uploadSingleImage);
+mediaRouter.post("/image/upload", upload.single("image"), uploadSingleImage);
 // For Single Image Remove
-mediaRouter.delete("/image", removeSingleImageUrl);
+mediaRouter.delete("/image/delete", removeSingleImageUrl);
 // For Multiple Images Remove
-mediaRouter.delete("/images", removeMultipleImageUrls);
+mediaRouter.delete("/images/delete", removeMultipleImageUrls);
 
 // Video Upload
 // For Single Video Upload
