@@ -30,7 +30,26 @@ export const uploadProduct = async (
       categoryLevelOne,
       categoryLevelTwo,
       categoryLevelThree,
-    } = body;
+      totalStock,
+      shadesData,
+    } = {
+      title: req.body.title?.trim(),
+      brand: req.body.brand?.trim(),
+      originalPrice: Number(body.originalPrice.trim()),
+      sellingPrice: Number(body.sellingPrice.trim()),
+      description: req.body.description?.trim(),
+      howToUse: req.body.howToUse?.trim(),
+      ingredients: req.body.ingredients?.trim(),
+      additionalDetails: req.body.additionalDetails?.trim(),
+      categoryLevelOne: req.body.categoryLevelOne?.trim(),
+      categoryLevelTwo: req.body.categoryLevelTwo?.trim(),
+      categoryLevelThree: req.body.categoryLevelThree?.trim(),
+      totalStock: Number(body.totalStock.trim()),
+      shadesData:
+        typeof req.body.shades === "string"
+          ? JSON.parse(req.body.shades)
+          : req.body.shades,
+    };
 
     const { error } = uploadProductValidationSchema.validate({
       title,
@@ -44,6 +63,7 @@ export const uploadProduct = async (
       categoryLevelOne,
       categoryLevelTwo,
       categoryLevelThree,
+      totalStock,
     });
 
     if (error) {
@@ -76,19 +96,16 @@ export const uploadProduct = async (
     } else {
       throw new AppError("All categories are required", 400);
     }
-
-    const shadesData = JSON.parse(JSON.stringify(body.shades || []));
     const shades = Array.isArray(shadesData) ? shadesData : [shadesData];
-
     const commonImages: Express.Multer.File[] = [];
     const shadeImagesMap: Record<number, Express.Multer.File[]> = {};
 
-    files.forEach((file) => {
+    files?.forEach((file) => {
       if (file.fieldname.startsWith("commonImages")) {
         commonImages.push(file);
       }
 
-      const shadeMatch = file.fieldname.match(/^shades\[(\d+)\]\[images\]/);
+      const shadeMatch = file?.fieldname.match(/^shades\[(\d+)\]\[images\]/);
       if (shadeMatch) {
         const shadeIndex = parseInt(shadeMatch[1]);
         if (!shadeImagesMap[shadeIndex]) {
@@ -100,7 +117,7 @@ export const uploadProduct = async (
 
     // Upload common images
     const uploadedCommonImages = await Promise.all(
-      commonImages.map((file) =>
+      commonImages?.map((file) =>
         imageUploader({
           file,
           folder: `Products/${title}/Common_Images`,
@@ -114,7 +131,7 @@ export const uploadProduct = async (
       shades?.map(async (shade, idx) => {
         const shadeFiles = shadeImagesMap[idx] || [];
         const uploadedShadeImages = await Promise.all(
-          shadeFiles.map((file) =>
+          shadeFiles?.map((file) =>
             imageUploader({
               file,
               folder: `Products/${title}/Shades/${shade.shadeName}`,
@@ -123,7 +140,7 @@ export const uploadProduct = async (
           )
         );
 
-        const images = uploadedShadeImages.map((img) => img.secure_url);
+        const images = uploadedShadeImages?.map((img) => img.secure_url);
 
         return {
           ...shade,
@@ -133,7 +150,7 @@ export const uploadProduct = async (
       })
     );
 
-    if (enrichedShades.length > 0) {
+    if (enrichedShades?.length > 0) {
       const { error } = addShadeValidationSchema.validate(enrichedShades);
       if (error) {
         const errorMessage = error.details
@@ -144,7 +161,7 @@ export const uploadProduct = async (
     }
 
     const newShadeIds = await Promise.all(
-      enrichedShades.map(async (shade) => {
+      enrichedShades?.map(async (shade) => {
         const newShade = await Shade.create(shade);
         return newShade._id;
       })
@@ -166,11 +183,16 @@ export const uploadProduct = async (
       sellingPrice,
       commonImages: uploadedCommonImages.map((img) => img.secure_url),
       shades: newShadeIds,
+      totalStock,
     };
 
-    const product = await Product.create(finalData);
+    try {
+      const product = await Product.create(finalData);
 
-    if (!product) {
+      SuccessResponse(res, 200, "Product uploaded successfully", {
+        product,
+      });
+    } catch (error) {
       // Rollback: Remove uploaded common images
       await Promise.all(
         uploadedCommonImages.map((img) =>
@@ -194,8 +216,6 @@ export const uploadProduct = async (
 
       throw new AppError("Failed to upload product", 400);
     }
-
-    SuccessResponse(res, 200, "Product uploaded successfully", { product });
   } catch (error) {
     return CatchErrorResponse(error, next);
   }
