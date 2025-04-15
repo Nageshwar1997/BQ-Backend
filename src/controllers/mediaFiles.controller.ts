@@ -20,13 +20,22 @@ export const uploadMultipleImages = async (
       throw new AppError("No files uploaded", 400);
     }
 
+    const cloudinaryConfigOption = req.body.cloudinaryConfigOption;
+
+    if (!cloudinaryConfigOption) {
+      throw new AppError(
+        `Cloudinary config option is required "image" || "video" || "product`,
+        400
+      );
+    }
+
     const files = req.files as Express.Multer.File[];
 
     const uploadPromises = files.map(async (file) => {
       const result = await imageUploader({
         file,
         folder: req?.body?.folderName,
-        cloudinaryConfigOption: "image",
+        cloudinaryConfigOption,
       });
 
       return {
@@ -49,6 +58,15 @@ export const uploadSingleImage = async (
   next: NextFunction
 ) => {
   try {
+    const cloudinaryConfigOption = req.body.cloudinaryConfigOption;
+
+    if (!cloudinaryConfigOption) {
+      throw new AppError(
+        `Cloudinary config option is required "image" || "video" || "product`,
+        400
+      );
+    }
+
     if (!req.file) {
       throw new AppError("No file uploaded", 400);
     }
@@ -56,7 +74,7 @@ export const uploadSingleImage = async (
     const result = await imageUploader({
       file: req.file,
       folder: req?.body?.folderName,
-      cloudinaryConfigOption: "image",
+      cloudinaryConfigOption,
     });
 
     SuccessResponse(res, 200, "Image uploaded successfully", {
@@ -74,8 +92,16 @@ export const removeSingleImageUrl = async (
 ) => {
   try {
     const ImgUrl = req.body.cloudUrl;
+    const cloudinaryConfigOption = req.body.cloudinaryConfigOption;
 
-    const { result } = await imageRemover(ImgUrl, "image");
+    if (!cloudinaryConfigOption) {
+      throw new AppError(
+        `Cloudinary config option is required "image" || "video" || "product`,
+        400
+      );
+    }
+
+    const { result } = await imageRemover(ImgUrl, cloudinaryConfigOption);
 
     if (result !== "ok" || result === "not found") {
       throw new AppError("Image not found or already removed", 404);
@@ -95,13 +121,22 @@ export const removeMultipleImageUrls = async (
   try {
     const imgUrls: string[] = req.body.cloudUrls;
 
+    const cloudinaryConfigOption = req.body.cloudinaryConfigOption;
+
+    if (!cloudinaryConfigOption) {
+      throw new AppError(
+        `Cloudinary config option is required "image" || "video" || "product`,
+        400
+      );
+    }
+
     if (!imgUrls || imgUrls.length === 0) {
       throw new AppError("No image URLs provided", 400);
     }
 
     // Delete all images concurrently
     const results = await Promise.all(
-      imgUrls.map((url) => imageRemover(url, "image"))
+      imgUrls.map((url) => imageRemover(url, cloudinaryConfigOption))
     );
 
     // Check if any deletions failed
@@ -126,6 +161,15 @@ export const uploadHomeVideo = async (
 ) => {
   try {
     const { title } = req.body;
+    const cloudinaryConfigOption = req.body.cloudinaryConfigOption;
+
+    if (!cloudinaryConfigOption) {
+      throw new AppError(
+        `Cloudinary config option is required "image" || "video" || "product`,
+        400
+      );
+    }
+
     if (!title) throw new AppError("Title is required", 400);
 
     const files = req.files as {
@@ -196,14 +240,14 @@ export const uploadHomeVideo = async (
     const video = await videoUploader({
       file: videoFile,
       folder: `Home/Videos/${title}`,
-      cloudinaryConfigOption: "video",
+      cloudinaryConfigOption,
     });
     if (!video) throw new AppError("Video upload failed", 500);
 
     const poster = await imageUploader({
       file: posterFile,
       folder: `Home/Videos/${title}`,
-      cloudinaryConfigOption: "video",
+      cloudinaryConfigOption,
     });
     if (!poster) throw new AppError("Poster upload failed", 500);
 
@@ -222,8 +266,8 @@ export const uploadHomeVideo = async (
     } catch (dbError) {
       // Clean up uploaded files from Cloudinary
       await Promise.all([
-        videoRemover(video.playback_url, "video"),
-        imageRemover(poster.secure_url, "video"),
+        videoRemover(video.playback_url, cloudinaryConfigOption),
+        imageRemover(poster.secure_url, cloudinaryConfigOption),
       ]);
       throw new AppError("Failed to save video metadata", 500);
     }
