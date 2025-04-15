@@ -31,6 +31,12 @@ export const uploadProductValidationSchema = Joi.object({
     "number.min": "Selling price must be at least 1.",
     "number.integer": "Selling price must be an integer.",
   }),
+  totalStock: Joi.number().integer().min(5).required().messages({
+    "number.base": "Total stock must be a number.",
+    "number.empty": "Total stock is required.",
+    "number.min": "Total stock must be at least 5.",
+    "number.integer": "Total stock must be an integer.",
+  }),
   description: Joi.string()
     .min(10)
     .pattern(/^(?!.* {2,}).*$/)

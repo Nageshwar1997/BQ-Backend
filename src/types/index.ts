@@ -79,6 +79,7 @@ export interface ProductProps {
   brand: string;
   originalPrice: number;
   sellingPrice: number;
+  totalStock: number;
   discount: number;
   description: string;
   howToUse: string;

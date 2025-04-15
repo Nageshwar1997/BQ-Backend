@@ -7,15 +7,13 @@ const productSchema = new Schema<ProductProps>(
     brand: { type: String, required: true, trim: true },
     originalPrice: { type: Number, required: true, min: 1, default: 1 },
     sellingPrice: { type: Number, required: true, min: 1, default: 1 },
+    totalStock: { type: Number, required: true, min: 1, default: 1 },
     discount: { type: Number, required: true, min: 0 },
     description: { type: String, required: true, trim: true },
     howToUse: { type: String, trim: true, default: "" },
     ingredients: { type: String, trim: true, default: "" },
     additionalDetails: { type: String, trim: true, default: "" },
-    commonImages: {
-      type: [String],
-      default: [],
-    },
+    commonImages: { type: [String], default: [] },
     shades: [{ type: Schema.Types.ObjectId, ref: "Shade" }],
     category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
     seller: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -24,10 +22,7 @@ const productSchema = new Schema<ProductProps>(
       default: [],
     },
   },
-  {
-    versionKey: false,
-    timestamps: true,
-  }
+  { versionKey: false, timestamps: true }
 );
 
 productSchema.index({ title: 1 });
