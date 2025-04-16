@@ -25,7 +25,6 @@ const handleProductionError = (err: AppError, res: Response) => {
     });
   } else {
     // Unknown Error: Don't leak details to the client
-    console.error("ERROR 💥:", err);
     res.status(500).json({
       success: false,
       error: true,
