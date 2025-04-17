@@ -46,3 +46,10 @@ export const validateSchema = (schema: ObjectSchema) => {
 export const isValidMongoId = (id: string): boolean => {
   return Types.ObjectId.isValid(id);
 };
+
+export const isSafePopulateField = <T extends readonly string[]>(
+  field: string,
+  allowedFields: T
+): field is T[number] => {
+  return allowedFields.includes(field as T[number]);
+};

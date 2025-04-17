@@ -1,5 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { CatchErrorResponse, SuccessResponse } from "../../utils";
+import {
+  CatchErrorResponse,
+  isSafePopulateField,
+  SuccessResponse,
+} from "../../utils";
 import { Category, Product, Shade } from "../../models";
 import { AppError } from "../../constructors";
 import { AuthorizedRequest } from "../../types";
@@ -7,6 +11,10 @@ import { imageRemover, imageUploader } from "../../utils/mediaUploader";
 import { uploadProductValidationSchema } from "../../validations/product/product.validation";
 import { findOrCreateCategory } from "../../services/product.service";
 import { addShadeValidationSchema } from "../../validations/product/shades.validation";
+import {
+  productPopulateFields,
+  ProductPopulateFieldsProps,
+} from "../../constants/populateFields";
 
 export const uploadProduct = async (
   req: AuthorizedRequest,
@@ -359,6 +367,88 @@ export const getProductsByCategory = async (
       products,
       totalProducts,
       currentPage: page ? page : 1,
+      totalPages: page && limit ? Math.ceil(totalProducts / limit) : 1,
+    });
+  } catch (error) {
+    return CatchErrorResponse(error, next);
+  }
+};
+
+export const getAllProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const page = Number(req.query.page);
+    const limit = Number(req.query.limit);
+    const skip = page && limit ? (page - 1) * limit : 0;
+
+    console.log("REQ BODY", req.body);
+    console.log("REQ QUERY", req.query);
+
+    const { populateFields = {} } = req.body;
+
+    // 🔐 Strongly Typed allowed fields
+    // const allowedPopulateFields: ProductPopulateFieldsProps = {
+    //   shades: ["shadeName", "colorCode", "images", "stock"],
+    //   seller: ["firstName", "lastName", "phoneNumber", "email", "profilePic"],
+    //   category: ["name", "level", "parentCategory"],
+    // };
+
+    // 🧠 Start building query
+    let query = Product.find();
+
+    // 🚀 Dynamic populate
+    for (const [path, requestedFields] of Object.entries(populateFields) as [
+      keyof ProductPopulateFieldsProps,
+      string[]
+    ][]) {
+      const allowedFields = productPopulateFields[path]; // Correctly typed now ✅
+
+      const safeFields = requestedFields.filter(
+        (field): field is (typeof allowedFields)[number] =>
+          isSafePopulateField(field, allowedFields)
+      );
+
+      if (safeFields.length) {
+        if (path === "category" && safeFields.includes("parentCategory")) {
+          query = query.populate({
+            path: "category",
+            select: safeFields.join(" "),
+            populate: {
+              path: "parentCategory",
+              select: "name level",
+              populate: {
+                path: "parentCategory",
+                select: "name level",
+              },
+            },
+          });
+        } else {
+          query = query.populate({
+            path,
+            select: safeFields.join(" "),
+          });
+        }
+      }
+    }
+
+    console.log("populateFields", populateFields);
+
+    // ⚡ Handle pagination
+    if (page && limit) {
+      query = query.skip(skip).limit(limit);
+    }
+
+    const products = await query.lean();
+
+    const totalProducts = await Product.countDocuments();
+
+    SuccessResponse(res, 200, "Products fetched successfully", {
+      products,
+      totalProducts,
+      currentPage: page || 1,
       totalPages: page && limit ? Math.ceil(totalProducts / limit) : 1,
     });
   } catch (error) {
