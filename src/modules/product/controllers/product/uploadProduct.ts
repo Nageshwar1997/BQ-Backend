@@ -95,9 +95,7 @@ export const uploadProductController = async (
     throw new AppError("All categories are required", 400);
   }
   const shades = Array.isArray(shadesData) ? shadesData : [shadesData];
-  const commonImages: Express.Multer.File[] = files.filter((file) =>
-    file.fieldname.startsWith("commonImages")
-  );
+  const commonImages: Express.Multer.File[] = [];
   const shadeImagesMap: Record<number, Express.Multer.File[]> = {};
 
   files?.forEach((file) => {
