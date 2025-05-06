@@ -8,9 +8,9 @@ import { generateToken } from "../providers";
 
 export const loginController = async (req: Request, res: Response) => {
   const { email, password, phoneNumber } = {
-    email: req?.body?.email?.trim().toLowerCase(),
-    password: req?.body?.password?.trim(),
-    phoneNumber: req?.body?.phoneNumber?.trim(),
+    email: req.body.email?.trim().toLowerCase(),
+    password: req.body.password.trim(),
+    phoneNumber: req.body.phoneNumber?.trim(),
   };
 
   const user = await UserModule.Services.getUserByEmailOrPhoneNumber(

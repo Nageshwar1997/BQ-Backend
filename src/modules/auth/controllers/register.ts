@@ -8,11 +8,11 @@ import { generateToken } from "../providers";
 
 export const registerController = async (req: Request, res: Response) => {
   const { firstName, lastName, email, password, phoneNumber } = {
-    firstName: req?.body?.firstName?.trim().toLowerCase(),
-    lastName: req?.body?.lastName?.trim().toLowerCase(),
-    email: req?.body?.email?.trim().toLowerCase(),
-    password: req?.body?.password?.trim(),
-    phoneNumber: req?.body?.phoneNumber?.trim(),
+    firstName: req.body.firstName.trim().toLowerCase(),
+    lastName: req.body.lastName.trim().toLowerCase(),
+    email: req.body.email.trim().toLowerCase(),
+    password: req.body.password.trim(),
+    phoneNumber: req.body.phoneNumber.trim(),
   };
 
   const isEmailExists = await UserModule.Services.getUserByEmail(email);
