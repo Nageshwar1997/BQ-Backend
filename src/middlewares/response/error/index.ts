@@ -40,7 +40,13 @@ export const error = (
   const error =
     err instanceof AppError
       ? err
-      : new AppError("Internal Server Error", 500, false);
+      : new AppError(
+          NODE_ENV === "development"
+            ? err.message ?? "Internal Server Error!"
+            : "Internal Server Error!",
+          500,
+          false
+        );
 
   error.statusCode ||= 500;
   error.isOperational ??= false;

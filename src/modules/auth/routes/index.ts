@@ -1,9 +1,9 @@
 import { Router } from "express";
 
 import { loginController, registerController } from "../controllers";
-import { loginJoiSchema, registerJoiSchema } from "../validations";
+import { loginZodSchema, registerZodSchema } from "../validations";
 import {
-  JoiMiddleware,
+  ZodMiddleware,
   MulterMiddleware,
   ResponseMiddleware,
 } from "../../../middlewares";
@@ -14,13 +14,13 @@ export const authRouter = Router();
 authRouter.post(
   "/register",
   MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
-  JoiMiddleware.validateJoiSchema(registerJoiSchema),
+  ZodMiddleware.validateZodSchema(registerZodSchema),
   ResponseMiddleware.catchAsync(registerController)
 );
 
 // Login Route
 authRouter.post(
   "/login",
-  JoiMiddleware.validateJoiSchema(loginJoiSchema),
+  ZodMiddleware.validateZodSchema(loginZodSchema),
   ResponseMiddleware.catchAsync(loginController)
 );

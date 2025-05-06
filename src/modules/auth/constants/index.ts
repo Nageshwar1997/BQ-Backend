@@ -1,64 +1,66 @@
-import Joi from "joi";
+import { z } from "zod";
 
-export const validateFirstName = Joi.string()
-  .pattern(/^(?!.*\d)(?!.* {2})([A-Za-z]+( [A-Za-z]+)*)$/)
-  .min(2)
-  .max(50)
-  .presence("required")
-  .messages({
-    "any.required": "First name is required.",
-    "string.empty": "First name cannot be empty.",
-    "string.min": "First name should be at least 2 characters long.",
-    "string.max": "First name should not exceed 50 characters.",
-    "string.base": "First name must be a text value.",
-    "string.pattern.base":
-      "First name can only contain letters and only one space is allowed between words.",
-  });
+const nameRegex = /^(?!.*\d)(?!.* {2})([A-Za-z]+( [A-Za-z]+)*)$/;
+const phoneRegex = /^[6-9][0-9]{9}$/;
+const passwordRegex =
+  /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#])(?=\S.*$).{6,20}$/;
 
-export const validateLastName = Joi.string()
-  .pattern(/^(?!.*\d)(?!.* {2})([A-Za-z]+( [A-Za-z]+)*)$/)
-  .min(2)
-  .max(50)
-  .presence("required")
-  .messages({
-    "any.required": "Last name is required.",
-    "string.empty": "Last name cannot be empty.",
-    "string.min": "Last name should be at least 2 characters long.",
-    "string.max": "Last name should not exceed 50 characters.",
-    "string.base": "Last name must be a text value.",
-    "string.pattern.base":
-      "Last name can only contain letters and only one space is allowed between words.",
-  });
+export const validateFirstName = z
+  .string({
+    required_error: "First name is required.",
+    invalid_type_error: "First name must be a text value.",
+  })
+  .regex(
+    nameRegex,
+    "First name can only contain letters and only one space is allowed between words."
+  )
+  .min(2, "First name should be at least 2 characters long.")
+  .max(50, "First name should not exceed 50 characters.");
 
-export const validateEmail = Joi.string()
-  .email()
-  // .email({ tlds: { allow: ["com", "in", "org"] } }) // It will allow only this domains
-  .presence("required")
-  .messages({
-    "any.required": "Email address is required.",
-    "string.empty": "Email address cannot be empty.",
-    "string.base": "Email address must be string.",
-    "string.email": "Please enter a valid email address.",
-  });
+export const validateLastName = z
+  .string({
+    required_error: "Last name is required.",
+    invalid_type_error: "Last name must be a text value.",
+  })
+  .min(2, "Last name should be at least 2 characters long.")
+  .max(50, "Last name should not exceed 50 characters.")
+  .regex(
+    nameRegex,
+    "Last name can only contain letters and only one space is allowed between words."
+  );
 
-export const validatePhoneNumber = Joi.string()
-  .pattern(/^[6-9][0-9]{9}$/)
-  .presence("required") // Ensures the key must be present
-  .messages({
-    "any.required": "Phone number is required.",
-    "string.empty": "Phone number cannot be empty.",
-    "string.base": "Phone number must be a string.",
-    "string.pattern.base":
-      "Phone number must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
-  });
+export const validateEmail = z
+  .string({
+    required_error: "Email address is required.",
+    invalid_type_error: "Email address must be string.",
+  })
+  .email("Please enter a valid email address.");
 
-export const validatePassword = Joi.string()
-  .pattern(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#])(?=\S.*$).{6,20}$/)
-  .presence("required")
-  .messages({
-    "any.required": "Password is required.",
-    "string.empty": "Password cannot be empty.",
-    "string.base": "Password must be string.",
-    "string.pattern.base":
-      "Password must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
-  });
+export const validatePhoneNumber = z
+  .string({
+    required_error: "Phone number is required.",
+    invalid_type_error: "Phone number must be a string.",
+  })
+  .regex(
+    phoneRegex,
+    "Phone number must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long."
+  );
+
+export const validatePassword = z
+  .string({
+    required_error: "Password is required.",
+    invalid_type_error: "Password must be string.",
+  })
+  .regex(
+    passwordRegex,
+    "Password must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
+  );
+
+export const validateConfirmPassword = z
+  .string({
+    required_error: "Confirm password is required.",
+  })
+  .regex(
+    passwordRegex,
+    "Confirm password must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
+  );

@@ -1,5 +1,6 @@
-import Joi from "joi";
+import { z } from "zod";
 import {
+  validateConfirmPassword,
   validateEmail,
   validateFirstName,
   validateLastName,
@@ -7,23 +8,27 @@ import {
   validatePhoneNumber,
 } from "../constants";
 
-export const registerJoiSchema = Joi.object({
-  firstName: validateFirstName,
-  lastName: validateLastName,
-  email: validateEmail,
-  phoneNumber: validatePhoneNumber,
-  password: validatePassword,
-  confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
-    "any.only": "Passwords don't match.",
-  }),
-});
+export const registerZodSchema = z
+  .object({
+    firstName: validateFirstName,
+    lastName: validateLastName,
+    email: validateEmail,
+    phoneNumber: validatePhoneNumber,
+    password: validatePassword,
+    confirmPassword: validateConfirmPassword,
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords don't match.",
+  });
 
-export const loginJoiSchema = Joi.object({
-  email: validateEmail.optional(),
-  phoneNumber: validatePhoneNumber.optional(),
-  password: validatePassword,
-})
-  .or("email", "phoneNumber") // Ensures at least one is present
-  .messages({
-    "object.missing": "Either email or phone number is required.",
+export const loginZodSchema = z
+  .object({
+    email: validateEmail.optional(),
+    phoneNumber: validatePhoneNumber.optional(),
+    password: validatePassword,
+  })
+  .refine((data) => data.email || data.phoneNumber, {
+    message: "Either email or phone number is required.",
+    path: [],
   });

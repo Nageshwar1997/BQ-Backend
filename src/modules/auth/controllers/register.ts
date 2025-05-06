@@ -65,7 +65,7 @@ export const registerController = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    // await singleImageRemover(profilePic, "image");
+    await MediaModule.Utils.singleImageRemover(profilePic, "image");
     throw new AppError("Failed to register user", 500);
   }
 };

@@ -4,13 +4,20 @@ import { AppError } from "../../classes";
 
 export const validateZodSchema = (schema: ZodSchema) => {
   return (req: Request, _: Response, next: NextFunction) => {
+    if (!req.body) {
+      return next(
+        new AppError(
+          "Request body is missing. Please provide required data.",
+          400
+        )
+      );
+    }
     const result = schema.safeParse(req.body);
-    console.log("result", result);
     if (!result.success) {
       // To make a zod error readable
       const errorMessage = result.error.errors
-        .map((err) => err.message)
-        .join(", ");
+        .map((err, ind) => `${ind + 1}) ${err.message}`)
+        .join(" ");
       return next(new AppError(errorMessage, 400));
     }
     req.body = result.data;
