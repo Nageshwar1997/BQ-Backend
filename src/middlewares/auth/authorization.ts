@@ -8,7 +8,7 @@ export const authorization =
   (allowedRoles: UserModule.Types.UserRoleType[]) =>
   async (req: AuthorizedRequest, _: Response, next: NextFunction) => {
     try {
-      const userId = AuthModule.Providers.getUserIdFromToken(req);
+      const userId = AuthModule.Services.getUserIdFromToken(req);
 
       const isValidId = isValidMongoId(userId);
 

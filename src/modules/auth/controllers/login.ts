@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 
 import { AppError } from "../../../classes";
 import { UserModule } from "../..";
-import { generateToken } from "../providers";
+import { generateToken } from "../services";
 
 export const loginController = async (req: Request, res: Response) => {
   const { email, password, phoneNumber } = {

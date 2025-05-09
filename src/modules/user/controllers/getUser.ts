@@ -6,7 +6,7 @@ import { getUserById } from "../services";
 import { AuthModule } from "../..";
 
 export const getUserController = async (req: Request, res: Response) => {
-  const userId = AuthModule.Providers.getUserIdFromToken(req);
+  const userId = AuthModule.Services.getUserIdFromToken(req);
   const isValidId = isValidMongoId(userId);
 
   if (!isValidId) {

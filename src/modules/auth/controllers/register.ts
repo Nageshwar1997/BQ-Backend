@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { AppError } from "../../../classes";
 import { getCloudinaryOptimizedUrl } from "../../../utils";
 import { MediaModule, UserModule } from "../..";
-import { generateToken } from "../providers";
+import { generateToken } from "../services";
 
 export const registerController = async (req: Request, res: Response) => {
   const { firstName, lastName, email, password, phoneNumber } = {

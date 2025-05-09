@@ -3,10 +3,7 @@ import { Request } from "express";
 
 import { AppError } from "../../../classes";
 import { JWT_SECRET } from "../../../envs";
-
-interface DecodedToken extends JwtPayload {
-  userId: string; // Assuming userId is a string
-}
+import { DecodedToken } from "../types";
 
 export const getUserIdFromToken = (req: Request) => {
   try {
