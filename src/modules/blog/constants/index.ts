@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { BlogThumbnailType } from "../types";
-import { ALLOWED_IMAGE_TYPES } from "../../../constants";
+import { BlogProps, BlogThumbnailType } from "../types";
+import { ALLOWED_IMAGE_TYPES, singleSpaceRegex } from "../../../constants";
+import { AppError } from "../../../classes";
 
 export const BLOGS_THUMBNAILS: BlogThumbnailType[] = [
   "smallThumbnail",
@@ -17,133 +18,134 @@ export const possibleEditBlogFields = [
   "publishedDate",
 ];
 
-export const singleSpaceRegex = /^(?!.*\s{2,}).*$/;
+export interface ValidateFieldProps {
+  field: string;
+  min?: number | undefined;
+  max?: number | undefined;
+  checkSpace?: boolean;
+  nonEmpty?: boolean;
+}
 
-export const validateMainTitle = z
-  .string({
-    required_error: "Main title is required.",
-    invalid_type_error: "Main title must be a text value.",
-  })
-  .trim()
-  .min(2, "Main title should be at least 2 characters long.")
-  .max(100, "Main title should not exceed 100 characters.")
-  .regex(singleSpaceRegex, "Only one space is allowed between words.");
+export const validateField = (props: ValidateFieldProps) => {
+  const { field, min, max, checkSpace = false, nonEmpty = false } = props;
 
-export const validateSubTitle = z
-  .string({
-    required_error: "Subtitle is required.",
-    invalid_type_error: "Subtitle must be a text value.",
-  })
-  .trim()
-  .min(2, "Subtitle should be at least 2 characters long.")
-  .max(100, "Subtitle should not exceed 100 characters.")
-  .regex(singleSpaceRegex, "Only one space is allowed between words.");
-
-export const validateContent = z
-  .string({
-    required_error: "Content is required.",
-    invalid_type_error: "Content must be a text value.",
-  })
-  .trim()
-  .min(10, "Content should be at least 10 characters long.")
-  .regex(singleSpaceRegex, "Only one space is allowed between words.");
-
-export const validateDescription = z
-  .string({
-    required_error: "Description is required.",
-    invalid_type_error: "Description must be a text value.",
-  })
-  .trim()
-  .min(10, "Description should be at least 10 characters long.")
-  .regex(singleSpaceRegex, "Only one space is allowed between words.");
-
-export const validateAuthor = z
-  .string({
-    required_error: "Author is required.",
-    invalid_type_error: "Author must be a text value.",
-  })
-  .trim()
-  .min(2, "Author should be at least 2 characters long.")
-  .max(100, "Author should not exceed 100 characters.")
-  .regex(singleSpaceRegex, "Only one space is allowed between words.");
-
-export const validateTags = z.preprocess(
-  (val) => {
-    if (typeof val === "string") {
-      try {
-        const parsed = JSON.parse(val);
-        return Array.isArray(parsed) ? parsed : undefined;
-      } catch {
-        return undefined;
-      }
-    }
-    return val;
-  },
-  z
-    .array(
-      z
+  switch (field) {
+    case "mainTitle":
+    case "subTitle":
+    case "author":
+    case "description":
+    case "content":
+    case "publisher": {
+      let schema = z
         .string({
-          required_error: "Tag is required.",
-          invalid_type_error: "Each tag must be a text value.",
+          required_error: `${field} is required.`,
+          invalid_type_error: `${field} must be a text value.`,
         })
-        .trim()
-        .nonempty({ message: "Tag cannot be empty." })
-        .min(2, "Tag should be at least 2 characters long.")
-        .max(20, "Tag should not exceed 20 characters.")
-        .regex(singleSpaceRegex, "Only one space is allowed between words."),
-      {
-        required_error: "Tags are required.",
-        invalid_type_error: "Tags must be an array of text values.",
+
+        .trim();
+
+      if (nonEmpty) {
+        schema = schema.nonempty({ message: `${field} cannot be empty.` });
       }
-    )
-    .min(1, "At least one tag is required.")
-    .refine(
-      (tags) => {
-        const trimmedTags = tags.map((tag) => tag.trim().toLowerCase());
-        return new Set(trimmedTags).size === trimmedTags.length;
-      },
-      { message: "Duplicate tags are not allowed." }
-    )
-);
+      // required_error: `${field} is required.`,
 
-export const validatePublishedDate = z.preprocess(
-  (val) =>
-    typeof val === "string" || val instanceof Date ? new Date(val) : val,
-  z
-    .date({
-      required_error: "Published date is required.",
-      invalid_type_error: "Invalid date format.",
-    })
-    .max(new Date(), { message: "Publish date cannot be in the future." })
-);
+      if (min) {
+        schema = schema.min(
+          min,
+          `${field} should be at least ${min} characters long.`
+        );
+      }
 
-export const validatePublisher = z
-  .string({
-    required_error: "Publisher is required.",
-    invalid_type_error: "Publisher must be a text value.",
-  })
-  .trim()
-  .nonempty({ message: "Publisher cannot be empty." })
-  .min(2, "Publisher should be at least 2 characters long.")
-  .max(50, "Publisher should not exceed 50 characters.")
-  .regex(singleSpaceRegex, "Only one space is allowed between words.");
+      if (max) {
+        schema = schema.max(
+          max,
+          `${field} should not exceed ${max} characters.`
+        );
+      }
 
-export const validateSmallThumbnail = z
-  .custom<Express.Multer.File>((file) => !!file && typeof file === "object", {
-    message: "Small thumbnail is required.",
-  })
-  .refine((file) => ALLOWED_IMAGE_TYPES.includes(file.mimetype), {
-    message: `Small thumbnail must be an image of type: ${ALLOWED_IMAGE_TYPES.map(
-      (type) => type.split("/")[1]
-    ).join(", ")}`,
-  });
+      if (checkSpace) {
+        schema = schema.regex(
+          singleSpaceRegex,
+          `Field: '${field}' Only one space is allowed between words.`
+        );
+      }
 
-export const validateLargeThumbnail = z
-  .custom<Express.Multer.File>((file) => !!file && typeof file === "object", {
-    message: "Large thumbnail is required.",
-  })
-  .refine((file) => ALLOWED_IMAGE_TYPES.includes(file.mimetype), {
-    message: `Large thumbnail must be an image of type: ${ALLOWED_IMAGE_TYPES.map(
-      (type) => type.split("/")[1]
-    ).join(", ")}`,
-  });
+      return schema;
+    }
+
+    case "tags": {
+      return z.preprocess(
+        (val) => {
+          if (typeof val === "string") {
+            try {
+              const parsed = JSON.parse(val);
+              return Array.isArray(parsed) ? parsed : undefined;
+            } catch {
+              return undefined;
+            }
+          }
+          return val;
+        },
+        z
+          .array(
+            z
+              .string({
+                required_error: "Tag is required.",
+                invalid_type_error: "Each tag must be a text value.",
+              })
+              .trim()
+              .nonempty({ message: "Tag cannot be empty." })
+              .min(2, "Tag should be at least 2 characters long.")
+              .max(20, "Tag should not exceed 20 characters.")
+              .regex(
+                singleSpaceRegex,
+                "Only one space is allowed between words."
+              )
+          )
+          .min(1, "At least one tag is required.")
+          .refine(
+            (tags) => {
+              const trimmedTags = tags.map((tag) => tag.trim().toLowerCase());
+              return new Set(trimmedTags).size === trimmedTags.length;
+            },
+            { message: "Duplicate tags are not allowed." }
+          )
+      );
+    }
+
+    case "publishedDate": {
+      return z.preprocess(
+        (val) =>
+          typeof val === "string" || val instanceof Date ? new Date(val) : val,
+        z
+          .date({
+            required_error: "Published date is required.",
+            invalid_type_error: "Invalid date format.",
+          })
+          .max(new Date(), { message: "Publish date cannot be in the future." })
+      );
+    }
+
+    case "smallThumbnail":
+    case "largeThumbnail": {
+      return z
+        .custom<Express.Multer.File>(
+          (file) => !!file && typeof file === "object",
+          {
+            message: `${field} is required.`,
+          }
+        )
+        .refine((file) => ALLOWED_IMAGE_TYPES.includes(file.mimetype), {
+          message: `${field} must be an image of type: ${ALLOWED_IMAGE_TYPES.map(
+            (type) => type.split("/")[1]
+          ).join(", ")}`,
+        });
+    }
+
+    default:
+      throw new AppError(
+        `Validation for field '${field}' is not implemented.`,
+        500
+      );
+  }
+};

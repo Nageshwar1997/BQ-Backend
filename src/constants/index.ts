@@ -31,3 +31,5 @@ export const allowedOrigins = [
   FRONTEND_PRODUCTION_ADMIN_URL,
   FRONTEND_PRODUCTION_MASTER_URL,
 ];
+
+export const singleSpaceRegex = /^(?!.*\s{2,}).*$/;
