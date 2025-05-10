@@ -12,11 +12,25 @@ export const validateZodSchema = (schema: ZodSchema) => {
         )
       );
     }
-    const result = schema.safeParse(req.body);
+
+    const payload = {
+      ...req.body,
+      ...(req.file && { file: req.file }),
+      ...Object.fromEntries(
+        Object.entries(req.files || {}).map(([key, value]) => [key, value[0]])
+      ),
+    };
+
+    const result = schema.safeParse(payload);
+
     if (!result.success) {
+      const errors = result.error.errors;
       // To make a zod error readable
-      const errorMessage = result.error.errors
-        .map((err, ind) => `${ind + 1}) ${err.message}`)
+      const errorMessage = errors
+        .map(
+          (err, ind) =>
+            `${errors.length > 1 ? `${ind + 1}) ` : ""}${err.message}`
+        )
         .join(" ");
       return next(new AppError(errorMessage, 400));
     }

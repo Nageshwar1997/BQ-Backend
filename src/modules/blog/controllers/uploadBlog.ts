@@ -1,12 +1,10 @@
 import { Response } from "express";
 
 import { BLOGS_THUMBNAILS } from "../constants";
-import { MAX_IMAGE_FILE_SIZE } from "../../../constants";
 import { AppError } from "../../../classes";
 import { Blog } from "../models";
 import { AuthorizedRequest } from "../../../types";
 import { getCloudinaryOptimizedUrl } from "../../../utils";
-import { uploadBlogJoiSchema } from "../validations";
 import { MediaModule } from "../..";
 
 export const uploadBlogController = async (
@@ -21,15 +19,7 @@ export const uploadBlogController = async (
     content,
     tags,
     publishedDate,
-  } = {
-    mainTitle: req.body.mainTitle,
-    subTitle: req.body.subTitle,
-    author: req.body.author,
-    description: req.body.description,
-    content: req.body.content,
-    tags: JSON.parse(req.body.tags),
-    publishedDate: req.body.publishedDate,
-  };
+  } = req.body;
 
   const isExistBlog = await Blog.findOne({
     $or: [
@@ -43,19 +33,6 @@ export const uploadBlogController = async (
   }
 
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-
-  if (files) {
-    for (const file of BLOGS_THUMBNAILS) {
-      if (files[file] && files[file][0].size > MAX_IMAGE_FILE_SIZE) {
-        throw new AppError(
-          `${file} file (${(files[file][0].size / (1024 * 1024)).toFixed(
-            2
-          )}MB) exceeds 2MB.`,
-          400
-        );
-      }
-    }
-  }
 
   const thumbnails: Record<string, string> = {};
 
@@ -87,15 +64,6 @@ export const uploadBlogController = async (
     publisher: user?._id,
     ...thumbnails,
   };
-
-  const { error } = uploadBlogJoiSchema.validate(cleanedData);
-
-  if (error) {
-    const errorMessage = error.details
-      .map((detail) => detail.message)
-      .join(", ");
-    throw new AppError(errorMessage, 400);
-  }
 
   try {
     const blog = await Blog.create(cleanedData);

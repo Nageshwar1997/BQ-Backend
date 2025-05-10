@@ -11,7 +11,9 @@ import {
   ResponseMiddleware,
   AuthMiddleware,
   MulterMiddleware,
+  ZodMiddleware,
 } from "../../../middlewares";
+import { uploadBlogZodSchema } from "../validations";
 
 export const blogRouter = Router();
 
@@ -35,6 +37,7 @@ blogRouter.post(
       maxCount: 1,
     })),
   }),
+  ZodMiddleware.validateZodSchema(uploadBlogZodSchema),
   ResponseMiddleware.catchAsync(uploadBlogController)
 );
 
