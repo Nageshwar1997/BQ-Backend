@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { validateField } from "../constants";
+import { validateField } from "../utils";
 
 const commonRequirements = {
   isString: true,
@@ -26,11 +26,7 @@ export const uploadBlogZodSchema = z.object({
     ...commonRequirements,
     max: undefined,
   }),
-  author: validateField({
-    field: "author",
-    ...commonRequirements,
-    min: 2,
-  }),
+  author: validateField({ field: "author", ...commonRequirements, min: 2 }),
   publisher: validateField({
     field: "publisher",
     ...commonRequirements,

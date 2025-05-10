@@ -14,3 +14,11 @@ export interface BlogProps {
 }
 
 export type BlogThumbnailType = "smallThumbnail" | "largeThumbnail";
+
+export interface ValidateBlogFieldProps {
+  field: keyof BlogProps;
+  min?: number | undefined;
+  max?: number | undefined;
+  checkSpace?: boolean;
+  nonEmpty?: boolean;
+}
