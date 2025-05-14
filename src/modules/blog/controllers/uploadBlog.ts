@@ -48,17 +48,6 @@ export const uploadBlogController = async (
         });
 
         thumbnails[item] = getCloudinaryOptimizedUrl(uploadResult.secure_url);
-      } else if (req.body[item]) {
-        if (item.includes("https://res.cloudinary.com/drbhw0nwt")) {
-          throw new AppError(
-            "You can't upload an image from another cloudinary",
-            400
-          );
-        } else {
-          thumbnails[item] = req.body[item];
-        }
-      } else {
-        thumbnails[item] = "";
       }
     })
   );
@@ -89,10 +78,7 @@ export const uploadBlogController = async (
     await Promise.all(
       BLOGS_THUMBNAILS.map(async (item) => {
         const thumbnail = thumbnails[item];
-        if (
-          thumbnail &&
-          thumbnail.includes("https://res.cloudinary.com/drbhw0nwt")
-        ) {
+        if (thumbnail) {
           await MediaModule.Utils.singleImageRemover(thumbnail, "image");
         }
       })
