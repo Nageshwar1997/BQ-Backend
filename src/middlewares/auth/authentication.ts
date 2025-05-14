@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "../../types";
 import { AuthModule, UserModule } from "../../modules";
 import { isValidMongoId } from "../../utils";
-import { AppError } from "../../classes";
+import { Shared } from "../../shared";
 
 export const authenticated = async (
   req: AuthenticatedRequest,
@@ -15,7 +15,7 @@ export const authenticated = async (
     const isValidId = isValidMongoId(userId);
 
     if (!isValidId) {
-      throw new AppError("Invalid userId", 400);
+      throw new Shared.Classes.AppError("Invalid userId", 400);
     }
 
     const user = await UserModule.Services.getUserById(userId);

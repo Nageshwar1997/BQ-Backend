@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AppSuccess } from "../../../classes";
+import { Shared } from "../../../shared";
 
 declare module "express-serve-static-core" {
   interface Response {
@@ -9,7 +9,7 @@ declare module "express-serve-static-core" {
 
 export const success = (_: Request, res: Response, next: NextFunction) => {
   res.success = (statusCode: number, message: string, data: object = {}) => {
-    const response = new AppSuccess(statusCode, message, data);
+    const response = new Shared.Classes.AppSuccess(statusCode, message, data);
 
     res.status(statusCode).json({
       success: true,

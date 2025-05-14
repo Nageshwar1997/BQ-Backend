@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { ZodSchema } from "zod";
-import { AppError } from "../../classes";
+import { Shared } from "../../shared";
 
 export const validateZodSchema = (schema: ZodSchema) => {
   return (req: Request, _: Response, next: NextFunction) => {
     if (!req.body) {
       return next(
-        new AppError(
+        new Shared.Classes.AppError(
           "Request body is missing. Please provide required data.",
           400
         )
@@ -32,7 +32,7 @@ export const validateZodSchema = (schema: ZodSchema) => {
             `${errors.length > 1 ? `${ind + 1}) ` : ""}${err.message}`
         )
         .join(" ");
-      return next(new AppError(errorMessage, 400));
+      return next(new Shared.Classes.AppError(errorMessage, 400));
     }
     req.body = result.data;
     next();

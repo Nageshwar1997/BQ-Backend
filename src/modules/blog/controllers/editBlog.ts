@@ -1,7 +1,7 @@
 import { Response } from "express";
 
 import { getCloudinaryOptimizedUrl, isValidMongoId } from "../../../utils";
-import { AppError } from "../../../classes";
+import { Shared } from "../../../shared";
 import { BlogThumbnailType } from "../types";
 import { Blog } from "../models";
 import { BLOGS_THUMBNAILS, possibleEditBlogFields } from "../constants";
@@ -18,7 +18,10 @@ export const editBlogController = async (
   const isValidId = isValidMongoId(id);
 
   if (!isValidId) {
-    throw new AppError("Invalid Blog Id provided for Update Blog", 404);
+    throw new Shared.Classes.AppError(
+      "Invalid Blog Id provided for Update Blog",
+      404
+    );
   }
 
   let updateBody: Record<string, any> = {};
@@ -27,13 +30,16 @@ export const editBlogController = async (
   const blog = await Blog.findById(id).lean();
 
   if (!blog) {
-    throw new AppError("Blog not found for update", 404);
+    throw new Shared.Classes.AppError("Blog not found for update", 404);
   }
 
   const user = req.user;
 
   if (blog.publisher.toString() !== user?._id?.toString()) {
-    throw new AppError("You are not authorized to edit this blog", 403);
+    throw new Shared.Classes.AppError(
+      "You are not authorized to edit this blog",
+      403
+    );
   }
 
   const files = req.files as { [fieldname: string]: Express.Multer.File[] }; // Type Assertion
@@ -68,7 +74,7 @@ export const editBlogController = async (
     const errorMessage = error.details
       .map((detail) => detail.message)
       .join(", ");
-    throw new AppError(errorMessage, 400);
+    throw new Shared.Classes.AppError(errorMessage, 400);
   }
 
   try {
@@ -81,7 +87,7 @@ export const editBlogController = async (
     });
 
     if (!updatedBlog) {
-      throw new AppError("Failed to edit blog", 400);
+      throw new Shared.Classes.AppError("Failed to edit blog", 400);
     }
   } catch (error) {
     if (uploadedKeys.length > 0) {

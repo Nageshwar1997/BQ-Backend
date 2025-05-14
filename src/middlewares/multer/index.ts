@@ -2,7 +2,7 @@ import multer, { MulterError } from "multer";
 import { NextFunction, Request, Response } from "express";
 
 import { FileValidatorOptionsProps, MulterType } from "../../types";
-import { AppError } from "../../classes";
+import { Shared } from "../../shared";
 import { getCustomError, getMulterError } from "./utils";
 
 export const validateFiles = ({
@@ -54,7 +54,7 @@ export const validateFiles = ({
       });
 
       if (multerErrMsg) {
-        return next(new AppError(multerErrMsg, 400));
+        return next(new Shared.Classes.AppError(multerErrMsg, 400));
       }
 
       const checkableTypes: MulterType[] = ["single", "array", "any", "fields"];
@@ -96,7 +96,7 @@ export const validateFiles = ({
         });
 
         if (customErrMsg) {
-          return next(new AppError(customErrMsg, 400));
+          return next(new Shared.Classes.AppError(customErrMsg, 400));
         }
       }
 

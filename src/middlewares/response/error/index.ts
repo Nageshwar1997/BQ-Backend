@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { Error as MongooseError } from "mongoose";
-import { AppError } from "../../../classes";
+import { Shared } from "../../../shared";
 import { NODE_ENV } from "../../../envs";
 
-const sendDevError = (err: AppError, res: Response): void => {
+const sendDevError = (err: Shared.Classes.AppError, res: Response): void => {
   res.status(err.statusCode || 500).json({
     success: false,
     error: true,
@@ -13,7 +13,7 @@ const sendDevError = (err: AppError, res: Response): void => {
   });
 };
 
-const sendProdError = (err: AppError, res: Response): void => {
+const sendProdError = (err: Shared.Classes.AppError, res: Response): void => {
   if (err.isOperational) {
     res.status(err.statusCode || 500).json({
       success: false,
@@ -32,15 +32,15 @@ const sendProdError = (err: AppError, res: Response): void => {
 };
 
 export const error = (
-  err: Error | AppError | MongooseError,
+  err: Error | Shared.Classes.AppError | MongooseError,
   _: Request,
   res: Response,
   __: NextFunction
 ): void => {
   const error =
-    err instanceof AppError
+    err instanceof Shared.Classes.AppError
       ? err
-      : new AppError(
+      : new Shared.Classes.AppError(
           NODE_ENV === "development"
             ? err.message ?? "Internal Server Error!"
             : "Internal Server Error!",

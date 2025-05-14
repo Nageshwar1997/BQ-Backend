@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Types } from "mongoose";
 import bcrypt from "bcryptjs";
 
-import { AppError } from "../../../classes";
+import { Shared } from "../../../shared";
 import { UserModule } from "../..";
 import { generateToken } from "../services";
 
@@ -21,7 +21,7 @@ export const loginController = async (req: Request, res: Response) => {
   const isPasswordMatch = bcrypt.compareSync(password, user.password);
 
   if (!isPasswordMatch) {
-    throw new AppError("Wrong password", 400);
+    throw new Shared.Classes.AppError("Wrong password", 400);
   }
 
   const token = generateToken(user._id as Types.ObjectId);

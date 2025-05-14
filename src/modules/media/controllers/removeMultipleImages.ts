@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { allowedOptions } from "../constants";
-import { AppError } from "../../../classes";
+import { Shared } from "../../../shared";
 import { multipleImagesRemover } from "../utils";
 
 export const removeMultipleImagesController = async (
@@ -16,14 +16,14 @@ export const removeMultipleImagesController = async (
     !cloudinaryConfigOption ||
     !allowedOptions.includes(cloudinaryConfigOption)
   ) {
-    throw new AppError(
+    throw new Shared.Classes.AppError(
       `Invalid cloudinary config option. Allowed options are "image", "video", or "product".`,
       400
     );
   }
 
   if (!imgUrls || imgUrls.length === 0) {
-    throw new AppError("No image URLs provided", 400);
+    throw new Shared.Classes.AppError("No image URLs provided", 400);
   }
 
   const results = await multipleImagesRemover(imgUrls, cloudinaryConfigOption);

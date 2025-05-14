@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express";
 import { AuthModule, UserModule } from "../../modules";
 import { AuthorizedRequest } from "../../types";
 import { isValidMongoId } from "../../utils";
-import { AppError } from "../../classes";
+import { Shared } from "../../shared";
 
 export const authorization =
   (allowedRoles: UserModule.Types.UserRoleType[]) =>
@@ -13,13 +13,13 @@ export const authorization =
       const isValidId = isValidMongoId(userId);
 
       if (!isValidId) {
-        throw new AppError("Invalid userId", 400);
+        throw new Shared.Classes.AppError("Invalid userId", 400);
       }
 
       const user = await UserModule.Services.getUserById(userId);
 
       if (!allowedRoles.includes(user.role)) {
-        throw new AppError("Unauthorized", 401);
+        throw new Shared.Classes.AppError("Unauthorized", 401);
       }
 
       req.user = user;
