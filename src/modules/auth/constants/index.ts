@@ -34,6 +34,7 @@ export const validateEmail = z
     required_error: "Email address is required.",
     invalid_type_error: "Email address must be string.",
   })
+  .trim()
   .email("Please enter a valid email address.");
 
 export const validatePhoneNumber = z
@@ -41,6 +42,7 @@ export const validatePhoneNumber = z
     required_error: "Phone number is required.",
     invalid_type_error: "Phone number must be a string.",
   })
+  .trim()
   .regex(
     phoneRegex,
     "Phone number must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long."
@@ -51,6 +53,7 @@ export const validatePassword = z
     required_error: "Password is required.",
     invalid_type_error: "Password must be string.",
   })
+  .trim()
   .regex(
     passwordRegex,
     "Password must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
