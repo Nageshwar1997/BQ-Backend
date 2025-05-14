@@ -22,7 +22,6 @@ export const validateField = (props: ValidateBlogFieldProps) => {
       if (nonEmpty) {
         schema = schema.nonempty({ message: `${field} cannot be empty.` });
       }
-      // required_error: `${field} is required.`,
 
       if (min) {
         schema = schema.min(
