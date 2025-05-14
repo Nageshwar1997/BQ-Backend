@@ -19,7 +19,9 @@ const uploadToCloudinary = async (
 ): Promise<UploadApiResponse> => {
   const subFolder = folder?.split(" ").join("_") || "Common_Folder";
 
-  const publicId = `${Date.now().toString()}_${file?.originalname
+  const publicId = `${new Date()
+    .toLocaleDateString()
+    .replace(/\//g, "_")}_${Date.now()}_${file?.originalname
     .split(" ")
     .join("_")
     .split(".")
