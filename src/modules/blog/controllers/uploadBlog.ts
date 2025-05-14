@@ -39,15 +39,20 @@ export const uploadBlogController = async (
   await Promise.all(
     BLOGS_THUMBNAILS.map(async (item) => {
       const file = files[item]?.[0];
-      if (!file) return;
 
-      const uploadResult = await MediaModule.Utils.singleImageUploader({
-        file,
-        folder: "Blogs",
-        cloudinaryConfigOption: "image",
-      });
+      if (file) {
+        const uploadResult = await MediaModule.Utils.singleImageUploader({
+          file,
+          folder: "Blogs",
+          cloudinaryConfigOption: "image",
+        });
 
-      thumbnails[item] = getCloudinaryOptimizedUrl(uploadResult.secure_url);
+        thumbnails[item] = getCloudinaryOptimizedUrl(uploadResult.secure_url);
+      } else if (req.body[item]) {
+        thumbnails[item] = req.body[item];
+      } else {
+        thumbnails[item] = "";
+      }
     })
   );
 
