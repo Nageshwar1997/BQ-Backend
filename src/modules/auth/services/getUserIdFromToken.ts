@@ -1,4 +1,4 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { Request } from "express";
 
 import { AppError } from "../../../classes";
@@ -30,6 +30,29 @@ export const getUserIdFromToken = (req: Request) => {
 
     return decoded.userId;
   } catch (error) {
+    const { TokenExpiredError, JsonWebTokenError, NotBeforeError } = jwt;
+
+    const errInstance =
+      error instanceof
+      (TokenExpiredError || JsonWebTokenError || NotBeforeError);
+
+    if (errInstance) {
+      const { name, message } = error;
+      const comMsg = "Please login again.";
+      let errorMessage = "";
+
+      switch (name) {
+        case "TokenExpiredError":
+        case "JsonWebTokenError":
+        case "NotBeforeError":
+          errorMessage = `${message}, ${comMsg}`;
+          break;
+        default:
+          errorMessage = `Token error: ${message}, ${comMsg}`;
+          break;
+      }
+      throw new AppError(errorMessage, 401);
+    }
     throw error;
   }
 };
