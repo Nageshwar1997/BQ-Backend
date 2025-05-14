@@ -24,7 +24,7 @@ export const validateZodSchema = (schema: ZodSchema) => {
     const result = schema.safeParse(payload);
 
     if (!result.success) {
-      const errors = result.error.errors;
+      const errors = result.error?.errors;
       // To make a zod error readable
       const errorMessage = errors
         .map(

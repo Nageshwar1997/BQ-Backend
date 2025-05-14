@@ -27,12 +27,6 @@ export const uploadBlogZodSchema = z.object({
     max: undefined,
   }),
   author: validateField({ field: "author", ...commonRequirements, min: 2 }),
-  publisher: validateField({
-    field: "publisher",
-    ...commonRequirements,
-    min: 2,
-    max: 50,
-  }),
   tags: validateField({ field: "tags" }),
   publishedDate: validateField({ field: "publishedDate" }),
   smallThumbnail: validateField({ field: "smallThumbnail" }),
