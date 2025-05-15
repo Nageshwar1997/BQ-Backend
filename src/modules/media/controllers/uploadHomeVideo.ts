@@ -2,7 +2,7 @@ import { Response } from "express";
 
 import { AuthorizedRequest } from "../../../types";
 import { allowedOptions } from "../constants";
-import { Shared } from "../../../shared";
+
 import {
   ALLOWED_IMAGE_TYPES,
   ALLOWED_VIDEO_TYPES,
@@ -17,6 +17,7 @@ import {
 } from "../utils";
 import { getCloudinaryOptimizedUrl } from "../../../utils";
 import { HomeVideo } from "../models";
+import { Shared } from "../../..";
 
 export const uploadHomeVideoController = async (
   req: AuthorizedRequest,

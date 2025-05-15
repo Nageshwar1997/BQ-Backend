@@ -1,7 +1,7 @@
 import { Response } from "express";
 
 import { getCloudinaryOptimizedUrl, isValidMongoId } from "../../../utils";
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 import { BlogThumbnailType } from "../types";
 import { Blog } from "../models";
 import { BLOGS_THUMBNAILS, possibleEditBlogFields } from "../constants";

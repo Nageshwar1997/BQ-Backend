@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "../../types";
 import { AuthModule, UserModule } from "../../modules";
 import { isValidMongoId } from "../../utils";
-import { Shared } from "../../shared";
+import { Shared } from "../..";
 
 export const authenticated = async (
   req: AuthenticatedRequest,

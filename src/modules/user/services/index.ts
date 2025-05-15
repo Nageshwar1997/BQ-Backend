@@ -1,4 +1,4 @@
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 import { User } from "../models";
 
 export const getUserByEmail = async (email: string) => {

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 
 declare module "express-serve-static-core" {
   interface Response {

@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express";
 import { AuthModule, UserModule } from "../../modules";
 import { AuthorizedRequest } from "../../types";
 import { isValidMongoId } from "../../utils";
-import { Shared } from "../../shared";
+import { Shared } from "../..";
 
 export const authorization =
   (allowedRoles: UserModule.Types.UserRoleType[]) =>

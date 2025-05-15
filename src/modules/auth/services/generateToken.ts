@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
 
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 import { JWT_SECRET } from "../../../envs";
 
 export const generateToken = (userId: Types.ObjectId | string): string => {

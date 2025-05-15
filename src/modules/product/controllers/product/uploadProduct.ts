@@ -1,9 +1,9 @@
 import { Response } from "express";
+
 import { AuthorizedRequest } from "../../../../types";
 import { addShadeJoiSchema, uploadProductJoiSchema } from "../../validations";
-import { Shared } from "../../../../shared";
+import { Shared } from "../../../..";
 import { findOrCreateCategory } from "../../services";
-
 import { getCloudinaryOptimizedUrl } from "../../../../utils";
 import { Product, Shade } from "../../models";
 import { MediaModule } from "../../..";

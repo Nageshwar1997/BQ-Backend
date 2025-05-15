@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 
 import { allowedOptions } from "../constants";
-import { Shared } from "../../../shared";
+
 import { singleImageRemover } from "../utils";
+import { Shared } from "../../..";
 
 export const removeSingleImageController = async (
   req: Request,

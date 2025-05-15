@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { isValidMongoId } from "../../../utils";
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 import { getUserById } from "../services";
 import { AuthModule } from "../..";
 

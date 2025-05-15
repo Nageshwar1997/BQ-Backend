@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Types } from "mongoose";
 import bcrypt from "bcryptjs";
 
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 import { UserModule } from "../..";
 import { generateToken } from "../services";
 

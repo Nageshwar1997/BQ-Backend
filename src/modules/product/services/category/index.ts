@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-import { Shared } from "../../../../shared";
+import { Shared } from "../../../..";
 import { Category } from "../../models";
 import { createCategoryJoiSchema } from "../../validations";
 

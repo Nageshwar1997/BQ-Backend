@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { isValidMongoId } from "../../../utils";
-import { Shared } from "../../../shared";
 import { Blog } from "../models";
+import { Shared } from "../../..";
 
 export const getBlogByIdController = async (req: Request, res: Response) => {
   const { id } = req.params;

@@ -1,6 +1,6 @@
 import cors from "cors";
 import { allowedOrigins } from "../../constants";
-import { Shared } from "../../shared";
+import { Shared } from "../..";
 
 export const checkOrigin = cors({
   origin: (origin, callback) => {

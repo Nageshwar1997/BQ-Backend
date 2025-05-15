@@ -1,6 +1,7 @@
 import { z } from "zod";
+
 import { ALLOWED_IMAGE_TYPES, singleSpaceRegex } from "../../../constants";
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 import { ValidateBlogFieldProps } from "../types";
 
 export const validateField = (props: ValidateBlogFieldProps) => {

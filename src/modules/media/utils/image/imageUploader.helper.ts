@@ -1,6 +1,5 @@
 import { UploadApiResponse } from "cloudinary";
 
-import { Shared } from "../../../../shared";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
 import {
   CloudinaryConfigOption,
@@ -8,6 +7,7 @@ import {
   SingleFileUploaderProps,
 } from "../../types";
 import { CLOUDINARY_MAIN_FOLDER } from "../../../../envs";
+import { Shared } from "../../../..";
 
 const mainFolder = CLOUDINARY_MAIN_FOLDER;
 

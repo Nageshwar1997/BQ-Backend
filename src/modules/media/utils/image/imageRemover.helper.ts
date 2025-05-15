@@ -1,8 +1,8 @@
 import { UploadApiResponse } from "cloudinary";
 
-import { Shared } from "../../../../shared";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
 import { CloudinaryConfigOption } from "../../types";
+import { Shared } from "../../../..";
 
 // ========== COMMON REMOVER FUNCTION ==========
 const removeFromCloudinary = async (

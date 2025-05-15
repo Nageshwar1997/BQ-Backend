@@ -3,8 +3,8 @@ import { UploadApiResponse } from "cloudinary";
 
 import { SingleFileUploaderProps } from "../../types";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
-import { Shared } from "../../../../shared";
 import { CLOUDINARY_MAIN_FOLDER } from "../../../../envs";
+import { Shared } from "../../../..";
 
 export const videoUploader = async ({
   file,

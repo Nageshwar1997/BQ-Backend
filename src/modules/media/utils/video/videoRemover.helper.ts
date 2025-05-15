@@ -1,8 +1,8 @@
 import { UploadApiResponse } from "cloudinary";
 
-import { Shared } from "../../../../shared";
 import { CloudinaryConfigOption } from "../../types";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
+import { Shared } from "../../../..";
 
 export const videoRemover = async (
   videoUrl: string,

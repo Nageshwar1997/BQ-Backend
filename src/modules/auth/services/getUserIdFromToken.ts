@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Request } from "express";
 
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 import { JWT_SECRET } from "../../../envs";
 import { DecodedToken } from "../types";
 

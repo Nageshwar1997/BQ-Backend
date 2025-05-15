@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
 
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 import { getCloudinaryOptimizedUrl } from "../../../utils";
 import { MediaModule, UserModule } from "../..";
 import { generateToken } from "../services";

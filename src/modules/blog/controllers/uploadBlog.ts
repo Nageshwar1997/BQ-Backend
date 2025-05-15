@@ -1,7 +1,7 @@
 import { Response } from "express";
 
 import { BLOGS_THUMBNAILS } from "../constants";
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 import { Blog } from "../models";
 import { AuthorizedRequest } from "../../../types";
 import { getCloudinaryOptimizedUrl } from "../../../utils";

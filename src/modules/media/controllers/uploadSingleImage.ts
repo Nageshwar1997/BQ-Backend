@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { allowedOptions } from "../constants";
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 import { singleImageUploader } from "../utils";
 import { getCloudinaryOptimizedUrl } from "../../../utils";
 

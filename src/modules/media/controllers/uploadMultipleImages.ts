@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 import { allowedOptions } from "../constants";
 import { singleImageUploader } from "../utils";
 import { getCloudinaryOptimizedUrl } from "../../../utils";

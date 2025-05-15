@@ -2,7 +2,7 @@ import { Response } from "express";
 
 import { AuthorizedRequest } from "../../../types";
 import { HomeVideo } from "../models";
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 
 export const getAllHomeVideosController = async (
   req: AuthorizedRequest,

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Blog } from "../models";
-import { Shared } from "../../../shared";
+import { Shared } from "../../..";
 
 export const getAllBlogsController = async (req: Request, res: Response) => {
   const page = Number(req.query.page);
