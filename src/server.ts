@@ -3,7 +3,7 @@ import path from "path";
 import express, { Request, Response } from "express";
 
 import router from "./router";
-import { connect } from "./configs";
+import { Shared } from ".";
 import {
   ResponseMiddleware,
   CorsMiddleware,
@@ -39,7 +39,7 @@ app.use(ResponseMiddleware.error);
 if (NODE_ENV === "development") {
   app.listen(port, async () => {
     try {
-      await connect();
+      await Shared.Configs.Database.connect();
       console.log(`Server running on http://localhost:${port}`);
     } catch (error) {
       console.error("Server startup failed:", error);

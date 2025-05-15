@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { connect } from "../../configs";
+import { Shared } from "../..";
 
 export const checkConnection = async (
   _: Request,
@@ -7,7 +7,7 @@ export const checkConnection = async (
   next: NextFunction
 ) => {
   try {
-    await connect();
+    await Shared.Configs.Database.connect();
 
     next();
   } catch (error) {
