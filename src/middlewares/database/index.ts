@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { connectDB } from "../../configs";
+import { connect } from "../../configs";
 
 export const checkConnection = async (
   _: Request,
@@ -7,7 +7,7 @@ export const checkConnection = async (
   next: NextFunction
 ) => {
   try {
-    await connectDB();
+    await connect();
 
     next();
   } catch (error) {
