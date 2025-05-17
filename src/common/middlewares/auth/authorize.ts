@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express";
 import { Auth, User } from "../../../modules";
 import { Classes, Types, Utils } from "../..";
 
-export const authorization =
+export const authorize =
   (allowedRoles: User.Types.UserRoleType[]) =>
   async (req: Types.AuthRequest, _: Response, next: NextFunction) => {
     try {

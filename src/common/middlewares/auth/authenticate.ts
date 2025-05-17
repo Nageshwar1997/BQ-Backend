@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express";
 import { Classes, Types, Utils } from "../..";
 import { Auth, User } from "../../../modules";
 
-export const authenticated = async (
+export const authenticate = async (
   req: Types.AuthRequest,
   _: Response,
   next: NextFunction
