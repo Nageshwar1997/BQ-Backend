@@ -24,7 +24,7 @@ export const loginController = async (req: Request, res: Response) => {
     throw new AppError("Wrong password", 400);
   }
 
-  const token = generateToken(user._id as Types.ObjectId);
+  const token = generateToken(user._id);
 
   res.success(200, "User logged in successfully", {
     token,
