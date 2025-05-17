@@ -3,7 +3,7 @@ import { UploadApiResponse } from "cloudinary";
 
 import { SingleFileUploaderProps } from "../../types";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
-import { AppError } from "../../../../classes";
+import { Classes } from "../../../../shared";
 import { CLOUDINARY_MAIN_FOLDER } from "../../../../envs";
 
 export const videoUploader = async ({
@@ -30,7 +30,7 @@ export const videoUploader = async ({
   );
 
   if (cloudinaryConnectionTest.error) {
-    throw new AppError(cloudinaryConnectionTest.message, 500);
+    throw new Classes.AppError(cloudinaryConnectionTest.message, 500);
   }
 
   try {
@@ -48,7 +48,7 @@ export const videoUploader = async ({
         (error, result) => {
           if (error) {
             return reject(
-              new AppError(
+              new Classes.AppError(
                 error.message || "Failed to upload video to Cloudinary",
                 500
               )
@@ -56,7 +56,9 @@ export const videoUploader = async ({
           } else if (result) {
             resolve(result);
           } else {
-            reject(new AppError("Failed to upload video to Cloudinary", 500));
+            reject(
+              new Classes.AppError("Failed to upload video to Cloudinary", 500)
+            );
           }
         }
       );
@@ -64,7 +66,7 @@ export const videoUploader = async ({
     });
     return result;
   } catch (error) {
-    throw new AppError(
+    throw new Classes.AppError(
       error instanceof Error
         ? error.message
         : "Unexpected error during upload video to Cloudinary",

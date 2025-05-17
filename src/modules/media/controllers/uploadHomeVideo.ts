@@ -2,7 +2,7 @@ import { Response } from "express";
 
 import { AuthorizedRequest } from "../../../types";
 import { allowedOptions } from "../constants";
-import { AppError } from "../../../classes";
+import { Classes } from "../../../shared";
 import {
   ALLOWED_IMAGE_TYPES,
   ALLOWED_VIDEO_TYPES,
@@ -29,14 +29,14 @@ export const uploadHomeVideoController = async (
     !cloudinaryConfigOption ||
     !allowedOptions.includes(cloudinaryConfigOption)
   ) {
-    throw new AppError(
+    throw new Classes.AppError(
       `Invalid cloudinary config option. Allowed options are "image", "video", or "product".`,
       400
     );
   }
 
   if (!title) {
-    throw new AppError("Title is required", 400);
+    throw new Classes.AppError("Title is required", 400);
   }
 
   const files = req.files as {
@@ -48,15 +48,15 @@ export const uploadHomeVideoController = async (
   const posterFile = files?.poster?.[0];
 
   if (!videoFile) {
-    throw new AppError("No video file uploaded", 400);
+    throw new Classes.AppError("No video file uploaded", 400);
   }
 
   if (!posterFile) {
-    throw new AppError("Poster file is required.", 400);
+    throw new Classes.AppError("Poster file is required.", 400);
   }
 
   if (!ALLOWED_VIDEO_TYPES.includes(videoFile.mimetype)) {
-    throw new AppError(
+    throw new Classes.AppError(
       `Invalid video format. Allowed formats: ${ALLOWED_VIDEO_TYPES.map((t) =>
         t.replace("video/", "")
       ).join(", ")}`,
@@ -65,7 +65,7 @@ export const uploadHomeVideoController = async (
   }
 
   if (!ALLOWED_IMAGE_TYPES.includes(posterFile.mimetype)) {
-    throw new AppError(
+    throw new Classes.AppError(
       `Invalid poster format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map((t) =>
         t.replace("image/", "")
       ).join(", ")}`,
@@ -74,11 +74,11 @@ export const uploadHomeVideoController = async (
   }
 
   if (videoFile.size > MAX_VIDEO_FILE_SIZE) {
-    throw new AppError("Video file size exceeds 50MB.", 400);
+    throw new Classes.AppError("Video file size exceeds 50MB.", 400);
   }
 
   if (posterFile.size > MAX_IMAGE_FILE_SIZE) {
-    throw new AppError("Poster image size exceeds 2MB.", 400);
+    throw new Classes.AppError("Poster image size exceeds 2MB.", 400);
   }
 
   // Upload video
@@ -87,14 +87,14 @@ export const uploadHomeVideoController = async (
     folder: `Home/Videos/${title}`,
     cloudinaryConfigOption,
   });
-  if (!video) throw new AppError("Video upload failed", 500);
+  if (!video) throw new Classes.AppError("Video upload failed", 500);
 
   const poster = await singleImageUploader({
     file: posterFile,
     folder: `Home/Videos/${title}`,
     cloudinaryConfigOption,
   });
-  if (!poster) throw new AppError("Poster upload failed", 500);
+  if (!poster) throw new Classes.AppError("Poster upload failed", 500);
 
   const user = req.user;
   let homeVideo;
@@ -115,6 +115,6 @@ export const uploadHomeVideoController = async (
       videoRemover(video.playback_url, cloudinaryConfigOption),
       singleImageRemover(poster.secure_url, cloudinaryConfigOption),
     ]);
-    throw new AppError("Failed to save video metadata", 500);
+    throw new Classes.AppError("Failed to save video metadata", 500);
   }
 };

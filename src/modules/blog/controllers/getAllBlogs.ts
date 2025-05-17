@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Blog } from "../models";
-import { AppError } from "../../../classes";
+import { Classes } from "../../../shared";
 
 export const getAllBlogsController = async (req: Request, res: Response) => {
   const page = Number(req.query.page);
@@ -14,7 +14,7 @@ export const getAllBlogsController = async (req: Request, res: Response) => {
     .lean();
 
   if (!blogs) {
-    throw new AppError("Blogs not found", 404);
+    throw new Classes.AppError("Blogs not found", 404);
   }
 
   const totalBlogs = await Blog.countDocuments();

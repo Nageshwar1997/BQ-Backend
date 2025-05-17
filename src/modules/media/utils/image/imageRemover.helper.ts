@@ -1,6 +1,6 @@
 import { UploadApiResponse } from "cloudinary";
 
-import { AppError } from "../../../../classes";
+import { Classes } from "../../../../shared";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
 import { CloudinaryConfigOption } from "../../types";
 
@@ -19,7 +19,7 @@ const removeFromCloudinary = async (
         if (error) {
           console.log("Failed to remove image from Cloudinary", error);
           return reject(
-            new AppError(
+            new Classes.AppError(
               error.message || "Failed to remove image from Cloudinary",
               500
             )
@@ -37,7 +37,7 @@ const extractPublicId = (imageUrl: string): string => {
   const match = imageUrl.match(regex);
 
   if (!match || !match[1]) {
-    throw new AppError("Invalid Cloudinary image URL", 400);
+    throw new Classes.AppError("Invalid Cloudinary image URL", 400);
   }
 
   return match[1];
@@ -49,7 +49,7 @@ export const singleImageRemover = async (
   cloudinaryConfigOption: CloudinaryConfigOption = "image"
 ) => {
   if (!imageUrl) {
-    throw new AppError("Image URL is required", 400);
+    throw new Classes.AppError("Image URL is required", 400);
   }
 
   const cloudinaryConnectionTest = await cloudinaryConnection(
@@ -57,7 +57,7 @@ export const singleImageRemover = async (
   );
 
   if (cloudinaryConnectionTest.error) {
-    throw new AppError(cloudinaryConnectionTest.message, 500);
+    throw new Classes.AppError(cloudinaryConnectionTest.message, 500);
   }
 
   try {
@@ -65,7 +65,7 @@ export const singleImageRemover = async (
     const result = await removeFromCloudinary(publicId, cloudinaryConfigOption);
     return result;
   } catch (error) {
-    throw new AppError(
+    throw new Classes.AppError(
       error instanceof Error ? error.message : "Unexpected error during remove",
       500
     );
@@ -78,14 +78,14 @@ export const multipleImagesRemover = async (
   cloudinaryConfigOption: CloudinaryConfigOption = "image"
 ) => {
   if (!imageUrls || !Array.isArray(imageUrls) || imageUrls.length === 0) {
-    throw new AppError("Image URLs are required", 400);
+    throw new Classes.AppError("Image URLs are required", 400);
   }
 
   const cloudinaryConnectionTest = await cloudinaryConnection(
     cloudinaryConfigOption
   );
   if (cloudinaryConnectionTest.error) {
-    throw new AppError(cloudinaryConnectionTest.message, 500);
+    throw new Classes.AppError(cloudinaryConnectionTest.message, 500);
   }
 
   try {
@@ -98,7 +98,7 @@ export const multipleImagesRemover = async (
 
     return removeResults; // Array of UploadApiResponse
   } catch (error) {
-    throw new AppError(
+    throw new Classes.AppError(
       error instanceof Error
         ? error.message
         : "Unexpected error during multiple remove",

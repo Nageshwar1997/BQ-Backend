@@ -2,7 +2,7 @@ import { Response } from "express";
 
 import { AuthorizedRequest } from "../../../types";
 import { HomeVideo } from "../models";
-import { AppError } from "../../../classes";
+import { Classes } from "../../../shared";
 
 export const getAllHomeVideosController = async (
   req: AuthorizedRequest,
@@ -18,7 +18,7 @@ export const getAllHomeVideosController = async (
     .lean();
 
   if (!videos) {
-    throw new AppError("Videos not found", 404);
+    throw new Classes.AppError("Videos not found", 404);
   }
 
   const totalVideos = await HomeVideo.countDocuments();

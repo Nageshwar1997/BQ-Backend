@@ -1,6 +1,6 @@
 import { UploadApiResponse } from "cloudinary";
 
-import { AppError } from "../../../../classes";
+import { Classes } from "../../../../shared";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
 import {
   CloudinaryConfigOption,
@@ -42,7 +42,7 @@ const uploadToCloudinary = async (
         (error, result) => {
           if (error) {
             return reject(
-              new AppError(
+              new Classes.AppError(
                 error.message || "Failed to upload image on Cloudinary",
                 500
               )
@@ -50,7 +50,9 @@ const uploadToCloudinary = async (
           } else if (result) {
             resolve(result);
           } else {
-            reject(new AppError("Failed to upload image on Cloudinary", 500));
+            reject(
+              new Classes.AppError("Failed to upload image on Cloudinary", 500)
+            );
           }
         }
       )
@@ -70,7 +72,7 @@ export const singleImageUploader = async ({
     );
 
     if (cloudinaryConnectionTest.error) {
-      throw new AppError(cloudinaryConnectionTest.message, 500);
+      throw new Classes.AppError(cloudinaryConnectionTest.message, 500);
     }
 
     const result = await uploadToCloudinary(
@@ -80,7 +82,7 @@ export const singleImageUploader = async ({
     );
     return result;
   } catch (error) {
-    throw new AppError(
+    throw new Classes.AppError(
       error instanceof Error ? error.message : "Unexpected error during upload",
       500
     );
@@ -99,7 +101,7 @@ export const multipleImagesUploader = async ({
     );
 
     if (cloudinaryConnectionTest.error) {
-      throw new AppError(cloudinaryConnectionTest.message, 500);
+      throw new Classes.AppError(cloudinaryConnectionTest.message, 500);
     }
 
     const uploadPromises = files.map((file) =>
@@ -110,7 +112,7 @@ export const multipleImagesUploader = async ({
 
     return uploadResults; // Array of UploadApiResponse
   } catch (error) {
-    throw new AppError(
+    throw new Classes.AppError(
       error instanceof Error
         ? error.message
         : "Unexpected error during multiple uploads",

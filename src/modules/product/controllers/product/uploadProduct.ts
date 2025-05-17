@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthorizedRequest } from "../../../../types";
 import { addShadeJoiSchema, uploadProductJoiSchema } from "../../validations";
-import { AppError } from "../../../../classes";
+import { Classes } from "../../../../shared";
 import { findOrCreateCategory } from "../../services";
 
 import { getCloudinaryOptimizedUrl } from "../../../../utils";
@@ -68,7 +68,7 @@ export const uploadProductController = async (
     const errorMessage = error.details
       .map((detail) => detail.message)
       .join(", ");
-    throw new AppError(errorMessage, 400);
+    throw new Classes.AppError(errorMessage, 400);
   }
 
   let category = null;
@@ -92,7 +92,7 @@ export const uploadProductController = async (
     );
     category = category_3._id;
   } else {
-    throw new AppError("All categories are required", 400);
+    throw new Classes.AppError("All categories are required", 400);
   }
   const shades = Array.isArray(shadesData) ? shadesData : [shadesData];
   const commonImages: Express.Multer.File[] = [];
@@ -149,7 +149,7 @@ export const uploadProductController = async (
       const errorMessage = error.details
         .map((detail) => detail.message)
         .join(", ");
-      throw new AppError(errorMessage, 400);
+      throw new Classes.AppError(errorMessage, 400);
     }
   }
 
