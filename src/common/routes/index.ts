@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { MediaModule } from "../../modules";
+
 // import {
 //   AuthModule,
 //   BlogModule,
@@ -15,8 +17,8 @@ export const router = Router();
 // // User routes
 // router.use("/users", UserModule.Routes.userRouter);
 
-// // Media routes
-// router.use("/media", MediaModule.Routes.mediaRouter);
+// Media routes
+router.use("/media", MediaModule.Routes.router);
 
 // // Blog routes
 // router.use("/blogs", BlogModule.Routes.blogRouter);

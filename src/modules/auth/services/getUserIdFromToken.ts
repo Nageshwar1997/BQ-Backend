@@ -1,15 +1,15 @@
 import jwt from "jsonwebtoken";
 import { Request } from "express";
 
-import { Common } from "../../..";
 import { Types } from "..";
+import { Classes, Envs } from "../../../common";
 
 export const getUserIdFromToken = (req: Request) => {
   try {
     const token = req.get("Authorization");
 
     if (!token) {
-      throw new Common.Classes.AppError("Token not found, please login", 401);
+      throw new Classes.AppError("Token not found, please login", 401);
     }
 
     const tokenWithoutBearer = token.startsWith("Bearer ")
@@ -18,13 +18,13 @@ export const getUserIdFromToken = (req: Request) => {
 
     const decoded = jwt.verify(
       tokenWithoutBearer,
-      Common.Envs.JWT_SECRET as string
+      Envs.JWT_SECRET as string
     ) as Types.DecodedToken;
 
     if (!decoded) {
-      throw new Common.Classes.AppError("Invalid token", 401);
+      throw new Classes.AppError("Invalid token", 401);
     } else if (!decoded.userId) {
-      throw new Common.Classes.AppError("UserId not found", 404);
+      throw new Classes.AppError("UserId not found", 404);
     }
 
     return decoded.userId;
@@ -50,7 +50,7 @@ export const getUserIdFromToken = (req: Request) => {
           errorMessage = `Token error: ${message}, ${comMsg}`;
           break;
       }
-      throw new Common.Classes.AppError(errorMessage, 401);
+      throw new Classes.AppError(errorMessage, 401);
     }
     throw error;
   }

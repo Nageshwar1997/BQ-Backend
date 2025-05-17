@@ -1,5 +1,5 @@
 import { Models } from "..";
-import { Common } from "../../..";
+import { Classes } from "../../../common";
 
 export const getUserByEmail = async (email: string) => {
   try {
@@ -29,7 +29,7 @@ export const getUserByEmailOrPhoneNumber = async (
     }).lean();
 
     if (!user) {
-      throw new Common.Classes.AppError("User not found", 404);
+      throw new Classes.AppError("User not found", 404);
     }
 
     return user;
@@ -47,7 +47,7 @@ export const getUserById = async (id: string, needPassword?: boolean) => {
     const user = await query.lean();
 
     if (!user) {
-      throw new Common.Classes.AppError("User not found", 404);
+      throw new Classes.AppError("User not found", 404);
     }
     return user;
   } catch (error) {

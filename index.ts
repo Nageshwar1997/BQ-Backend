@@ -1,10 +1,10 @@
 import "dotenv/config";
 import path from "path";
 import express, { Request, Response } from "express";
-import { Common } from "./src";
+import { Configs, Envs, Middlewares, Routes } from "./src/common";
 
 const app = express();
-const port = Common.Envs.PORT || 5454;
+const port = Envs.PORT || 5454;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -12,9 +12,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.resolve("public")));
 
 // Custom Middlewares
-app.use(Common.Middlewares.Response.success);
-app.use(Common.Middlewares.Cors.checkOrigin);
-app.use(Common.Middlewares.Database.checkConnection);
+app.use(Middlewares.Response.success);
+app.use(Middlewares.Cors.checkOrigin);
+app.use(Middlewares.Database.checkConnection);
 
 // Home Route
 app.get("/", (_: Request, res: Response) => {
@@ -22,16 +22,16 @@ app.get("/", (_: Request, res: Response) => {
 });
 
 // Routes
-app.use("/api", Common.Routes.router);
+app.use("/api", Routes.router);
 
 // Error Handling Routes
-app.use(Common.Middlewares.Response.notFound);
-app.use(Common.Middlewares.Response.error);
+app.use(Middlewares.Response.notFound);
+app.use(Middlewares.Response.error);
 
-if (Common.Envs.NODE_ENV === "development") {
+if (Envs.NODE_ENV === "development") {
   app.listen(port, async () => {
     try {
-      await Common.Configs.Database.connect();
+      await Configs.Database.connect();
       console.log(`Server running on http://localhost:${port}`);
     } catch (error) {
       console.error("Server startup failed:", error);
