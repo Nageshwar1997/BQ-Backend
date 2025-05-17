@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { Types } from "mongoose";
 import bcrypt from "bcryptjs";
 
 import { AppError } from "../../../classes";
