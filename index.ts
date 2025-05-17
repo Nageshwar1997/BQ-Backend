@@ -1,6 +1,7 @@
 import "dotenv/config";
 import path from "path";
 import express, { Request, Response } from "express";
+import { Shared } from "./src";
 
 // import router from "./src/router";
 // import { connectDB } from "./src/configs";
@@ -9,10 +10,9 @@ import express, { Request, Response } from "express";
 //   CorsMiddleware,
 //   DatabaseMiddleware,
 // } from "./src/middlewares";
-// import { NODE_ENV, PORT } from "./src/envs";
 
 const app = express();
-// const port = PORT || 5454;
+const port = Shared.Envs.PORT || 5454;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -36,16 +36,16 @@ app.get("/", (_: Request, res: Response) => {
 // app.use(ResponseMiddleware.notFound);
 // app.use(ResponseMiddleware.error);
 
-// if (NODE_ENV === "development") {
-app.listen(8080, async () => {
-  try {
-    // await connectDB();
-    console.log(`Server running on http://localhost:${8080}`);
-  } catch (error) {
-    console.error("Server startup failed:", error);
-    process.exit(1);
-  }
-});
-// }
+if (Shared.Envs.NODE_ENV === "development") {
+  app.listen(port, async () => {
+    try {
+      // await connectDB();
+      console.log(`Server running on http://localhost:${8080}`);
+    } catch (error) {
+      console.error("Server startup failed:", error);
+      process.exit(1);
+    }
+  });
+}
 
 export default app;
