@@ -17,7 +17,9 @@ export const videoUploader = async ({
   const mainFolder = CLOUDINARY_MAIN_FOLDER;
   const subFolder = folder?.split(" ").join("_") || "Common_Folder";
 
-  const public_id = `${Date.now().toString()}_${file?.originalname
+  const publicId = `${new Date()
+    .toLocaleDateString()
+    .replace(/\//g, "_")}_${Date.now()}_${file?.originalname
     .split(" ")
     .join("_")
     .split(".")
@@ -40,7 +42,7 @@ export const videoUploader = async ({
         {
           resource_type: "video",
           folder: `${mainFolder}/${subFolder}`,
-          public_id,
+          public_id: publicId,
           allowed_formats: ["mp4", "webm"],
           overwrite: true, // Replace existing video
           invalidate: true, // Clear cache
