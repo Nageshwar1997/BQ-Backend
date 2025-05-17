@@ -6,7 +6,6 @@ import { BlogThumbnailType } from "../types";
 import { Blog } from "../models";
 import { BLOGS_THUMBNAILS, possibleEditBlogFields } from "../constants";
 import { AuthorizedRequest } from "../../../types";
-import { editBlogJoiSchema } from "../validations";
 import { MediaModule } from "../..";
 
 export const editBlogController = async (
@@ -57,18 +56,9 @@ export const editBlogController = async (
 
   for (const field of possibleEditBlogFields) {
     const value = req.body[field];
-    if (value !== undefined) {
-      updateBody[field] = field === "tags" ? JSON.parse(value) : value;
+    if (value && value !== undefined && value !== null) {
+      updateBody[field] = value;
     }
-  }
-
-  const { error } = editBlogJoiSchema.validate(updateBody);
-
-  if (error) {
-    const errorMessage = error.details
-      .map((detail) => detail.message)
-      .join(", ");
-    throw new AppError(errorMessage, 400);
   }
 
   try {

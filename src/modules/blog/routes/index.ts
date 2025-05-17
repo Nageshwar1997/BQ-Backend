@@ -13,7 +13,7 @@ import {
   MulterMiddleware,
   ZodMiddleware,
 } from "../../../middlewares";
-import { uploadBlogZodSchema } from "../validations";
+import { editBlogZodSchema, uploadBlogZodSchema } from "../validations";
 
 export const blogRouter = Router();
 
@@ -42,7 +42,7 @@ blogRouter.post(
 );
 
 // Blog Edit Route
-blogRouter.put(
+blogRouter.patch(
   "/blog/edit/:id",
   AuthMiddleware.authorization(["ADMIN", "SELLER", "MASTER"]),
   MulterMiddleware.validateFiles({
@@ -52,6 +52,7 @@ blogRouter.put(
       maxCount: 1,
     })),
   }),
+  ZodMiddleware.validateZodSchema(editBlogZodSchema),
   ResponseMiddleware.catchAsync(editBlogController)
 );
 
