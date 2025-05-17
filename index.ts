@@ -2,6 +2,7 @@ import "dotenv/config";
 import path from "path";
 import express, { Request, Response } from "express";
 import { Common } from "./src";
+import { Middlewares } from "./src/common";
 
 // import router from "./src/router";
 // import {
@@ -20,7 +21,7 @@ app.use(express.static(path.resolve("public")));
 
 // Custom Middlewares
 // app.use(ResponseMiddleware.success);
-// app.use(CorsMiddleware.checkOrigin);
+app.use(Middlewares.Cors.checkOrigin);
 // app.use(DatabaseMiddleware.checkConnection);
 
 // Home Route
