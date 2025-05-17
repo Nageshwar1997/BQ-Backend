@@ -2,7 +2,7 @@ import multer, { MulterError } from "multer";
 import { NextFunction, Request, Response } from "express";
 
 import { getCustomError, getMulterError } from "./utils";
-import { Classes, Types } from "..";
+import { Classes, Types } from "../..";
 
 export const validateFiles = ({
   type,

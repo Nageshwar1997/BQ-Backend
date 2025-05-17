@@ -1,4 +1,4 @@
-import { Constants, Types } from "../..";
+import { Constants, Types } from "../../..";
 
 export const getCustomError = ({
   files,
