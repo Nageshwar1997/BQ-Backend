@@ -5,11 +5,6 @@ import { Common } from "./src";
 import { Middlewares } from "./src/common";
 
 // import router from "./src/router";
-// import {
-//   ResponseMiddleware,
-//   CorsMiddleware,
-//   DatabaseMiddleware,
-// } from "./src/middlewares";
 
 const app = express();
 const port = Common.Envs.PORT || 5454;
@@ -20,27 +15,27 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.resolve("public")));
 
 // Custom Middlewares
-// app.use(ResponseMiddleware.success);
+app.use(Middlewares.Response.success);
 app.use(Middlewares.Cors.checkOrigin);
-// app.use(DatabaseMiddleware.checkConnection);
+app.use(Middlewares.Database.checkConnection);
 
 // Home Route
 app.get("/", (_: Request, res: Response) => {
-  // res.success(200, "Welcome to the MERN Beautinique API");
+  res.success(200, "Welcome to the MERN Beautinique API");
 });
 
 // Routes
 // app.use("/api", router);
 
-// // Error Handling Routes
-// app.use(ResponseMiddleware.notFound);
-// app.use(ResponseMiddleware.error);
+// Error Handling Routes
+app.use(Middlewares.Response.notFound);
+app.use(Middlewares.Response.error);
 
 if (Common.Envs.NODE_ENV === "development") {
   app.listen(port, async () => {
     try {
       await Common.Configs.Database.connect();
-      console.log(`Server running on http://localhost:${8080}`);
+      console.log(`Server running on http://localhost:${port}`);
     } catch (error) {
       console.error("Server startup failed:", error);
       process.exit(1);
