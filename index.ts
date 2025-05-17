@@ -1,10 +1,9 @@
 import "dotenv/config";
 import path from "path";
 import express, { Request, Response } from "express";
-import { Shared } from "./src";
+import { Common } from "./src";
 
 // import router from "./src/router";
-// import { connectDB } from "./src/configs";
 // import {
 //   ResponseMiddleware,
 //   CorsMiddleware,
@@ -12,7 +11,7 @@ import { Shared } from "./src";
 // } from "./src/middlewares";
 
 const app = express();
-const port = Shared.Envs.PORT || 5454;
+const port = Common.Envs.PORT || 5454;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -36,10 +35,10 @@ app.get("/", (_: Request, res: Response) => {
 // app.use(ResponseMiddleware.notFound);
 // app.use(ResponseMiddleware.error);
 
-if (Shared.Envs.NODE_ENV === "development") {
+if (Common.Envs.NODE_ENV === "development") {
   app.listen(port, async () => {
     try {
-      // await connectDB();
+      await Common.Configs.Database.connect();
       console.log(`Server running on http://localhost:${8080}`);
     } catch (error) {
       console.error("Server startup failed:", error);

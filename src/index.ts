@@ -1,1 +1,1 @@
-export * as Shared from "./shared";
+export * as Common from "./common";
