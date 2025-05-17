@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { Options } from "multer";
 
-import { User } from "../../modules";
+import { Modules } from "../..";
 
 // Connection config interface
 export interface IMongoOptions {
@@ -11,8 +11,9 @@ export interface IMongoOptions {
   minPoolSize?: number;
 }
 
+// Interface for authorized & authenticated requests with user
 export interface AuthRequest extends Request {
-  user?: Omit<User.Types.UserProps, "password">;
+  user?: Omit<Modules.User.Types.UserProps, "password">; // User object without password
 }
 
 export type MulterType = "single" | "array" | "any" | "fields" | "none";
