@@ -1,12 +1,12 @@
 import { NextFunction, Response } from "express";
-import { Auth, User } from "../../../modules";
 import { Classes, Types, Utils } from "../..";
+import { Modules } from "../../..";
 
 export const authorize =
-  (allowedRoles: User.Types.UserRoleType[]) =>
+  (allowedRoles: Modules.User.Types.UserRoleType[]) =>
   async (req: Types.AuthRequest, _: Response, next: NextFunction) => {
     try {
-      const userId = Auth.Services.getUserIdFromToken(req);
+      const userId = Modules.Auth.Services.getUserIdFromToken(req);
 
       const isValidId = Utils.isValidMongoId(userId);
 
@@ -14,7 +14,7 @@ export const authorize =
         throw new Classes.AppError("Invalid userId", 400);
       }
 
-      const user = await User.Services.getUserById(userId);
+      const user = await Modules.User.Services.getUserById(userId);
 
       if (!allowedRoles.includes(user.role)) {
         throw new Classes.AppError("Unauthorized", 401);
