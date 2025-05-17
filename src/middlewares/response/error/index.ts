@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Error as MongooseError } from "mongoose";
-import { AppError } from "../../../classes";
+
+import { AppError } from "../../../shared/classes";
 import { NODE_ENV } from "../../../envs";
 
 const sendDevError = (err: AppError, res: Response): void => {
