@@ -3,7 +3,7 @@
   "name": "bq-backend",
   "builds": [
     {
-      "src": "src/index.ts",
+      "src": "index.ts",
       "use": "@vercel/node",
       "config": {
         "includeFiles": ["src/**/*.ts"],
@@ -14,7 +14,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "src/index.ts"
+      "dest": "index.ts"
     }
   ]
 }
