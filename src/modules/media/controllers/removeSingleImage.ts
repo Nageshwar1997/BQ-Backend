@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { allowedOptions } from "../constants";
-import { Classes } from "../../../shared";
+import { AppError } from "../../../classes";
 import { singleImageRemover } from "../utils";
 
 export const removeSingleImageController = async (
@@ -15,7 +15,7 @@ export const removeSingleImageController = async (
     !cloudinaryConfigOption ||
     !allowedOptions.includes(cloudinaryConfigOption)
   ) {
-    throw new Classes.AppError(
+    throw new AppError(
       `Invalid cloudinary config option. Allowed options are "image", "video", or "product".`,
       400
     );

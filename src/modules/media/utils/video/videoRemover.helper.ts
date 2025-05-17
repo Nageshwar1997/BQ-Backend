@@ -1,6 +1,6 @@
 import { UploadApiResponse } from "cloudinary";
 
-import { Classes } from "../../../../shared";
+import { AppError } from "../../../../classes";
 import { CloudinaryConfigOption } from "../../types";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
 
@@ -9,7 +9,7 @@ export const videoRemover = async (
   cloudinaryConfigOption: CloudinaryConfigOption = "video"
 ) => {
   if (!videoUrl) {
-    throw new Classes.AppError("Video URL is required", 400);
+    throw new AppError("Video URL is required", 400);
   }
 
   // Updated regex to handle .mp4, .webm, and .m3u8
@@ -17,7 +17,7 @@ export const videoRemover = async (
   const match = videoUrl.match(regex);
 
   if (!match || !match[1]) {
-    throw new Classes.AppError("Invalid Cloudinary video URL", 400);
+    throw new AppError("Invalid Cloudinary video URL", 400);
   }
 
   const publicId = match[1];
@@ -28,7 +28,7 @@ export const videoRemover = async (
   );
 
   if (cloudinaryConnectionTest.error) {
-    throw new Classes.AppError(cloudinaryConnectionTest.message, 500);
+    throw new AppError(cloudinaryConnectionTest.message, 500);
   }
 
   try {
@@ -41,7 +41,7 @@ export const videoRemover = async (
         (error, result) => {
           if (error) {
             return reject(
-              new Classes.AppError(
+              new AppError(
                 error.message || "Failed to remove video from Cloudinary",
                 500
               )
@@ -54,7 +54,7 @@ export const videoRemover = async (
 
     return result;
   } catch (error) {
-    throw new Classes.AppError(
+    throw new AppError(
       error instanceof Error
         ? error.message
         : "Unexpected error during video removal",

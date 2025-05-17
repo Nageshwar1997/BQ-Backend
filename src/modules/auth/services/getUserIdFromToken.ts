@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Request } from "express";
 
-import { Classes } from "../../../shared";
+import { AppError } from "../../../classes";
 import { JWT_SECRET } from "../../../envs";
 import { DecodedToken } from "../types";
 
@@ -10,7 +10,7 @@ export const getUserIdFromToken = (req: Request) => {
     const token = req.get("Authorization");
 
     if (!token) {
-      throw new Classes.AppError("Token not found, please login", 401);
+      throw new AppError("Token not found, please login", 401);
     }
 
     const tokenWithoutBearer = token.startsWith("Bearer ")
@@ -23,9 +23,9 @@ export const getUserIdFromToken = (req: Request) => {
     ) as DecodedToken;
 
     if (!decoded) {
-      throw new Classes.AppError("Invalid token", 401);
+      throw new AppError("Invalid token", 401);
     } else if (!decoded.userId) {
-      throw new Classes.AppError("UserId not found", 404);
+      throw new AppError("UserId not found", 404);
     }
 
     return decoded.userId;
@@ -51,7 +51,7 @@ export const getUserIdFromToken = (req: Request) => {
           errorMessage = `Token error: ${message}, ${comMsg}`;
           break;
       }
-      throw new Classes.AppError(errorMessage, 401);
+      throw new AppError(errorMessage, 401);
     }
     throw error;
   }

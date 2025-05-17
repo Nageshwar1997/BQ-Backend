@@ -1,7 +1,7 @@
 import { Response } from "express";
 
 import { BLOGS_THUMBNAILS } from "../constants";
-import { Classes } from "../../../shared";
+import { AppError } from "../../../classes";
 import { Blog } from "../models";
 import { AuthorizedRequest } from "../../../types";
 import { getCloudinaryOptimizedUrl } from "../../../utils";
@@ -29,10 +29,7 @@ export const uploadBlogController = async (
   }).lean();
 
   if (isExistBlog) {
-    throw new Classes.AppError(
-      "Blog already exists with Main Title OR Subtitle",
-      400
-    );
+    throw new AppError("Blog already exists with Main Title OR Subtitle", 400);
   }
 
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -73,7 +70,7 @@ export const uploadBlogController = async (
     const blog = await Blog.create(cleanedData);
 
     if (!blog) {
-      throw new Classes.AppError("Failed to upload blog", 400);
+      throw new AppError("Failed to upload blog", 400);
     }
 
     res.success(201, "Blog uploaded successfully", { blog });

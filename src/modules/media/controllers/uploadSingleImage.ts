@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { allowedOptions } from "../constants";
-import { Classes } from "../../../shared";
+import { AppError } from "../../../classes";
 import { singleImageUploader } from "../utils";
 import { getCloudinaryOptimizedUrl } from "../../../utils";
 
@@ -15,14 +15,14 @@ export const uploadSingleImageController = async (
     !cloudinaryConfigOption ||
     !allowedOptions.includes(cloudinaryConfigOption)
   ) {
-    throw new Classes.AppError(
+    throw new AppError(
       `Invalid cloudinary config option. Allowed options are "image", "video", or "product".`,
       400
     );
   }
 
   if (!req.file) {
-    throw new Classes.AppError("Image file is required", 404);
+    throw new AppError("Image file is required", 404);
   }
 
   const result = await singleImageUploader({

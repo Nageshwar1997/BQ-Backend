@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
 
-import { Classes } from "../../../shared";
+import { AppError } from "../../../classes";
 import { getCloudinaryOptimizedUrl } from "../../../utils";
 import { MediaModule, UserModule } from "../..";
 import { generateToken } from "../services";
@@ -18,7 +18,7 @@ export const registerController = async (req: Request, res: Response) => {
   const isEmailExists = await UserModule.Services.getUserByEmail(email);
 
   if (isEmailExists) {
-    throw new Classes.AppError("Email already exists", 400);
+    throw new AppError("Email already exists", 400);
   }
 
   const isPhoneNumberExists = await UserModule.Services.getUserByPhoneNumber(
@@ -26,7 +26,7 @@ export const registerController = async (req: Request, res: Response) => {
   );
 
   if (isPhoneNumberExists) {
-    throw new Classes.AppError("Phone number already exists", 400);
+    throw new AppError("Phone number already exists", 400);
   }
 
   const file = req.file;
@@ -66,6 +66,6 @@ export const registerController = async (req: Request, res: Response) => {
     });
   } catch (error) {
     await MediaModule.Utils.singleImageRemover(profilePic, "image");
-    throw new Classes.AppError("Failed to register user", 500);
+    throw new AppError("Failed to register user", 500);
   }
 };

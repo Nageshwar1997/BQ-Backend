@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ALLOWED_IMAGE_TYPES, singleSpaceRegex } from "../../../constants";
-import { Classes } from "../../../shared";
+import { AppError } from "../../../classes";
 import { ValidateBlogFieldProps } from "../types";
 
 export const validateField = (props: ValidateBlogFieldProps) => {
@@ -153,7 +153,7 @@ export const validateField = (props: ValidateBlogFieldProps) => {
     }
 
     default:
-      throw new Classes.AppError(
+      throw new AppError(
         `Validation for field '${field}' is not implemented.`,
         500
       );

@@ -1,4 +1,4 @@
-import { Classes } from "../../../shared";
+import { AppError } from "../../../classes";
 import { User } from "../models";
 
 export const getUserByEmail = async (email: string) => {
@@ -29,7 +29,7 @@ export const getUserByEmailOrPhoneNumber = async (
     }).lean();
 
     if (!user) {
-      throw new Classes.AppError("User not found", 404);
+      throw new AppError("User not found", 404);
     }
 
     return user;
@@ -47,7 +47,7 @@ export const getUserById = async (id: string, needPassword?: boolean) => {
     const user = await query.lean();
 
     if (!user) {
-      throw new Classes.AppError("User not found", 404);
+      throw new AppError("User not found", 404);
     }
     return user;
   } catch (error) {

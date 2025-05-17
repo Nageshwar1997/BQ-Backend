@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { isValidMongoId } from "../../../utils";
-import { Classes } from "../../../shared";
+import { AppError } from "../../../classes";
 import { getUserById } from "../services";
 import { AuthModule } from "../..";
 
@@ -10,7 +10,7 @@ export const getUserController = async (req: Request, res: Response) => {
   const isValidId = isValidMongoId(userId);
 
   if (!isValidId) {
-    throw new Classes.AppError("Invalid userId", 400);
+    throw new AppError("Invalid userId", 400);
   }
 
   const user = await getUserById(userId);

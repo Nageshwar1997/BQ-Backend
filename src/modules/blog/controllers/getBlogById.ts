@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { isValidMongoId } from "../../../utils";
-import { Classes } from "../../../shared";
+import { AppError } from "../../../classes";
 import { Blog } from "../models";
 
 export const getBlogByIdController = async (req: Request, res: Response) => {
@@ -8,13 +8,13 @@ export const getBlogByIdController = async (req: Request, res: Response) => {
   const isValidId = isValidMongoId(id);
 
   if (!isValidId) {
-    throw new Classes.AppError("Invalid Blog Id provided", 404);
+    throw new AppError("Invalid Blog Id provided", 404);
   }
 
   const blog = await Blog.findById(id).lean();
 
   if (!blog) {
-    throw new Classes.AppError("Blog not found", 404);
+    throw new AppError("Blog not found", 404);
   }
 
   res.success(200, "Blog fetched successfully", { blog });

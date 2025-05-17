@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { Classes } from "../../../shared";
+import { AppError } from "../../../classes";
 import { allowedOptions } from "../constants";
 import { singleImageUploader } from "../utils";
 import { getCloudinaryOptimizedUrl } from "../../../utils";
@@ -10,7 +10,7 @@ export const uploadMultipleImagesController = async (
   res: Response
 ) => {
   if (!req.files || !(req.files instanceof Array)) {
-    throw new Classes.AppError("No files uploaded", 400);
+    throw new AppError("No files uploaded", 400);
   }
 
   const cloudinaryConfigOption = req.body?.cloudinaryConfigOption;
@@ -19,7 +19,7 @@ export const uploadMultipleImagesController = async (
     !cloudinaryConfigOption ||
     !allowedOptions.includes(cloudinaryConfigOption)
   ) {
-    throw new Classes.AppError(
+    throw new AppError(
       `Invalid cloudinary config option. Allowed options are "image", "video", or "product".`,
       400
     );

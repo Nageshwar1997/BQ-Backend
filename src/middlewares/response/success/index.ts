@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AppSuccess } from "../../../shared/classes";
+import { AppSuccess } from "../../../classes";
 
 declare module "express-serve-static-core" {
   interface Response {
