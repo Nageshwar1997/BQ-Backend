@@ -5,3 +5,4 @@ export * as Constants from "./constants";
 export * as Configs from "./configs";
 export * as Middlewares from "./middlewares";
 export * as Utils from "./utils";
+export * as Routes from "./routes";
