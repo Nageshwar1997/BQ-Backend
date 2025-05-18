@@ -123,32 +123,19 @@ export const validateField = (props: ValidateBlogFieldProps) => {
           message: `${field} is required.`,
         })
         .pipe(
-          z.union([
-            z
-              .custom<Express.Multer.File>(
-                (file) => !!file && typeof file === "object",
-                {
-                  message: `${field} is required.`,
-                }
-              )
-              .refine((file) => ALLOWED_IMAGE_TYPES.includes(file.mimetype), {
-                message: `${field} must be an image of type: ${ALLOWED_IMAGE_TYPES.map(
-                  (type) => type.split("/")[1]
-                ).join(", ")}`,
-              }),
-            z
-              .string({
-                required_error: `${field} is required.`,
-                invalid_type_error: `${field} must be a valid image URL.`,
-              })
-              .url(`${field} must be a valid URL.`)
-              .refine(
-                (url) => /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i.test(url),
-                {
-                  message: `${field} must be a valid image URL ending in .jpg, .png, etc.`,
-                }
-              ),
-          ])
+          z
+            .custom<Express.Multer.File>(
+              (file) =>
+                !!file && typeof file === "object" && "mimetype" in file,
+              {
+                message: `${field} must be a valid image file.`,
+              }
+            )
+            .refine((file) => ALLOWED_IMAGE_TYPES.includes(file.mimetype), {
+              message: `${field} must be an image of type: ${ALLOWED_IMAGE_TYPES.map(
+                (type) => type.split("/")[1]
+              ).join(", ")}`,
+            })
         );
     }
 
