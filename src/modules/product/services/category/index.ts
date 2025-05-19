@@ -1,30 +1,21 @@
 import { Types } from "mongoose";
 
-import { AppError } from "../../../../classes";
 import { Category } from "../../models";
-import { createCategoryJoiSchema } from "../../validations";
 
 export const createCategory = async (
   name: string,
-  level: number,
-  parentCategory: Types.ObjectId | string | null
+  category: string,
+  parentCategory: Types.ObjectId | string | null,
+  level: number
 ) => {
   try {
-    const { error } = createCategoryJoiSchema.validate({
+    const cat = await Category.create({
       name,
-      level,
       parentCategory,
+      level,
+      category,
     });
-
-    if (error) {
-      const errorMessage = error.details
-        .map((detail) => detail.message)
-        .join(", ");
-      throw new AppError(errorMessage, 400);
-    }
-
-    const category = await Category.create({ name, parentCategory, level });
-    return category;
+    return cat;
   } catch (error) {
     throw error;
   }
@@ -32,11 +23,18 @@ export const createCategory = async (
 
 export const getCategoryByNameAndParentId = async (
   name: string,
-  parentCategory: Types.ObjectId | string | null
+  category: string,
+  parentCategory: Types.ObjectId | string | null,
+  level: number
 ) => {
   try {
-    const category = await Category.findOne({ name, parentCategory });
-    return category;
+    const cat = await Category.findOne({
+      name,
+      parentCategory,
+      level,
+      category,
+    }).lean();
+    return cat;
   } catch (error) {
     throw error;
   }
@@ -44,17 +42,23 @@ export const getCategoryByNameAndParentId = async (
 
 export const findOrCreateCategory = async (
   name: string,
-  level: number,
-  parentCategory: Types.ObjectId | string | null
+  category: string,
+  parentCategory: Types.ObjectId | string | null,
+  level: number
 ) => {
   try {
-    let category = await getCategoryByNameAndParentId(name, parentCategory);
+    let cat = await getCategoryByNameAndParentId(
+      name,
+      category,
+      parentCategory,
+      level
+    );
 
-    if (!category) {
-      category = await createCategory(name, level, parentCategory);
+    if (!cat) {
+      cat = await createCategory(name, category, parentCategory, level);
     }
 
-    return category;
+    return cat;
   } catch (error) {
     throw error;
   }
