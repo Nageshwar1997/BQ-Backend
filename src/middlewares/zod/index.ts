@@ -13,12 +13,31 @@ export const validateZodSchema = (schema: ZodSchema) => {
       );
     }
 
+    let filePayload: Record<
+      string,
+      Express.Multer.File | Express.Multer.File[]
+    > = {};
+
+    if (Array.isArray(req.files)) {
+      // Group files by fieldname
+      filePayload = req.files.reduce((acc, file) => {
+        if (!acc[file.fieldname]) {
+          acc[file.fieldname] = [];
+        }
+        (acc[file.fieldname] as Express.Multer.File[]).push(file);
+        return acc;
+      }, {} as Record<string, Express.Multer.File[]>);
+    } else {
+      // Multer's field-based object format
+      filePayload = Object.fromEntries(
+        Object.entries(req.files || {}).map(([key, value]) => [key, value])
+      );
+    }
+
     const payload = {
       ...req.body,
       ...(req.file && { file: req.file }),
-      ...Object.fromEntries(
-        Object.entries(req.files || {}).map(([key, value]) => [key, value[0]])
-      ),
+      ...filePayload,
     };
 
     const result = schema.safeParse(payload);
