@@ -33,9 +33,9 @@ productRouter.post(
     ],
   }),
   ZodMiddleware.validateZodSchema(createCategoryZodSchema),
-  ResponseMiddleware.catchAsync(addCategoryToRequest),
+  ResponseMiddleware.catchAsync(addCategoryToRequest), // Add Category to Request
   ZodMiddleware.validateZodSchema(addShadeZodSchema),
-  ResponseMiddleware.catchAsync(addShadesToRequest),
+  ResponseMiddleware.catchAsync(addShadesToRequest), // Add Shades to Request & and add common images
   ZodMiddleware.validateZodSchema(uploadProductZodSchema),
   ResponseMiddleware.catchAsync(uploadProductController)
 );
