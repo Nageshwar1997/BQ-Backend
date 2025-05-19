@@ -120,24 +120,4 @@ export const uploadProductZodSchema = z.object({
       invalid_type_error: "Common images must be an array.",
     }
   ),
-  // categoryLevelOne: z
-  //   .string({
-  //     required_error: "Category Level One is required.",
-  //     invalid_type_error: "Category Level One must be a string.",
-  //   })
-  //   .min(1, "Category Level One is required."),
-
-  // categoryLevelTwo: z
-  //   .string({
-  //     required_error: "Category Level Two is required.",
-  //     invalid_type_error: "Category Level Two must be a string.",
-  //   })
-  //   .min(1, "Category Level Two is required."),
-
-  // categoryLevelThree: z
-  //   .string({
-  //     required_error: "Category Level Three is required.",
-  //     invalid_type_error: "Category Level Three must be a string.",
-  //   })
-  //   .min(1, "Category Level Three is required."),
 });
