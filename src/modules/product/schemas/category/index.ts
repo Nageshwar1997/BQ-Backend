@@ -4,6 +4,7 @@ import { CategoryProps } from "../../types";
 export const categorySchema = new Schema<CategoryProps>(
   {
     name: { type: String, required: true, trim: true },
+    category: { type: String, required: true, trim: true },
     level: { type: Number, required: true, default: 1 },
     parentCategory: {
       type: Schema.Types.ObjectId,
