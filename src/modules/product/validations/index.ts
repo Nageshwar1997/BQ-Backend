@@ -1,3 +1,3 @@
-export * from "./category-joi-schema";
-export * from "./product-joi-schema";
-export * from "./shade-joi-schema";
+export * from "./category";
+export * from "./product";
+export * from "./shade";
