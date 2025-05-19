@@ -1,8 +1,10 @@
+import { Types } from "mongoose";
 import { NextFunction, Response } from "express";
 import { AuthorizedRequest } from "../../../../types";
 import { MediaModule } from "../../..";
 import { getCloudinaryOptimizedUrl } from "../../../../utils";
 import { AppError } from "../../../../classes";
+import { Shade } from "../../models";
 
 export const addShadesToRequest = async (
   req: AuthorizedRequest,
@@ -12,24 +14,51 @@ export const addShadesToRequest = async (
   const files = req.files as Express.Multer.File[];
   const { shades, title } = req.body;
 
-  if (shades) {
-    try {
-      const shadesData = Array.isArray(shades) ? shades : [shades];
+  const commonImageFiles: Express.Multer.File[] = [];
+  let uploadedCommonImages: string[] = [];
+  let uploadedAllShadesImages: string[] = [];
 
-      const shadeImagesMap: Record<number, Express.Multer.File[]> = {};
-      files?.forEach((file) => {
-        const shadeMatch = file?.fieldname.match(/^shades\[(\d+)\]\[images\]/);
+  const shadeImagesMap: Record<number, Express.Multer.File[]> = {};
+  files?.forEach((file) => {
+    if (file.fieldname.startsWith("commonImages")) {
+      commonImageFiles.push(file);
+    } else {
+      const shadeMatch = file?.fieldname.match(/^shades\[(\d+)\]\[images\]/);
 
-        if (shadeMatch) {
-          const shadeIndex = parseInt(shadeMatch[1]);
-          if (!shadeImagesMap[shadeIndex]) {
-            shadeImagesMap[shadeIndex] = [];
-          }
-          shadeImagesMap[shadeIndex].push(file);
+      if (shadeMatch) {
+        const shadeIndex = parseInt(shadeMatch[1]);
+        if (!shadeImagesMap[shadeIndex]) {
+          shadeImagesMap[shadeIndex] = [];
         }
+        shadeImagesMap[shadeIndex].push(file);
+      }
+    }
+  });
+
+  if (!commonImageFiles.length) {
+    throw new AppError("Common images are required", 400);
+  }
+
+  try {
+    // Upload common images
+    const uploadedCommonImagesResult =
+      await MediaModule.Utils.multipleImagesUploader({
+        files: commonImageFiles,
+        folder: `Products/${title}/Common_Images`,
+        cloudinaryConfigOption: "product",
       });
 
+    uploadedCommonImages = uploadedCommonImagesResult.map((img) =>
+      getCloudinaryOptimizedUrl(img.secure_url)
+    );
+    req.body.commonImages = uploadedCommonImages;
+
+    if (shades) {
+      const shadesData = Array.isArray(shades) ? shades : [shades];
+      let newShadeIds: (string | Types.ObjectId)[] = [];
+
       const missingShadeErrors: string[] = [];
+      let totalStock = 0;
 
       shadesData.forEach((shade, idx) => {
         if (!(shadeImagesMap[idx] && shadeImagesMap[idx].length > 0)) {
@@ -52,26 +81,23 @@ export const addShadesToRequest = async (
         throw new AppError(errorMessage, 400);
       }
 
-      const shadesTotalStock = shadesData.reduce(
-        (total, shade) => total + shade.stock,
-        0
-      );
-
       // Upload shade images
       const enrichedShades = await Promise.all(
         shadesData.map(async (shade, idx) => {
           const shadeFiles = shadeImagesMap[idx] || [];
 
-          const uploadedShadeImages =
+          totalStock += shade.stock;
+          const uploadedShadeImagesResult =
             await MediaModule.Utils.multipleImagesUploader({
               files: shadeFiles,
               folder: `Products/${title}/Shades/${shade.shadeName}`,
               cloudinaryConfigOption: "product",
             });
 
-          const images = uploadedShadeImages.map((img) =>
+          const images = uploadedShadeImagesResult.map((img) =>
             getCloudinaryOptimizedUrl(img.secure_url)
           );
+          uploadedAllShadesImages.push(...images);
 
           return {
             ...shade,
@@ -81,15 +107,32 @@ export const addShadesToRequest = async (
         })
       );
 
-      req.body.shades = enrichedShades ?? [];
+      newShadeIds = await Promise.all(
+        enrichedShades.map(async (shade) => {
+          const newShade = await Shade.create(shade);
+          return newShade._id;
+        })
+      );
 
-      req.body.shadesTotalStock = shadesTotalStock ?? 0;
-
-      next();
-    } catch (error) {
-      next(error);
+      req.body.shades = newShadeIds || [];
+      req.body.totalStock = totalStock || 0;
     }
-  } else {
+
     next();
+  } catch (error) {
+    if (uploadedCommonImages.length) {
+      await MediaModule.Utils.multipleImagesRemover(
+        uploadedCommonImages,
+        "product"
+      );
+    }
+    // Remove uploaded images
+    if (uploadedAllShadesImages.length > 0) {
+      await MediaModule.Utils.multipleImagesRemover(
+        uploadedAllShadesImages,
+        "product"
+      );
+    }
+    next(error);
   }
 };

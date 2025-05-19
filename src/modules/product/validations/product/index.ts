@@ -95,29 +95,4 @@ export const uploadProductZodSchema = z.object({
     .regex(noDoubleSpacesRegex, "Multiple spaces are not allowed.")
     .optional()
     .or(z.literal("")),
-  commonImages: z.array(
-    z
-      .any()
-      .refine((val) => val !== undefined && val !== null, {
-        message: `Common image is required.`,
-      })
-      .pipe(
-        z
-          .custom<Express.Multer.File>(
-            (file) => !!file && typeof file === "object" && "mimetype" in file,
-            {
-              message: `Common image must be a valid image file.`,
-            }
-          )
-          .refine((file) => ALLOWED_IMAGE_TYPES.includes(file.mimetype), {
-            message: `Common image must be an image of type: ${ALLOWED_IMAGE_TYPES.map(
-              (type) => type.split("/")[1]
-            ).join(", ")}`,
-          })
-      ),
-    {
-      required_error: "Common images are required.",
-      invalid_type_error: "Common images must be an array.",
-    }
-  ),
 });

@@ -26,7 +26,7 @@ export const uploadProductController = async (
     ingredients,
     additionalDetails,
     category,
-    shadesTotalStock,
+    commonImages,
     totalStock,
     shades,
   } = {
@@ -40,43 +40,9 @@ export const uploadProductController = async (
     additionalDetails: req.body.additionalDetails?.trim(),
     category: req.body.category,
     totalStock: req.body.totalStock,
-    shadesTotalStock: req.body?.shadesTotalStock,
+    commonImages: req.body.commonImages,
     shades: req.body.shades,
   };
-
-  const commonImages: Express.Multer.File[] = files?.filter((file) =>
-    file.fieldname.startsWith("commonImages")
-  );
-
-  let uploadedCommonImages: UploadApiResponse[] | [] = [];
-  let newShadeIds: (string | Types.ObjectId)[] = [];
-  let finalStock = 0;
-
-  // Upload common images
-  uploadedCommonImages = await MediaModule.Utils.multipleImagesUploader({
-    files: commonImages,
-    folder: `Products/${title}/Common_Images`,
-    cloudinaryConfigOption: "product",
-  });
-
-  // Upload shades
-  if (shades?.length > 0) {
-    newShadeIds = await Promise.all(
-      shades.map(async (shade: ShadeProps) => {
-        const newShade = await Shade.create(shade);
-        return newShade._id;
-      })
-    );
-
-    if (shadesTotalStock === totalStock) {
-      finalStock = totalStock;
-    } else {
-      throw new AppError(
-        "Shades total stock and total stock should be same",
-        400
-      );
-    }
-  }
 
   const finalData = {
     title,
@@ -90,11 +56,9 @@ export const uploadProductController = async (
     seller: user?._id,
     originalPrice,
     sellingPrice,
-    commonImages: uploadedCommonImages.map((img) =>
-      getCloudinaryOptimizedUrl(img.secure_url)
-    ),
-    shades: newShadeIds,
-    totalStock: finalStock,
+    commonImages,
+    shades,
+    totalStock,
   };
   try {
     const product = await Product.create(finalData);
@@ -102,24 +66,18 @@ export const uploadProductController = async (
     res.success(200, "Product uploaded successfully", { product });
   } catch (error) {
     // Rollback: Remove uploaded common images
-    if (uploadedCommonImages.length > 0) {
-      await MediaModule.Utils.multipleImagesRemover(
-        uploadedCommonImages.map((img) => img.secure_url),
-        "product"
-      );
+    if (commonImages.length > 0) {
+      await MediaModule.Utils.multipleImagesRemover(commonImages, "product");
     }
 
     // Rollback: Remove uploaded shades
-    if (newShadeIds.length > 0) {
-      await Shade.deleteMany({ _id: { $in: newShadeIds } });
-    }
-
-    if (shades.length > 0) {
+    if (shades.length) {
+      await Shade.deleteMany({ _id: { $in: shades } }); // To remove all shades
       await Promise.all(
         shades.map((shade: ShadeProps) =>
           MediaModule.Utils.multipleImagesRemover(shade.images, "product")
         )
-      );
+      ); // To remove all shade images
     }
 
     throw error;
