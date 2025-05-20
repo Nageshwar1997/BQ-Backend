@@ -47,3 +47,11 @@ export interface CustomFileErrorProps {
   customLimits?: CustomLimitsType;
   customFileTypes?: CustomFileType;
 }
+
+export interface ValidateZodFieldProps {
+  min?: number | undefined;
+  max?: number | undefined;
+  blockMultipleSpaces?: boolean;
+  blockSingleSpace?: boolean;
+  nonEmpty?: boolean;
+}

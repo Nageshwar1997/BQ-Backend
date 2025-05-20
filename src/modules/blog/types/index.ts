@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { ValidateZodFieldProps } from "../../../types";
 
 export interface BlogProps {
   mainTitle: string;
@@ -15,10 +16,6 @@ export interface BlogProps {
 
 export type BlogThumbnailType = "smallThumbnail" | "largeThumbnail";
 
-export interface ValidateBlogFieldProps {
+export interface ValidateBlogFieldProps extends ValidateZodFieldProps {
   field: keyof BlogProps;
-  min?: number | undefined;
-  max?: number | undefined;
-  checkSpace?: boolean;
-  nonEmpty?: boolean;
 }
