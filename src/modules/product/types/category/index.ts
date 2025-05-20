@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { ValidateZodFieldProps } from "../../../../types";
 
 export interface CategoryProps {
   name: string;
@@ -6,3 +7,5 @@ export interface CategoryProps {
   level: number;
   parentCategory: Types.ObjectId | null;
 }
+
+export type ValidateCategoryFieldProps = ValidateZodFieldProps;
