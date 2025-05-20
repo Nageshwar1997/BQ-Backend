@@ -31,9 +31,6 @@ export const validateZodString = ({
 }: ZodStringProps) => {
   const nestedField = parentField ? `${parentField}.${field}` : field;
 
-  if (parentField) {
-    console.log("nestedField", nestedField);
-  }
   let schema = z
     .string({
       required_error: `The '${nestedField}' field is required.`,
