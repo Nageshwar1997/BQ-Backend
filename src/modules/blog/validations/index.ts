@@ -5,7 +5,7 @@ const commonRequirements = {
   isString: true,
   min: 10,
   max: 100,
-  checkSpace: true,
+  blockMultipleSpaces: true,
   nonEmpty: true,
 };
 

@@ -4,7 +4,13 @@ import { AppError } from "../../../classes";
 import { ValidateBlogFieldProps } from "../types";
 
 export const validateField = (props: ValidateBlogFieldProps) => {
-  const { field, min, max, checkSpace = false, nonEmpty = false } = props;
+  const {
+    field,
+    min,
+    max,
+    blockMultipleSpaces = false,
+    nonEmpty = false,
+  } = props;
 
   switch (field) {
     case "mainTitle":
@@ -37,7 +43,7 @@ export const validateField = (props: ValidateBlogFieldProps) => {
         );
       }
 
-      if (checkSpace) {
+      if (blockMultipleSpaces) {
         schema = schema.regex(
           singleSpaceRegex,
           `Field: '${field}' Only one space is allowed between words.`
