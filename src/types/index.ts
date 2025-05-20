@@ -48,14 +48,21 @@ export interface CustomFileErrorProps {
   customFileTypes?: CustomFileType;
 }
 
-export interface ZodStringProps {
+export interface ZodCommonProps {
   field: string;
   parentField?: string;
   min?: number | undefined;
   max?: number | undefined;
+}
+
+export interface ZodStringProps extends ZodCommonProps {
   blockMultipleSpaces?: boolean;
   blockSingleSpace?: boolean;
   nonEmpty?: boolean;
 }
 
-export type ValidateZodFieldProps = ZodStringProps;
+export interface ZodNumberProps extends ZodCommonProps {
+  mustBeInt?: boolean;
+}
+
+export interface ValidateZodFieldProps extends ZodStringProps, ZodNumberProps {}

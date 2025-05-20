@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { z } from "zod";
 
-import { ZodStringProps } from "../types";
+import { ZodNumberProps, ZodStringProps } from "../types";
 import { noSpaceRegex, singleSpaceRegex } from "../constants";
 
 export const isValidMongoId = (id: string): boolean => {
@@ -44,14 +44,14 @@ export const validateZodString = ({
     });
   }
 
-  if (min) {
+  if (min !== undefined) {
     schema = schema.min(
       min,
       `The '${nestedField}' field must be at least ${min} characters long.`
     );
   }
 
-  if (max) {
+  if (max !== undefined) {
     schema = schema.max(
       max,
       `'${nestedField}' must not exceed ${max} characters.`
@@ -69,6 +69,47 @@ export const validateZodString = ({
     schema = schema.regex(
       noSpaceRegex,
       `The '${nestedField}' field must not contain any spaces.`
+    );
+  }
+
+  return schema;
+};
+
+export const validateZodNumber = ({
+  field,
+  parentField,
+  min,
+  max,
+  mustBeInt = false,
+}: ZodNumberProps) => {
+  const nestedField = parentField ? `${parentField}.${field}` : field;
+
+  let schema = z.coerce
+    .number({
+      required_error: `The '${nestedField}' field is required.`,
+      invalid_type_error: `The '${nestedField}' field must be a number.`,
+    })
+    .nonnegative({
+      message: `The '${nestedField}' field must be a non-negative number.`,
+    });
+
+  if (mustBeInt) {
+    schema = schema.int({
+      message: `The '${nestedField}' field must be an integer.`,
+    });
+  }
+
+  if (min !== undefined) {
+    schema = schema.min(
+      min,
+      `The '${nestedField}' field must be at least ${min}.`
+    );
+  }
+
+  if (max !== undefined) {
+    schema = schema.max(
+      max,
+      `The '${nestedField}' field must not exceed ${max}.`
     );
   }
 
