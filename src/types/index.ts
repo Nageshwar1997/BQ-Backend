@@ -53,6 +53,7 @@ export interface ZodCommonProps {
   parentField?: string;
   min?: number | undefined;
   max?: number | undefined;
+  isOptional?: boolean;
   customRegex?: {
     regex: RegExp;
     message: string;
