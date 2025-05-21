@@ -53,6 +53,10 @@ export interface ZodCommonProps {
   parentField?: string;
   min?: number | undefined;
   max?: number | undefined;
+  customRegex?: {
+    regex: RegExp;
+    message: string;
+  };
 }
 
 export interface ZodStringProps extends ZodCommonProps {
@@ -63,6 +67,8 @@ export interface ZodStringProps extends ZodCommonProps {
 
 export interface ZodNumberProps extends ZodCommonProps {
   mustBeInt?: boolean;
+  nonNegative?: boolean;
+  checkNaN?: boolean;
 }
 
 export interface ValidateZodFieldProps extends ZodStringProps, ZodNumberProps {}
