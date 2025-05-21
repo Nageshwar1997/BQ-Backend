@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { ALLOWED_IMAGE_TYPES } from "../../../../constants";
 
 const noDoubleSpacesRegex = /^(?!.*\s{2,}).*$/;
 
