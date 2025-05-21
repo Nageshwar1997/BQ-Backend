@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { z } from "zod";
 
-import { ZodNumberProps, ZodStringProps } from "../types";
+import { ZodNumberConfigs, ZodStringProps } from "../types";
 import { noSpaceRegex, singleSpaceRegex } from "../constants";
 
 export const isValidMongoId = (id: string): boolean => {
@@ -156,7 +156,9 @@ export const validateZodNumber = ({
   max,
   mustBeInt = false,
   nonNegative = true,
-}: ZodNumberProps) => {
+  customRegex,
+  isOptional = false,
+}: ZodNumberConfigs) => {
   const nestedField = parentField ? `${parentField}.${field}` : field;
 
   let schema = z.coerce.number({

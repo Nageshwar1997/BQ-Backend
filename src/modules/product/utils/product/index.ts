@@ -1,6 +1,6 @@
 import { AppError } from "../../../../classes";
 import { validateZodNumber, validateZodString } from "../../../../utils";
-import { ValidateProductFieldProps } from "../../types";
+import { ValidateProductFieldConfigs } from "../../types";
 
 export const isSafePopulateField = <T extends readonly string[]>(
   field: string,
@@ -15,7 +15,7 @@ export function typedObjectEntries<T extends object>(
   return Object.entries(obj) as [keyof T, T[keyof T]][];
 }
 
-export const validateProductField = (props: ValidateProductFieldProps) => {
+export const validateProductField = (props: ValidateProductFieldConfigs) => {
   const {
     field,
     parentField,
@@ -27,6 +27,7 @@ export const validateProductField = (props: ValidateProductFieldProps) => {
     customRegex,
     isOptional = false,
     mustBeInt = false,
+    nonNegative = true,
   } = props;
 
   const nestedField = parentField ? `${parentField}.${field}` : field;
@@ -70,6 +71,10 @@ export const validateProductField = (props: ValidateProductFieldProps) => {
         parentField,
         min,
         mustBeInt,
+        customRegex,
+        isOptional,
+        max,
+        nonNegative,
       });
     }
 

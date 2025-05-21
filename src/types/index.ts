@@ -48,7 +48,7 @@ export interface CustomFileErrorProps {
   customFileTypes?: CustomFileType;
 }
 
-export interface ZodCommonProps {
+export interface ZodCommonConfigs {
   field: string;
   parentField?: string;
   min?: number | undefined;
@@ -60,15 +60,17 @@ export interface ZodCommonProps {
   };
 }
 
-export interface ZodStringProps extends ZodCommonProps {
+export interface ZodStringProps extends ZodCommonConfigs {
   blockMultipleSpaces?: boolean;
   blockSingleSpace?: boolean;
   nonEmpty?: boolean;
 }
 
-export interface ZodNumberProps extends ZodCommonProps {
+export interface ZodNumberConfigs extends ZodCommonConfigs {
   mustBeInt?: boolean;
   nonNegative?: boolean;
 }
 
-export interface ValidateZodFieldProps extends ZodStringProps, ZodNumberProps {}
+export interface ValidateZodFieldConfigs
+  extends ZodStringProps,
+    ZodNumberConfigs {}

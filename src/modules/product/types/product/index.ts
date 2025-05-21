@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { CategoryProps, TCategoryFieldOnly } from "../category";
 import { ShadeProps, TShadesFieldOnly } from "../shade";
 import { UserProps } from "../../../user/types";
-import { ValidateZodFieldProps } from "../../../../types";
+import { ValidateZodFieldConfigs } from "../../../../types";
 
 export interface ProductPopulateFieldsProps {
   category: (keyof CategoryProps)[];
@@ -44,6 +44,6 @@ export type TProductWithShadesWithCategoryFields =
   | TShadesFieldOnly
   | TCategoryFieldOnly;
 
-export interface ValidateProductFieldProps extends ValidateZodFieldProps {
+export interface ValidateProductFieldConfigs extends ValidateZodFieldConfigs {
   field: TProductWithShadesWithCategoryFields;
 }

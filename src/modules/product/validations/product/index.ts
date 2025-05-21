@@ -2,27 +2,27 @@ import { z } from "zod";
 import { validateProductField } from "../../utils";
 import { createCategoryZodSchema } from "../category";
 import { addShadesZodSchema } from "../shade";
-import { TProductFieldOnly, ValidateProductFieldProps } from "../../types";
+import { TProductFieldOnly, ValidateProductFieldConfigs } from "../../types";
 
-const commonTextValidation: Partial<ValidateProductFieldProps> = {
+const commonTextValidation: Partial<ValidateProductFieldConfigs> = {
   min: 2,
   blockMultipleSpaces: true,
 };
 
-const optionalTextValidation: Partial<ValidateProductFieldProps> = {
+const optionalTextValidation: Partial<ValidateProductFieldConfigs> = {
   ...commonTextValidation,
   min: 10,
   isOptional: true,
 };
 
-const numberValidation: Partial<ValidateProductFieldProps> = {
+const numberValidation: Partial<ValidateProductFieldConfigs> = {
   min: 1,
   nonNegative: true,
 };
 
 const uploadProductFields: Record<
   TProductFieldOnly,
-  ValidateProductFieldProps
+  ValidateProductFieldConfigs
 > = {
   title: { ...commonTextValidation, field: "title" },
   brand: { ...commonTextValidation, min: 1, field: "brand" },
