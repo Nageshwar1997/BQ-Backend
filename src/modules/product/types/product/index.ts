@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { CategoryProps } from "../category";
 import { ShadeProps } from "../shade";
 import { UserProps } from "../../../user/types";
+import { ValidateZodFieldProps } from "../../../../types";
 
 export interface ProductPopulateFieldsProps {
   category: (keyof CategoryProps)[];
@@ -26,3 +27,5 @@ export interface ProductProps {
   seller: Types.ObjectId;
   reviews: Types.ObjectId[];
 }
+
+export type ValidateProductFieldProps = ValidateZodFieldProps;
