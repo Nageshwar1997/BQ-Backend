@@ -1,26 +1,30 @@
 import { z } from "zod";
 import { validateProductField } from "../../utils";
+import { createCategoryZodSchema } from "../category";
+import { addShadesZodSchema } from "../shade";
 
 export const uploadProductZodSchema = z.object({
-  // No need to validate title, it is already validated in the category validation middleware
+  title: validateProductField({
+    field: "title",
+    blockMultipleSpaces: true,
+    min: 2,
+  }),
+
   brand: validateProductField({
     field: "brand",
     min: 1,
     blockMultipleSpaces: true,
-    nonEmpty: true,
   }),
 
   originalPrice: validateProductField({
     field: "originalPrice",
     min: 1,
-    mustBeInt: true,
     nonNegative: true,
   }),
 
   sellingPrice: validateProductField({
     field: "sellingPrice",
     min: 1,
-    mustBeInt: true,
     nonNegative: true,
   }),
 
@@ -35,14 +39,12 @@ export const uploadProductZodSchema = z.object({
     field: "description",
     min: 10,
     blockMultipleSpaces: true,
-    nonEmpty: true,
   }),
 
   howToUse: validateProductField({
     field: "howToUse",
     min: 10,
     blockMultipleSpaces: true,
-    nonEmpty: true,
     isOptional: true,
   }),
 
@@ -50,7 +52,6 @@ export const uploadProductZodSchema = z.object({
     field: "ingredients",
     min: 10,
     blockMultipleSpaces: true,
-    nonEmpty: true,
     isOptional: true,
   }),
 
@@ -58,7 +59,11 @@ export const uploadProductZodSchema = z.object({
     field: "additionalDetails",
     min: 10,
     blockMultipleSpaces: true,
-    nonEmpty: true,
     isOptional: true,
   }),
+
+  categoryLevelOne: createCategoryZodSchema("categoryLevelOne"),
+  categoryLevelTwo: createCategoryZodSchema("categoryLevelTwo"),
+  categoryLevelThree: createCategoryZodSchema("categoryLevelThree"),
+  shades: addShadesZodSchema.optional().default([]),
 });

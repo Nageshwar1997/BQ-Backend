@@ -1,37 +1,28 @@
 import { z } from "zod";
-import { validateCategoryField } from "../../utils";
+import { validateProductField } from "../../utils";
 
-const createCategorySchema = (
-  field: "categoryLevelOne" | "categoryLevelTwo" | "categoryLevelThree"
+export const createCategoryZodSchema = (
+  parentField: "categoryLevelOne" | "categoryLevelTwo" | "categoryLevelThree"
 ) => {
-  const commonRequirements = {
-    parentField: field,
-    nonEmpty: true,
-    min: 2,
-  };
+  const commonRequirements = { parentField, min: 2 };
 
-  return z.object(
+  const schema = z.object(
     {
-      name: validateCategoryField({
+      name: validateProductField({
         ...commonRequirements,
         field: "name",
         blockMultipleSpaces: true,
       }),
-      category: validateCategoryField({
+      category: validateProductField({
         ...commonRequirements,
         field: "category",
         blockSingleSpace: true,
       }),
     },
     {
-      required_error: `'${field}' is required.`,
-      invalid_type_error: `'${field}' must be an object of key-value pairs keys: name, category.`,
+      required_error: `'${parentField}' is required.`,
+      invalid_type_error: `'${parentField}' must be an object of key-value pairs keys: name, category.`,
     }
   );
+  return schema;
 };
-
-export const createCategoryZodSchema = z.object({
-  categoryLevelOne: createCategorySchema("categoryLevelOne"),
-  categoryLevelTwo: createCategorySchema("categoryLevelTwo"),
-  categoryLevelThree: createCategorySchema("categoryLevelThree"),
-});

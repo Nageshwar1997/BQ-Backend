@@ -86,61 +86,63 @@ export const validateZodString = ({
     .default("")
     .optional()
     .superRefine((val, ctx) => {
-      if (typeof val !== "string") {
-        ctx.addIssue({
-          code: z.ZodIssueCode.invalid_type,
-          expected: "string",
-          received: typeof val,
-          path: ctx.path,
-          message: messages.invalid_type,
-        });
-        return;
-      }
+      if (val) {
+        if (typeof val !== "string") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.invalid_type,
+            expected: "string",
+            received: typeof val,
+            path: ctx.path,
+            message: messages.invalid_type,
+          });
+          return;
+        }
 
-      if (min !== undefined && val.length < min && val !== "") {
-        ctx.addIssue({
-          code: z.ZodIssueCode.too_small,
-          type: "string",
-          minimum: min,
-          path: ctx.path,
-          inclusive: true,
-          message: messages.min,
-        });
-      }
+        if (min !== undefined && val.length < min && val !== "") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.too_small,
+            type: "string",
+            minimum: min,
+            path: ctx.path,
+            inclusive: true,
+            message: messages.min,
+          });
+        }
 
-      if (max !== undefined && val.length > max) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.too_big,
-          type: "string",
-          maximum: max,
-          path: ctx.path,
-          inclusive: true,
-          message: messages.max,
-        });
-      }
+        if (max !== undefined && val.length > max) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.too_big,
+            type: "string",
+            maximum: max,
+            path: ctx.path,
+            inclusive: true,
+            message: messages.max,
+          });
+        }
 
-      if (blockMultipleSpaces && singleSpaceRegex.test(val)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ctx.path,
-          message: messages.multiple_spaces,
-        });
-      }
+        if (blockMultipleSpaces && singleSpaceRegex.test(val)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ctx.path,
+            message: messages.multiple_spaces,
+          });
+        }
 
-      if (blockSingleSpace && noSpaceRegex.test(val)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ctx.path,
-          message: messages.single_space,
-        });
-      }
+        if (blockSingleSpace && noSpaceRegex.test(val)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ctx.path,
+            message: messages.single_space,
+          });
+        }
 
-      if (customRegex && customRegex?.regex && !customRegex.regex.test(val)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ctx.path,
-          message: messages.custom,
-        });
+        if (customRegex && customRegex?.regex && !customRegex.regex.test(val)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ctx.path,
+            message: messages.custom,
+          });
+        }
       }
     });
 
@@ -159,7 +161,7 @@ export const validateZodNumber = ({
 
   let schema = z.coerce.number({
     required_error: `The '${nestedField}' field is required.`,
-    invalid_type_error: `The '${nestedField}' field must be a number.`,
+    invalid_type_error: `The '${nestedField}' field is required & must be a number.`,
   });
 
   if (nonNegative) {

@@ -1,3 +1,7 @@
+import { AppError } from "../../../../classes";
+import { validateZodNumber, validateZodString } from "../../../../utils";
+import { ValidateProductFieldProps } from "../../types";
+
 export const isSafePopulateField = <T extends readonly string[]>(
   field: string,
   allowedFields: T
@@ -11,10 +15,6 @@ export function typedObjectEntries<T extends object>(
   return Object.entries(obj) as [keyof T, T[keyof T]][];
 }
 
-import { AppError } from "../../../../classes";
-import { validateZodNumber, validateZodString } from "../../../../utils";
-import { ValidateProductFieldProps } from "../../types";
-
 export const validateProductField = (props: ValidateProductFieldProps) => {
   const {
     field,
@@ -23,20 +23,29 @@ export const validateProductField = (props: ValidateProductFieldProps) => {
     max,
     blockMultipleSpaces = false,
     blockSingleSpace = false,
-    nonEmpty = false,
+    nonEmpty = true,
     customRegex,
+    isOptional = false,
+    mustBeInt = false,
   } = props;
 
   const nestedField = parentField ? `${parentField}.${field}` : field;
 
   switch (field) {
-    case "title":
+    // For all string fields
+    // For product main fields
+    case "additionalDetails":
     case "brand":
     case "description":
     case "howToUse":
     case "ingredients":
-    case "additionalDetails":
-    case "description": {
+    case "title":
+    // For Shades Field
+    case "colorCode":
+    case "shadeName":
+    // For Category
+    case "category":
+    case "name": {
       return validateZodString({
         field,
         parentField,
@@ -46,22 +55,29 @@ export const validateProductField = (props: ValidateProductFieldProps) => {
         nonEmpty,
         blockMultipleSpaces,
         customRegex,
+        isOptional,
       });
     }
+    // For all number fields
+    // For product main fields
+    case "totalStock":
     case "originalPrice":
     case "sellingPrice":
-    case "totalStock": {
+    // For Shades Field
+    case "stock": {
       return validateZodNumber({
-        field: "stock",
-        parentField: "shades[some_index]",
-        min: 5,
-        mustBeInt: true,
+        field,
+        parentField,
+        min,
+        mustBeInt,
       });
     }
-    default:
+
+    default: {
       throw new AppError(
         `Validation for field '${nestedField}' is not implemented.`,
         500
       );
+    }
   }
 };

@@ -28,4 +28,22 @@ export interface ProductProps {
   reviews: Types.ObjectId[];
 }
 
-export type ValidateProductFieldProps = ValidateZodFieldProps;
+export interface ValidateProductFieldProps extends ValidateZodFieldProps {
+  field:
+    | "additionalDetails"
+    | "brand"
+    | "description"
+    | "howToUse"
+    | "ingredients"
+    | "originalPrice"
+    | "sellingPrice"
+    | "title"
+    | "totalStock"
+    // For Shade
+    | "colorCode"
+    | "shadeName"
+    | "stock"
+    // For Category
+    | "category"
+    | "name";
+}
