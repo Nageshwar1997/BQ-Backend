@@ -6,3 +6,5 @@ export interface CategoryProps {
   level: number;
   parentCategory: Types.ObjectId | null;
 }
+
+export type TCategoryFieldOnly = "category" | "name";

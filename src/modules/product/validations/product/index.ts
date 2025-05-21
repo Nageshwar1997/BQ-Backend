@@ -2,66 +2,51 @@ import { z } from "zod";
 import { validateProductField } from "../../utils";
 import { createCategoryZodSchema } from "../category";
 import { addShadesZodSchema } from "../shade";
+import { TProductFieldOnly, ValidateProductFieldProps } from "../../types";
 
-export const uploadProductZodSchema = z.object({
-  title: validateProductField({
-    field: "title",
-    blockMultipleSpaces: true,
-    min: 2,
-  }),
+const commonTextValidation: Partial<ValidateProductFieldProps> = {
+  min: 2,
+  blockMultipleSpaces: true,
+};
 
-  brand: validateProductField({
-    field: "brand",
-    min: 1,
-    blockMultipleSpaces: true,
-  }),
+const optionalTextValidation: Partial<ValidateProductFieldProps> = {
+  ...commonTextValidation,
+  min: 10,
+  isOptional: true,
+};
 
-  originalPrice: validateProductField({
-    field: "originalPrice",
-    min: 1,
-    nonNegative: true,
-  }),
+const numberValidation: Partial<ValidateProductFieldProps> = {
+  min: 1,
+  nonNegative: true,
+};
 
-  sellingPrice: validateProductField({
-    field: "sellingPrice",
-    min: 1,
-    nonNegative: true,
-  }),
-
-  totalStock: validateProductField({
+const uploadProductFields: Record<
+  TProductFieldOnly,
+  ValidateProductFieldProps
+> = {
+  title: { ...commonTextValidation, field: "title" },
+  brand: { ...commonTextValidation, min: 1, field: "brand" },
+  originalPrice: { ...numberValidation, field: "originalPrice" },
+  sellingPrice: { ...numberValidation, field: "sellingPrice" },
+  totalStock: {
+    ...numberValidation,
     field: "totalStock",
     min: 5,
     mustBeInt: true,
-    nonNegative: true,
-  }),
+  },
+  description: { ...commonTextValidation, min: 10, field: "description" },
+  howToUse: { ...optionalTextValidation, field: "howToUse" },
+  ingredients: { ...optionalTextValidation, field: "ingredients" },
+  additionalDetails: { ...optionalTextValidation, field: "additionalDetails" },
+};
 
-  description: validateProductField({
-    field: "description",
-    min: 10,
-    blockMultipleSpaces: true,
-  }),
-
-  howToUse: validateProductField({
-    field: "howToUse",
-    min: 10,
-    blockMultipleSpaces: true,
-    isOptional: true,
-  }),
-
-  ingredients: validateProductField({
-    field: "ingredients",
-    min: 10,
-    blockMultipleSpaces: true,
-    isOptional: true,
-  }),
-
-  additionalDetails: validateProductField({
-    field: "additionalDetails",
-    min: 10,
-    blockMultipleSpaces: true,
-    isOptional: true,
-  }),
-
+export const uploadProductZodSchema = z.object({
+  ...Object.fromEntries(
+    Object.entries(uploadProductFields).map(([key, props]) => [
+      key,
+      validateProductField(props),
+    ])
+  ),
   categoryLevelOne: createCategoryZodSchema("categoryLevelOne"),
   categoryLevelTwo: createCategoryZodSchema("categoryLevelTwo"),
   categoryLevelThree: createCategoryZodSchema("categoryLevelThree"),

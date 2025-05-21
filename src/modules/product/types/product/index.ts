@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import { CategoryProps } from "../category";
-import { ShadeProps } from "../shade";
+import { CategoryProps, TCategoryFieldOnly } from "../category";
+import { ShadeProps, TShadesFieldOnly } from "../shade";
 import { UserProps } from "../../../user/types";
 import { ValidateZodFieldProps } from "../../../../types";
 
@@ -28,22 +28,22 @@ export interface ProductProps {
   reviews: Types.ObjectId[];
 }
 
+export type TProductFieldOnly =
+  | "additionalDetails"
+  | "brand"
+  | "description"
+  | "howToUse"
+  | "ingredients"
+  | "originalPrice"
+  | "sellingPrice"
+  | "title"
+  | "totalStock";
+
+export type TProductWithShadesWithCategoryFields =
+  | TProductFieldOnly
+  | TShadesFieldOnly
+  | TCategoryFieldOnly;
+
 export interface ValidateProductFieldProps extends ValidateZodFieldProps {
-  field:
-    | "additionalDetails"
-    | "brand"
-    | "description"
-    | "howToUse"
-    | "ingredients"
-    | "originalPrice"
-    | "sellingPrice"
-    | "title"
-    | "totalStock"
-    // For Shade
-    | "colorCode"
-    | "shadeName"
-    | "stock"
-    // For Category
-    | "category"
-    | "name";
+  field: TProductWithShadesWithCategoryFields;
 }

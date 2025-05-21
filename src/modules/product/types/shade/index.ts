@@ -4,3 +4,5 @@ export interface ShadeProps {
   images: string[];
   stock: number;
 }
+
+export type TShadesFieldOnly = "colorCode" | "shadeName" | "stock";
