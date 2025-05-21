@@ -8,6 +8,7 @@ import {
   AuthMiddleware,
   JSONParseMiddleware,
   MulterMiddleware,
+  RequestMiddleware,
   ResponseMiddleware,
   ZodMiddleware,
 } from "../../../../middlewares";
@@ -24,6 +25,7 @@ productRouter.post(
   "/upload",
   AuthMiddleware.authorization(["ADMIN", "MASTER", "SELLER"]),
   MulterMiddleware.validateFiles({ type: "any" }),
+  RequestMiddleware.checkEmptyRequest({ body: true, files: true }),
   JSONParseMiddleware.JSONParse({
     fieldsToParse: [
       "categoryLevelOne",
