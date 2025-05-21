@@ -1,45 +1,43 @@
 import { z } from "zod";
+import { validateZodNumber, validateZodString } from "../../../../utils";
 
 export const addShadeZodSchema = z.object({
   shades: z
     .array(
       z.object({
-        shadeName: z
-          .string({
-            required_error: "Shade name is required.",
-            invalid_type_error: "Shade name must be a string.",
-          })
-          .trim()
-          .min(1, "Shade name is required."),
-        colorCode: z
-          .string({
-            required_error: "Color code is required.",
-            invalid_type_error: "Color code must be a string.",
-          })
-          .trim()
-          .min(1, "Color code is required."),
-        stock: z.preprocess(
-          (val) => {
-            const parsed = Number(val);
-            return isNaN(parsed) ? undefined : parsed;
+        shadeName: validateZodString({
+          field: "shadeName",
+          parentField: "shades[some_index]",
+          blockMultipleSpaces: true,
+          nonEmpty: true,
+          min: 2,
+        }),
+        colorCode: validateZodString({
+          field: "colorCode",
+          parentField: "shades[some_index]",
+          blockSingleSpace: true,
+          nonEmpty: true,
+          min: 4,
+          customRegex: {
+            regex:
+              /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/,
+            message: "Color code must be a valid hex color code.",
           },
-          z
-            .number({
-              required_error: "Stock is required.",
-              invalid_type_error: "Stock must be a number.",
-            })
-            .int("Stock must be an integer.")
-            .min(1, "Stock must be at least 1.")
-        ),
+        }),
+        stock: validateZodNumber({
+          field: "stock",
+          parentField: "shades[some_index]",
+          min: 5,
+          mustBeInt: true,
+        }),
       })
     )
     .optional()
     .default([]),
-  title: z
-    .string({
-      required_error: "Title is required.",
-      invalid_type_error: "Title must be a string.",
-    })
-    .trim()
-    .min(1, "Title is required."),
+  title: validateZodString({
+    field: "title",
+    blockMultipleSpaces: true,
+    nonEmpty: true,
+    min: 2,
+  }),
 });

@@ -28,6 +28,7 @@ export const validateZodString = ({
   blockSingleSpace,
   blockMultipleSpaces,
   parentField,
+  customRegex,
 }: ZodStringProps) => {
   const nestedField = parentField ? `${parentField}.${field}` : field;
 
@@ -72,6 +73,13 @@ export const validateZodString = ({
     );
   }
 
+  if (customRegex) {
+    const { regex, message } = customRegex;
+    if (regex && message) {
+      schema = schema.regex(regex, message);
+    }
+  }
+
   return schema;
 };
 
@@ -81,17 +89,20 @@ export const validateZodNumber = ({
   min,
   max,
   mustBeInt = false,
+  nonNegative = true,
 }: ZodNumberProps) => {
   const nestedField = parentField ? `${parentField}.${field}` : field;
 
-  let schema = z.coerce
-    .number({
-      required_error: `The '${nestedField}' field is required.`,
-      invalid_type_error: `The '${nestedField}' field must be a number.`,
-    })
-    .nonnegative({
+  let schema = z.coerce.number({
+    required_error: `The '${nestedField}' field is required.`,
+    invalid_type_error: `The '${nestedField}' field must be a number.`,
+  });
+
+  if (nonNegative) {
+    schema = schema.nonnegative({
       message: `The '${nestedField}' field must be a non-negative number.`,
     });
+  }
 
   if (mustBeInt) {
     schema = schema.int({
