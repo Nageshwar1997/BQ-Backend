@@ -1,8 +1,8 @@
 import { AppError } from "../../../../classes";
 import { validateZodNumber, validateZodString } from "../../../../utils";
-import { ValidateCategoryFieldProps } from "../../types";
+import { ValidateShadeFieldProps } from "../../types";
 
-export const validateShadeField = (props: ValidateCategoryFieldProps) => {
+export const validateShadeField = (props: ValidateShadeFieldProps) => {
   const {
     field,
     parentField,
