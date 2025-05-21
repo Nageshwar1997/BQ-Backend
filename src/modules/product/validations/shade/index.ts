@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { validateZodNumber, validateZodString } from "../../../../utils";
+import { hexColorRegex } from "../../../../constants";
+import { validateProductField } from "../../utils";
 import { validateShadeField } from "../../utils/shade";
 
 export const addShadeZodSchema = z.object({
@@ -20,8 +21,7 @@ export const addShadeZodSchema = z.object({
           nonEmpty: true,
           min: 4,
           customRegex: {
-            regex:
-              /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/,
+            regex: hexColorRegex,
             message: "Color code must be a valid hex color code.",
           },
         }),
@@ -35,7 +35,7 @@ export const addShadeZodSchema = z.object({
     )
     .optional()
     .default([]),
-  title: validateZodString({
+  title: validateProductField({
     field: "title",
     blockMultipleSpaces: true,
     nonEmpty: true,

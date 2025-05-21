@@ -1,97 +1,64 @@
 import { z } from "zod";
-
-const noDoubleSpacesRegex = /^(?!.*\s{2,}).*$/;
+import { validateProductField } from "../../utils";
 
 export const uploadProductZodSchema = z.object({
-  title: z
-    .string({
-      required_error: "Title is required.",
-      invalid_type_error: "Title must be a string.",
-    })
-    .min(2, "Title must be at least 2 characters.")
-    .regex(noDoubleSpacesRegex, "Only one space is allowed between words."),
+  // No need to validate title, it is already validated in the category validation middleware
+  brand: validateProductField({
+    field: "brand",
+    min: 1,
+    blockMultipleSpaces: true,
+    nonEmpty: true,
+  }),
 
-  brand: z
-    .string({
-      required_error: "Brand is required.",
-      invalid_type_error: "Brand must be a string.",
-    })
-    .regex(noDoubleSpacesRegex, "Only one space is allowed between words."),
+  originalPrice: validateProductField({
+    field: "originalPrice",
+    min: 1,
+    mustBeInt: true,
+    nonNegative: true,
+  }),
 
-  originalPrice: z.preprocess(
-    (val) => {
-      const parsed = Number(val);
-      return isNaN(parsed) ? undefined : parsed;
-    },
-    z
-      .number({
-        required_error: "Original price is required.",
-        invalid_type_error: "Original price must be a number.",
-      })
-      .int("Original price must be an integer.")
-      .min(1, "Original price must be at least 1.")
-  ),
+  sellingPrice: validateProductField({
+    field: "sellingPrice",
+    min: 1,
+    mustBeInt: true,
+    nonNegative: true,
+  }),
 
-  sellingPrice: z.preprocess(
-    (val) => {
-      const parsed = Number(val);
-      return isNaN(parsed) ? undefined : parsed;
-    },
-    z
-      .number({
-        required_error: "Selling price is required.",
-        invalid_type_error: "Selling price must be a number.",
-      })
-      .int("Selling price must be an integer.")
-      .min(1, "Selling price must be at least 1.")
-  ),
+  totalStock: validateProductField({
+    field: "totalStock",
+    min: 5,
+    mustBeInt: true,
+    nonNegative: true,
+  }),
 
-  totalStock: z.preprocess(
-    (val) => {
-      const parsed = Number(val);
-      return isNaN(parsed) ? undefined : parsed;
-    },
-    z
-      .number({
-        required_error: "Total stock is required.",
-        invalid_type_error: "Total stock must be a number.",
-      })
-      .int("Total stock must be an integer.")
-      .min(5, "Total stock must be at least 5.")
-  ),
+  description: validateProductField({
+    field: "description",
+    min: 10,
+    blockMultipleSpaces: true,
+    nonEmpty: true,
+  }),
 
-  description: z
-    .string({
-      required_error: "Description is required.",
-      invalid_type_error: "Description must be a string.",
-    })
-    .min(10, "Description must be at least 10 characters.")
-    .regex(noDoubleSpacesRegex, "Only one space is allowed between words."),
+  howToUse: validateProductField({
+    field: "howToUse",
+    min: 10,
+    blockMultipleSpaces: true,
+    nonEmpty: true,
+    isOptional: true,
+  }),
 
-  howToUse: z
-    .string({
-      invalid_type_error: "How to use must be a string.",
-    })
-    .min(10, "How to use must be at least 10 characters.")
-    .regex(noDoubleSpacesRegex, "Multiple spaces are not allowed.")
-    .optional()
-    .or(z.literal("")),
+  ingredients: validateProductField({
+    field: "ingredients",
+    min: 10,
+    blockMultipleSpaces: true,
+    nonEmpty: true,
+    isOptional: true,
+  }),
 
-  ingredients: z
-    .string({
-      invalid_type_error: "Ingredients must be a string.",
-    })
-    .min(10, "Ingredients must be at least 10 characters.")
-    .regex(noDoubleSpacesRegex, "Multiple spaces are not allowed.")
-    .optional()
-    .or(z.literal("")),
-
-  additionalDetails: z
-    .string({
-      invalid_type_error: "Additional details must be a string.",
-    })
-    .min(10, "Additional details must be at least 10 characters.")
-    .regex(noDoubleSpacesRegex, "Multiple spaces are not allowed.")
-    .optional()
-    .or(z.literal("")),
+  additionalDetails: validateProductField({
+    field: "additionalDetails",
+    min: 10,
+    blockMultipleSpaces: true,
+    nonEmpty: true,
+    isOptional: true,
+  }),
 });
