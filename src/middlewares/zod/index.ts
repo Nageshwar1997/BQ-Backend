@@ -4,15 +4,6 @@ import { AppError } from "../../classes";
 
 export const validateZodSchema = (schema: ZodSchema) => {
   return (req: Request, _: Response, next: NextFunction) => {
-    if (!req.body) {
-      return next(
-        new AppError(
-          "Request body is missing. Please provide required data.",
-          400
-        )
-      );
-    }
-
     let filePayload: Record<
       string,
       Express.Multer.File | Express.Multer.File[]
