@@ -1,18 +1,19 @@
 import { z } from "zod";
 import { validateZodNumber, validateZodString } from "../../../../utils";
+import { validateShadeField } from "../../utils/shade";
 
 export const addShadeZodSchema = z.object({
   shades: z
     .array(
       z.object({
-        shadeName: validateZodString({
+        shadeName: validateShadeField({
           field: "shadeName",
           parentField: "shades[some_index]",
           blockMultipleSpaces: true,
           nonEmpty: true,
           min: 2,
         }),
-        colorCode: validateZodString({
+        colorCode: validateShadeField({
           field: "colorCode",
           parentField: "shades[some_index]",
           blockSingleSpace: true,
@@ -24,7 +25,7 @@ export const addShadeZodSchema = z.object({
             message: "Color code must be a valid hex color code.",
           },
         }),
-        stock: validateZodNumber({
+        stock: validateShadeField({
           field: "stock",
           parentField: "shades[some_index]",
           min: 5,

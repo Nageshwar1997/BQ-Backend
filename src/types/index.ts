@@ -68,7 +68,6 @@ export interface ZodStringProps extends ZodCommonProps {
 export interface ZodNumberProps extends ZodCommonProps {
   mustBeInt?: boolean;
   nonNegative?: boolean;
-  checkNaN?: boolean;
 }
 
 export interface ValidateZodFieldProps extends ZodStringProps, ZodNumberProps {}
