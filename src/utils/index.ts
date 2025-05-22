@@ -1,8 +1,10 @@
+import { Request } from "express";
 import { Types } from "mongoose";
 import { z } from "zod";
 
 import { ZodNumberConfigs, ZodStringProps } from "../types";
 import { noSpaceRegex, singleSpaceRegex } from "../constants";
+import { AppError } from "../classes";
 
 export const isValidMongoId = (id: string): boolean => {
   return Types.ObjectId.isValid(id);
@@ -18,6 +20,50 @@ export const getCloudinaryOptimizedUrl = (url: string): string => {
 
   // Insert f_auto,q_auto after /upload/
   return url.replace("/upload/", "/upload/f_auto,q_auto/");
+};
+
+interface ValidateRequiredFileFieldsParams {
+  req: Request;
+  fields: string[];
+  checkIn: "file" | "files";
+}
+
+export const validateRequiredFileFields = ({
+  req,
+  fields,
+  checkIn,
+}: ValidateRequiredFileFieldsParams): void => {
+  const requiredFields: string[] = [];
+
+  if (checkIn === "file") {
+    if (!req.file) {
+      requiredFields.push(...fields);
+    }
+  } else {
+    const files = req.files as Express.Multer.File[];
+
+    if (!Array.isArray(files)) {
+      requiredFields.push(...fields);
+    } else {
+      fields.forEach((expectedField) => {
+        const exists = files.some((file) =>
+          file.fieldname.startsWith(expectedField)
+        );
+        if (!exists) {
+          requiredFields.push(expectedField);
+        }
+      });
+    }
+  }
+
+  if (requiredFields.length > 0) {
+    throw new AppError(
+      `Required file field${
+        requiredFields.length > 1 ? "s" : ""
+      }: ${requiredFields.join(", ")}`,
+      400
+    );
+  }
 };
 
 export const validateZodString = ({
