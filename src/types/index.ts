@@ -54,16 +54,16 @@ export interface ZodCommonConfigs {
   min?: number | undefined;
   max?: number | undefined;
   isOptional?: boolean;
-  customRegex?: {
-    regex: RegExp;
-    message: string;
-  };
 }
 
 export interface ZodStringProps extends ZodCommonConfigs {
   blockMultipleSpaces?: boolean;
   blockSingleSpace?: boolean;
   nonEmpty?: boolean;
+  customRegex?: {
+    regex: RegExp;
+    message: string | number;
+  };
 }
 
 export interface ZodNumberConfigs extends ZodCommonConfigs {
