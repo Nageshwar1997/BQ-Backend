@@ -162,7 +162,7 @@ export const validateZodNumber = ({
 
   const messages = {
     required: `The '${nestedField}' field is required.`,
-    invalid_type: `The '${nestedField}' field must be a number.`,
+    invalid_type: `The '${nestedField}' field is required and should be a number.`,
     non_negative: `The '${nestedField}' field must be a non-negative number.`,
     must_be_int: `The '${nestedField}' field must be an integer.`,
     min: `The '${nestedField}' field must be at least ${min}.`,
