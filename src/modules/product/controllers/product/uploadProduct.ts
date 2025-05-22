@@ -72,12 +72,14 @@ export const uploadProductController = async (
 
     // Rollback: Remove uploaded shades
     if (shades.length) {
-      await Shade.deleteMany({ _id: { $in: shades } }); // To remove all shades
+      const removingShades = await Shade.find({ _id: { $in: shades } });
+
       await Promise.all(
-        shades.map((shade: ShadeProps) =>
+        removingShades.map((shade: ShadeProps) =>
           MediaModule.Utils.multipleImagesRemover(shade.images, "product")
         )
       ); // To remove all shade images
+      await Shade.deleteMany({ _id: { $in: shades } }); // To remove all shades
     }
 
     throw error;

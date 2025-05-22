@@ -71,7 +71,6 @@ export const validateProductField = (props: ValidateProductFieldConfigs) => {
         parentField,
         min,
         mustBeInt,
-        customRegex,
         isOptional,
         max,
         nonNegative,
