@@ -170,7 +170,7 @@ export const validateZodNumber = ({
   };
 
   let requiredSchema = z.coerce.number({
-    required_error: messages.required,
+    required_error: messages.required, // mostly this error will not be thrown because of coerce
     invalid_type_error: messages.invalid_type,
   });
 
