@@ -156,41 +156,98 @@ export const validateZodNumber = ({
   max,
   mustBeInt = false,
   nonNegative = true,
-  customRegex,
   isOptional = false,
 }: ZodNumberConfigs) => {
   const nestedField = parentField ? `${parentField}.${field}` : field;
 
-  let schema = z.coerce.number({
-    required_error: `The '${nestedField}' field is required.`,
-    invalid_type_error: `The '${nestedField}' field is required & must be a number.`,
+  const messages = {
+    required: `The '${nestedField}' field is required.`,
+    invalid_type: `The '${nestedField}' field must be a number.`,
+    non_negative: `The '${nestedField}' field must be a non-negative number.`,
+    must_be_int: `The '${nestedField}' field must be an integer.`,
+    min: `The '${nestedField}' field must be at least ${min}.`,
+    max: `The '${nestedField}' field must not exceed ${max}.`,
+  };
+
+  let requiredSchema = z.coerce.number({
+    required_error: messages.required,
+    invalid_type_error: messages.invalid_type,
   });
 
   if (nonNegative) {
-    schema = schema.nonnegative({
-      message: `The '${nestedField}' field must be a non-negative number.`,
+    requiredSchema = requiredSchema.nonnegative({
+      message: messages.non_negative,
     });
   }
 
   if (mustBeInt) {
-    schema = schema.int({
-      message: `The '${nestedField}' field must be an integer.`,
-    });
+    requiredSchema = requiredSchema.int({ message: messages.must_be_int });
   }
 
   if (min !== undefined) {
-    schema = schema.min(
-      min,
-      `The '${nestedField}' field must be at least ${min}.`
-    );
+    requiredSchema = requiredSchema.min(min, messages.min);
   }
 
   if (max !== undefined) {
-    schema = schema.max(
-      max,
-      `The '${nestedField}' field must not exceed ${max}.`
-    );
+    requiredSchema = requiredSchema.max(max, messages.max);
   }
 
-  return schema;
+  const optionalSchema = z.coerce
+    .number()
+    .optional()
+    .default(0)
+    .superRefine((val, ctx) => {
+      if (val) {
+        if (typeof val !== "number" || isNaN(val)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.invalid_type,
+            expected: "number",
+            received: typeof val,
+            path: ctx.path,
+            message: messages.invalid_type,
+          });
+          return;
+        }
+
+        if (nonNegative && val < 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ctx.path,
+            message: messages.non_negative,
+          });
+        }
+
+        if (mustBeInt && !Number.isInteger(val)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ctx.path,
+            message: messages.must_be_int,
+          });
+        }
+
+        if (min !== undefined && val < min) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.too_small,
+            type: "number",
+            minimum: min,
+            path: ctx.path,
+            inclusive: true,
+            message: messages.min,
+          });
+        }
+
+        if (max !== undefined && val > max) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.too_big,
+            type: "number",
+            maximum: max,
+            path: ctx.path,
+            inclusive: true,
+            message: messages.max,
+          });
+        }
+      }
+    });
+
+  return isOptional ? optionalSchema : requiredSchema;
 };
