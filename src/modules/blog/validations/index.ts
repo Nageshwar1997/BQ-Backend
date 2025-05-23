@@ -1,36 +1,39 @@
 import { z } from "zod";
-import { validateField } from "../utils";
-
-const commonRequirements = {
-  isString: true,
-  min: 10,
-  max: 100,
-  blockMultipleSpaces: true,
-  nonEmpty: true,
-};
+import { validateBlogField } from "../utils";
+import { validateZodDate } from "../../../utils";
 
 const blogSchema = z.object({
-  mainTitle: validateField({
+  mainTitle: validateBlogField({
     field: "mainTitle",
-    ...commonRequirements,
+    blockMultipleSpaces: true,
     min: 2,
   }),
-  subTitle: validateField({ field: "subTitle", ...commonRequirements, min: 2 }),
-  content: validateField({
+  subTitle: validateBlogField({
+    field: "subTitle",
+    blockMultipleSpaces: true,
+    min: 2,
+  }),
+  content: validateBlogField({
     field: "content",
-    ...commonRequirements,
-    max: undefined,
+    min: 10,
+    blockMultipleSpaces: true,
   }),
-  description: validateField({
+  description: validateBlogField({
     field: "description",
-    ...commonRequirements,
-    max: undefined,
+    min: 10,
+    blockMultipleSpaces: true,
   }),
-  author: validateField({ field: "author", ...commonRequirements, min: 2 }),
-  tags: validateField({ field: "tags" }),
-  publishedDate: validateField({ field: "publishedDate" }),
-  smallThumbnail: validateField({ field: "smallThumbnail" }),
-  largeThumbnail: validateField({ field: "largeThumbnail" }),
+  publishedDate: validateZodDate({
+    field: "publishedDate",
+    mustBePastDate: true,
+  }),
+  author: validateBlogField({ field: "author", blockMultipleSpaces: true, min: 2 }),
+  tags: validateBlogField({
+    field: "tags",
+    min: 2,
+    max: 20,
+    blockMultipleSpaces: true,
+  }),
 });
 
 export const uploadBlogZodSchema = blogSchema;

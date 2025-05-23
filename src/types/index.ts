@@ -48,15 +48,24 @@ export interface CustomFileErrorProps {
   customFileTypes?: CustomFileType;
 }
 
+export interface ValidateRequiredFileFieldsParams {
+  req: Request;
+  fields: string[];
+  checkIn: "file" | "files";
+}
+
 export interface ZodCommonConfigs {
   field: string;
   parentField?: string;
-  min?: number | undefined;
-  max?: number | undefined;
   isOptional?: boolean;
 }
 
-export interface ZodStringProps extends ZodCommonConfigs {
+interface ZodCompareConfigs {
+  min?: number | undefined;
+  max?: number | undefined;
+}
+
+export interface ZodStringProps extends ZodCommonConfigs, ZodCompareConfigs {
   blockMultipleSpaces?: boolean;
   blockSingleSpace?: boolean;
   nonEmpty?: boolean;
@@ -66,9 +75,14 @@ export interface ZodStringProps extends ZodCommonConfigs {
   };
 }
 
-export interface ZodNumberConfigs extends ZodCommonConfigs {
+export interface ZodNumberConfigs extends ZodCommonConfigs, ZodCompareConfigs {
   mustBeInt?: boolean;
   nonNegative?: boolean;
+}
+
+export interface ZodDateProps extends ZodCommonConfigs {
+  mustBePastDate?: boolean;
+  mustBeFutureDate?: boolean;
 }
 
 export interface ValidateZodFieldConfigs

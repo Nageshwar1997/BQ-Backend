@@ -2,13 +2,18 @@ import { z } from "zod";
 import { ALLOWED_IMAGE_TYPES, singleSpaceRegex } from "../../../constants";
 import { AppError } from "../../../classes";
 import { ValidateBlogFieldProps } from "../types";
+import { validateZodString } from "../../../utils";
 
-export const validateField = (props: ValidateBlogFieldProps) => {
+export const validateBlogField = (props: ValidateBlogFieldProps) => {
   const {
     field,
+    parentField,
     min,
     max,
     blockMultipleSpaces = false,
+    blockSingleSpace = false,
+    customRegex,
+    isOptional = false,
     nonEmpty = false,
   } = props;
 
@@ -18,88 +23,47 @@ export const validateField = (props: ValidateBlogFieldProps) => {
     case "author":
     case "description":
     case "content": {
-      let schema = z
-        .string({
-          required_error: `${field} is required.`,
-          invalid_type_error: `${field} must be a text value.`,
-        })
-        .trim();
-
-      if (nonEmpty) {
-        schema = schema.nonempty({ message: `${field} cannot be empty.` });
-      }
-
-      if (min) {
-        schema = schema.min(
-          min,
-          `${field} should be at least ${min} characters long.`
-        );
-      }
-
-      if (max) {
-        schema = schema.max(
-          max,
-          `${field} should not exceed ${max} characters.`
-        );
-      }
-
-      if (blockMultipleSpaces) {
-        schema = schema.regex(
-          singleSpaceRegex,
-          `Field: '${field}' Only one space is allowed between words.`
-        );
-      }
-
-      return schema;
+      return validateZodString({
+        field,
+        parentField,
+        max,
+        min,
+        blockSingleSpace,
+        nonEmpty,
+        blockMultipleSpaces,
+        customRegex,
+        isOptional,
+      });
     }
 
     case "tags": {
       return z
-        .any()
-        .refine((val) => val !== undefined && val !== null, {
-          message: "Tags are required.",
-        })
-        .transform((val) => {
-          if (typeof val === "string") {
-            try {
-              const parsed = JSON.parse(val);
-              return parsed;
-            } catch {
-              return "__invalid_json__";
-            }
-          }
-          return val;
-        })
-        .refine(
-          (val) =>
-            Array.isArray(val) && val.every((item) => typeof item === "string"),
+        .array(
+          validateZodString({
+            field: "tag",
+            parentField: "tags[some_index]",
+            max,
+            min,
+            blockSingleSpace,
+            nonEmpty,
+            blockMultipleSpaces,
+            customRegex,
+            isOptional,
+          }),
           {
-            message: "Tags must be a valid JSON array of strings.",
-            path: ["tags"],
+            required_error: "'tags' are required",
+            invalid_type_error: "'tags' must be an array of strings.",
           }
         )
-        .pipe(
-          z
-            .array(
-              z
-                .string()
-                .trim()
-                .nonempty({ message: "Tag cannot be empty." })
-                .min(2, "Tag should be at least 2 characters long.")
-                .max(20, "Tag should not exceed 20 characters.")
-                .regex(
-                  singleSpaceRegex,
-                  `Field: '${field}' Only one space is allowed between words.`
-                )
-            )
-            .min(1, "At least one tag is required.")
-            .refine(
-              (tags) => {
-                const trimmedTags = tags.map((tag) => tag.trim().toLowerCase());
-                return new Set(trimmedTags).size === trimmedTags.length;
-              },
-              { message: "Duplicate tags are not allowed." }
-            )
+        .min(1, { message: "At least 1 'tag' is required." })
+        .max(5, { message: "Maximum of 5 'tags' are allowed." })
+        .nonempty({ message: "At least 1 'tag' is required." })
+        .refine(
+          (tags) => {
+            const trimmedTags = tags.map((tag) => tag?.trim().toLowerCase());
+            return new Set(trimmedTags).size === trimmedTags.length;
+          },
+          { message: "Duplicate tags are not allowed." }
         );
     }
 
@@ -119,30 +83,6 @@ export const validateField = (props: ValidateBlogFieldProps) => {
         .refine((val) => val <= new Date(), {
           message: "Publish date cannot be in the future.",
         });
-    }
-
-    case "smallThumbnail":
-    case "largeThumbnail": {
-      return z
-        .any()
-        .refine((val) => val !== undefined && val !== null, {
-          message: `${field} is required.`,
-        })
-        .pipe(
-          z
-            .custom<Express.Multer.File>(
-              (file) =>
-                !!file && typeof file === "object" && "mimetype" in file,
-              {
-                message: `${field} must be a valid image file.`,
-              }
-            )
-            .refine((file) => ALLOWED_IMAGE_TYPES.includes(file.mimetype), {
-              message: `${field} must be an image of type: ${ALLOWED_IMAGE_TYPES.map(
-                (type) => type.split("/")[1]
-              ).join(", ")}`,
-            })
-        );
     }
 
     default:
