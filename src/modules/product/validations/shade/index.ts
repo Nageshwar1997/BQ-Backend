@@ -14,7 +14,6 @@ export const addShadesZodSchema = z.array(
       field: "colorCode",
       parentField: "shades[some_index]",
       blockSingleSpace: true,
-      nonEmpty: true,
       min: 4,
       max: 9,
       customRegex: {
