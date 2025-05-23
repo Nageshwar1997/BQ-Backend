@@ -1,9 +1,13 @@
-import { Request } from "express";
 import { Types } from "mongoose";
-import { z } from "zod";
+import { z, ZodType } from "zod";
 
-import { ZodNumberConfigs, ZodStringProps } from "../types";
-import { noSpaceRegex, singleSpaceRegex } from "../constants";
+import {
+  ValidateRequiredFileFieldsParams,
+  ZodDateProps,
+  ZodNumberConfigs,
+  ZodStringProps,
+} from "../types";
+import { dateRegex, noSpaceRegex, singleSpaceRegex } from "../constants";
 import { AppError } from "../classes";
 
 export const isValidMongoId = (id: string): boolean => {
@@ -22,11 +26,11 @@ export const getCloudinaryOptimizedUrl = (url: string): string => {
   return url.replace("/upload/", "/upload/f_auto,q_auto/");
 };
 
-interface ValidateRequiredFileFieldsParams {
-  req: Request;
-  fields: string[];
-  checkIn: "file" | "files";
-}
+export const convertToISTDate = (date: Date): Date => {
+  const utcTime = date.getTime();
+  const IST_OFFSET = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in ms
+  return new Date(utcTime + IST_OFFSET);
+};
 
 export const validateRequiredFileFields = ({
   req,
@@ -68,7 +72,7 @@ export const validateRequiredFileFields = ({
 
 export const validateZodString = ({
   field,
-  nonEmpty = false,
+  nonEmpty = true,
   min,
   max,
   blockSingleSpace,
@@ -77,7 +81,9 @@ export const validateZodString = ({
   customRegex,
   isOptional = false,
 }: ZodStringProps) => {
-  const nestedField = parentField ? `${parentField}.${field}` : field;
+  const nestedField = parentField
+    ? `${parentField}${parentField.includes("[") ? " " : "."}${field}`
+    : field;
 
   const messages = {
     required: `The '${nestedField}' field is required.`,
@@ -204,7 +210,9 @@ export const validateZodNumber = ({
   nonNegative = true,
   isOptional = false,
 }: ZodNumberConfigs) => {
-  const nestedField = parentField ? `${parentField}.${field}` : field;
+  const nestedField = parentField
+    ? `${parentField}${parentField.includes("[") ? " " : "."}${field}`
+    : field;
 
   const messages = {
     required: `The '${nestedField}' field is required.`,
@@ -296,4 +304,69 @@ export const validateZodNumber = ({
     });
 
   return isOptional ? optionalSchema : requiredSchema;
+};
+
+export const validateZodDate = ({
+  field,
+  parentField,
+  isOptional = false,
+  mustBePastDate = false,
+  mustBeFutureDate = false,
+}: ZodDateProps): ZodType<Date | undefined> => {
+  const nestedField = parentField
+    ? `${parentField}${parentField.includes("[") ? " " : "."}${field}`
+    : field;
+
+  const messages = {
+    required: `The '${nestedField}' field is required.`,
+    invalid_format: `The '${nestedField}' field must be in 'YYYY-MM-DD' or ISO format.`,
+    invalid_date: `The '${nestedField}' field is not a valid date.`,
+    past: `The '${nestedField}' field must be in the past.`,
+    future: `The '${nestedField}' field must be in the future.`,
+  };
+
+  const baseSchema = z
+    .string({
+      required_error: messages.required,
+      invalid_type_error: messages.invalid_format,
+    })
+    .refine((val) => dateRegex.test(val), {
+      message: messages.invalid_format,
+    })
+    .transform((val) => {
+      const hasTime = val.includes("T");
+      const date = new Date(val);
+      if (hasTime) {
+        const utcTime = date.getTime();
+        const IST_OFFSET = 5.5 * 60 * 60 * 1000;
+        return new Date(utcTime + IST_OFFSET);
+      } else {
+        return date;
+      }
+    })
+
+    .refine((date) => date instanceof Date && !isNaN(date.getTime()), {
+      message: messages.invalid_date,
+    });
+
+  const refinedSchema = baseSchema.refine(
+    (val) => {
+      if (!(val instanceof Date)) return false;
+
+      const nowIST = convertToISTDate(new Date());
+
+      if (mustBePastDate && val > nowIST) return false;
+      if (mustBeFutureDate && val <= nowIST) return false;
+      return true;
+    },
+    {
+      message: mustBePastDate ? messages.past : messages.future,
+    }
+  );
+
+  return (isOptional
+    ? refinedSchema.optional()
+    : refinedSchema.refine((val) => val !== undefined, {
+        message: messages.required,
+      })) as unknown as ZodType<Date | undefined>;
 };
