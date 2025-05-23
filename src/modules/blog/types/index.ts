@@ -17,5 +17,5 @@ export interface BlogProps {
 export type BlogThumbnailType = "smallThumbnail" | "largeThumbnail";
 
 export interface ValidateBlogFieldProps extends ValidateZodFieldConfigs {
-  field: keyof BlogProps;
+  field: Partial<keyof BlogProps>;
 }
