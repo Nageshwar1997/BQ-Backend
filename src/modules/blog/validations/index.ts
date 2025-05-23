@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { validateBlogField } from "../utils";
-import { validateZodDate } from "../../../utils";
 
 const blogSchema = z.object({
   mainTitle: validateBlogField({
@@ -23,11 +22,15 @@ const blogSchema = z.object({
     min: 10,
     blockMultipleSpaces: true,
   }),
-  publishedDate: validateZodDate({
+  publishedDate: validateBlogField({
     field: "publishedDate",
     mustBePastDate: true,
   }),
-  author: validateBlogField({ field: "author", blockMultipleSpaces: true, min: 2 }),
+  author: validateBlogField({
+    field: "author",
+    blockMultipleSpaces: true,
+    min: 2,
+  }),
   tags: validateBlogField({
     field: "tags",
     min: 2,

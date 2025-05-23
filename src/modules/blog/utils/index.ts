@@ -1,8 +1,7 @@
 import { z } from "zod";
-import { ALLOWED_IMAGE_TYPES, singleSpaceRegex } from "../../../constants";
 import { AppError } from "../../../classes";
 import { ValidateBlogFieldProps } from "../types";
-import { validateZodString } from "../../../utils";
+import { validateZodDate, validateZodString } from "../../../utils";
 
 export const validateBlogField = (props: ValidateBlogFieldProps) => {
   const {
@@ -15,6 +14,8 @@ export const validateBlogField = (props: ValidateBlogFieldProps) => {
     customRegex,
     isOptional = false,
     nonEmpty = false,
+    mustBePastDate,
+    mustBeFutureDate,
   } = props;
 
   switch (field) {
@@ -68,21 +69,13 @@ export const validateBlogField = (props: ValidateBlogFieldProps) => {
     }
 
     case "publishedDate": {
-      return z
-        .any()
-        .refine((val) => val !== undefined && val !== null && val !== "", {
-          message: "Published date is required.",
-        })
-        .transform((val) => {
-          const date = new Date(val);
-          return isNaN(date.getTime()) ? "__invalid_date__" : date;
-        })
-        .refine((val) => val !== "__invalid_date__", {
-          message: "Invalid date format.",
-        })
-        .refine((val) => val <= new Date(), {
-          message: "Publish date cannot be in the future.",
-        });
+      return validateZodDate({
+        field: "publishedDate",
+        mustBePastDate,
+        mustBeFutureDate,
+        isOptional,
+        parentField,
+      });
     }
 
     default:
