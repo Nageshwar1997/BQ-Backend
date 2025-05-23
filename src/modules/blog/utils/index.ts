@@ -70,7 +70,7 @@ export const validateBlogField = (props: ValidateBlogFieldProps) => {
 
     case "publishedDate": {
       return validateZodDate({
-        field: "publishedDate",
+        field,
         mustBePastDate,
         mustBeFutureDate,
         isOptional,
