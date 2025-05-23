@@ -4,13 +4,18 @@ import { BLOGS_THUMBNAILS } from "../constants";
 import { AppError } from "../../../classes";
 import { Blog } from "../models";
 import { AuthorizedRequest } from "../../../types";
-import { getCloudinaryOptimizedUrl } from "../../../utils";
+import {
+  getCloudinaryOptimizedUrl,
+  validateRequiredFileFields,
+} from "../../../utils";
 import { MediaModule } from "../..";
 
 export const uploadBlogController = async (
   req: AuthorizedRequest,
   res: Response
 ) => {
+  validateRequiredFileFields({ req, fields: BLOGS_THUMBNAILS });
+
   const {
     mainTitle,
     subTitle,

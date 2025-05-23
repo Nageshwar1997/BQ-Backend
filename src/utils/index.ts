@@ -35,31 +35,47 @@ export const convertToISTDate = (date: Date): Date => {
 export const validateRequiredFileFields = ({
   req,
   fields,
-  checkIn,
 }: ValidateRequiredFileFieldsParams): void => {
   const requiredFields: string[] = [];
 
-  if (checkIn === "file") {
-    if (!req.file) {
-      requiredFields.push(...fields);
-    }
-  } else {
-    const files = req.files as Express.Multer.File[];
-
-    if (!Array.isArray(files)) {
-      requiredFields.push(...fields);
-    } else {
-      fields.forEach((expectedField) => {
-        const exists = files.some((file) =>
-          file.fieldname.startsWith(expectedField)
-        );
-        if (!exists) {
-          requiredFields.push(expectedField);
-        }
-      });
-    }
+  const singleFile = req.file;
+  const multipleFiles = req.files;
+  // Helper to check if any file fieldname starts with the expected field
+  const hasMatchingField = (
+    field: string,
+    uploadedFieldNames: string[]
+  ): boolean => {
+    return uploadedFieldNames.some((uploaded) => uploaded.startsWith(field));
+  };
+  // Case 1: .single()
+  if (singleFile) {
+    const uploadedFieldNames = [singleFile.fieldname];
+    fields.forEach((field) => {
+      if (!hasMatchingField(field, uploadedFieldNames)) {
+        requiredFields.push(field);
+      }
+    });
   }
-
+  // Case 2: .array() or .any()
+  else if (Array.isArray(multipleFiles)) {
+    const uploadedFieldNames = multipleFiles.map((file) => file.fieldname);
+    fields.forEach((field) => {
+      if (!hasMatchingField(field, uploadedFieldNames)) {
+        requiredFields.push(field);
+      }
+    });
+  }
+  // Case 3: .fields() => files is Record<string, File[]>
+  else if (multipleFiles && typeof multipleFiles === "object") {
+    const fileMap = multipleFiles as Record<string, Express.Multer.File[]>;
+    const uploadedFieldNames = Object.keys(fileMap);
+    fields.forEach((field) => {
+      if (!hasMatchingField(field, uploadedFieldNames)) {
+        requiredFields.push(field);
+      }
+    });
+  }
+  // Throw error if any required fields are missing
   if (requiredFields.length > 0) {
     throw new AppError(
       `Required file field${

@@ -51,7 +51,6 @@ export interface CustomFileErrorProps {
 export interface ValidateRequiredFileFieldsParams {
   req: Request;
   fields: string[];
-  checkIn: "file" | "files";
 }
 
 export interface ZodCommonConfigs {
