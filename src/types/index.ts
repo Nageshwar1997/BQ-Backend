@@ -65,7 +65,7 @@ interface ZodCompareConfigs {
   max?: number | undefined;
 }
 
-export interface ZodStringProps extends ZodCommonConfigs, ZodCompareConfigs {
+export interface ZodStringConfigs extends ZodCommonConfigs, ZodCompareConfigs {
   blockMultipleSpaces?: boolean;
   blockSingleSpace?: boolean;
   nonEmpty?: boolean;
@@ -80,11 +80,12 @@ export interface ZodNumberConfigs extends ZodCommonConfigs, ZodCompareConfigs {
   nonNegative?: boolean;
 }
 
-export interface ZodDateProps extends ZodCommonConfigs {
+export interface ZodDateConfigs extends ZodCommonConfigs {
   mustBePastDate?: boolean;
   mustBeFutureDate?: boolean;
 }
 
 export interface ValidateZodFieldConfigs
-  extends ZodStringProps,
-    ZodNumberConfigs {}
+  extends ZodStringConfigs,
+    ZodNumberConfigs,
+    ZodDateConfigs {}

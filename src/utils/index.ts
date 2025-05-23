@@ -3,9 +3,9 @@ import { z, ZodType } from "zod";
 
 import {
   ValidateRequiredFileFieldsParams,
-  ZodDateProps,
+  ZodDateConfigs,
   ZodNumberConfigs,
-  ZodStringProps,
+  ZodStringConfigs,
 } from "../types";
 import { dateRegex, noSpaceRegex, singleSpaceRegex } from "../constants";
 import { AppError } from "../classes";
@@ -80,7 +80,7 @@ export const validateZodString = ({
   parentField,
   customRegex,
   isOptional = false,
-}: ZodStringProps) => {
+}: ZodStringConfigs) => {
   const nestedField = parentField
     ? `${parentField}${parentField.includes("[") ? " " : "."}${field}`
     : field;
@@ -312,7 +312,7 @@ export const validateZodDate = ({
   isOptional = false,
   mustBePastDate = false,
   mustBeFutureDate = false,
-}: ZodDateProps): ZodType<Date | undefined> => {
+}: ZodDateConfigs): ZodType<Date | undefined> => {
   const nestedField = parentField
     ? `${parentField}${parentField.includes("[") ? " " : "."}${field}`
     : field;
