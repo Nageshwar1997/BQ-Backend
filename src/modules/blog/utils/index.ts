@@ -18,53 +18,53 @@ export const validateBlogField = (props: ValidateBlogFieldProps) => {
     mustBeFutureDate,
   } = props;
 
+  const commonConfigs: ValidateBlogFieldProps = {
+    field,
+    parentField,
+    max,
+    min,
+    blockSingleSpace,
+    nonEmpty,
+    blockMultipleSpaces,
+    customRegex,
+    isOptional,
+  };
+
   switch (field) {
     case "mainTitle":
     case "subTitle":
     case "author":
     case "description":
     case "content": {
-      return validateZodString({
-        field,
-        parentField,
-        max,
-        min,
-        blockSingleSpace,
-        nonEmpty,
-        blockMultipleSpaces,
-        customRegex,
-        isOptional,
-      });
+      return validateZodString({ ...commonConfigs, field, parentField });
     }
 
     case "tags": {
       return z
         .array(
           validateZodString({
+            ...commonConfigs,
             field: "tag",
-            parentField: "tags[some_index]",
-            max,
-            min,
-            blockSingleSpace,
-            nonEmpty,
-            blockMultipleSpaces,
-            customRegex,
-            isOptional,
+            parentField: `${field}[some_index]`,
           }),
           {
-            required_error: "'tags' are required",
-            invalid_type_error: "'tags' must be an array of strings.",
+            required_error: `'${field}' are required.`,
+            invalid_type_error: `'${field}' must be an array of strings.`,
           }
         )
-        .min(1, { message: "At least 1 'tag' is required." })
-        .max(5, { message: "Maximum of 5 'tags' are allowed." })
-        .nonempty({ message: "At least 1 'tag' is required." })
+        .min(min ?? 1, {
+          message: `At least 1 '${field.slice(0, -1)}' is required.`,
+        })
+        .max(max ?? 5, { message: `Maximum of 5 '${field}' are allowed.` })
+        .nonempty({
+          message: `At least 1 '${field.slice(0, -1)}' is required.`,
+        })
         .refine(
           (tags) => {
             const trimmedTags = tags.map((tag) => tag?.trim().toLowerCase());
             return new Set(trimmedTags).size === trimmedTags.length;
           },
-          { message: "Duplicate tags are not allowed." }
+          { message: `Duplicate '${field}' are not allowed.` }
         );
     }
 
