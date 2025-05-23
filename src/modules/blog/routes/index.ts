@@ -12,6 +12,8 @@ import {
   AuthMiddleware,
   MulterMiddleware,
   ZodMiddleware,
+  RequestMiddleware,
+  JSONParseMiddleware,
 } from "../../../middlewares";
 import { editBlogZodSchema, uploadBlogZodSchema } from "../validations";
 
@@ -37,6 +39,8 @@ blogRouter.post(
       maxCount: 1,
     })),
   }),
+  RequestMiddleware.checkEmptyRequest({ body: true, files: true }),
+  JSONParseMiddleware.JSONParse({ fieldsToParse: ["tags"] }),
   ZodMiddleware.validateZodSchema(uploadBlogZodSchema),
   ResponseMiddleware.catchAsync(uploadBlogController)
 );
