@@ -52,13 +52,10 @@ export const validateBlogField = (props: ValidateBlogFieldProps) => {
             invalid_type_error: `'${field}' must be an array of strings.`,
           }
         )
-        .min(min ?? 1, {
-          message: `At least 1 '${field.slice(0, -1)}' is required.`,
-        })
-        .max(max ?? 5, { message: `Maximum of 5 '${field}' are allowed.` })
-        .nonempty({
-          message: `At least 1 '${field.slice(0, -1)}' is required.`,
-        })
+        .nonempty({ message: `The '${field}' field cannot be empty.` })
+        .min(1, { message: `At least 1 'tag' is required.` })
+        .max(5, { message: `Maximum of 5 '${field}' are allowed.` })
+
         .refine(
           (tags) => {
             const trimmedTags = tags.map((tag) => tag?.trim().toLowerCase());
