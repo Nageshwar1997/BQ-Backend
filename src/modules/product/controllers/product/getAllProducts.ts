@@ -33,10 +33,10 @@ export const getAllProductsController = async (req: Request, res: Response) => {
           select: safeFields.join(" "),
           populate: {
             path: "parentCategory",
-            select: "name level",
+            select: "name category level",
             populate: {
               path: "parentCategory",
-              select: "name level",
+              select: "name category level",
             },
           },
         });
