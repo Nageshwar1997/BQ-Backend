@@ -1,43 +1,30 @@
 import { z } from "zod";
 import { validateBlogField } from "../utils";
+import { TBlogFieldOnly, ValidateBlogFieldConfigs } from "../types";
 
-const blogSchema = z.object({
-  mainTitle: validateBlogField({
-    field: "mainTitle",
-    blockMultipleSpaces: true,
-    min: 2,
-  }),
-  subTitle: validateBlogField({
-    field: "subTitle",
-    blockMultipleSpaces: true,
-    min: 2,
-  }),
-  content: validateBlogField({
-    field: "content",
-    min: 10,
-    blockMultipleSpaces: true,
-  }),
-  description: validateBlogField({
-    field: "description",
-    min: 10,
-    blockMultipleSpaces: true,
-  }),
-  publishedDate: validateBlogField({
-    field: "publishedDate",
-    mustBePastDate: true,
-  }),
-  author: validateBlogField({
-    field: "author",
-    blockMultipleSpaces: true,
-    min: 2,
-  }),
-  tags: validateBlogField({
-    field: "tags",
-    min: 2,
-    max: 20,
-    blockMultipleSpaces: true,
-  }),
-});
+const common: Record<string, Partial<ValidateBlogFieldConfigs>> = {
+  text: { min: 2, blockMultipleSpaces: true },
+  content: { min: 10 },
+};
 
-export const uploadBlogZodSchema = blogSchema;
-export const editBlogZodSchema = blogSchema.partial();
+const blogFieldValidations: Record<TBlogFieldOnly, ValidateBlogFieldConfigs> = {
+  mainTitle: { ...common.text, field: "mainTitle" },
+  subTitle: { ...common.text, field: "subTitle" },
+  content: { ...common.text, ...common.content, field: "content" },
+  description: { ...common.text, ...common.content, field: "description" },
+  publishedDate: { field: "publishedDate", mustBePastDate: true },
+  author: { ...common.text, field: "author" },
+  tags: { ...common.text, max: 20, field: "tags" },
+};
+
+export const blogZodSchema = z.object(
+  Object.fromEntries(
+    Object.entries(blogFieldValidations).map(([key, config]) => [
+      key,
+      validateBlogField(config),
+    ])
+  )
+);
+
+export const uploadBlogZodSchema = blogZodSchema;
+export const editBlogZodSchema = blogZodSchema.partial();

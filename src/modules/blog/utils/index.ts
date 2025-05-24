@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { AppError } from "../../../classes";
-import { ValidateBlogFieldProps } from "../types";
+import { ValidateBlogFieldConfigs } from "../types";
 import { validateZodDate, validateZodString } from "../../../utils";
 
-export const validateBlogField = (props: ValidateBlogFieldProps) => {
+export const validateBlogField = (props: ValidateBlogFieldConfigs) => {
   const {
     field,
     parentField,
@@ -18,7 +18,7 @@ export const validateBlogField = (props: ValidateBlogFieldProps) => {
     mustBeFutureDate,
   } = props;
 
-  const commonConfigs: ValidateBlogFieldProps = {
+  const commonConfigs: ValidateBlogFieldConfigs = {
     field,
     parentField,
     max,
