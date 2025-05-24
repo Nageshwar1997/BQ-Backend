@@ -13,7 +13,7 @@ export const validateBlogField = (props: ValidateBlogFieldProps) => {
     blockSingleSpace = false,
     customRegex,
     isOptional = false,
-    nonEmpty = false,
+    nonEmpty = true,
     mustBePastDate,
     mustBeFutureDate,
   } = props;
@@ -55,7 +55,6 @@ export const validateBlogField = (props: ValidateBlogFieldProps) => {
         .nonempty({ message: `The '${field}' field cannot be empty.` })
         .min(1, { message: `At least 1 'tag' is required.` })
         .max(5, { message: `Maximum of 5 '${field}' are allowed.` })
-
         .refine(
           (tags) => {
             const trimmedTags = tags.map((tag) => tag?.trim().toLowerCase());
