@@ -62,7 +62,7 @@ export const uploadProductController = async (
 
     // Rollback: Remove uploaded shades
     if (shades.length) {
-      const removingShades = await Shade.find({ _id: { $in: shades } });
+      const removingShades = await Shade.find({ _id: { $in: shades } }).lean();
 
       await Promise.all(
         removingShades.map((shade: ShadeProps) =>
