@@ -114,8 +114,8 @@ export const addShadesToRequest = async (
         })
       );
 
-      req.body.shades = newShadeIds || [];
-      req.body.totalStock = totalStock || 0;
+      req.body.shades = newShadeIds.length > 0 ? newShadeIds : [];
+      req.body.totalStock = totalStock ? totalStock : req.body.totalStock;
     }
 
     next();

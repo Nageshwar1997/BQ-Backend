@@ -1,11 +1,8 @@
 import { Response } from "express";
-import { Types } from "mongoose";
-import { UploadApiResponse } from "cloudinary";
 
 import { AuthorizedRequest } from "../../../../types";
 import { ShadeProps } from "../../types";
 import { AppError } from "../../../../classes";
-import { getCloudinaryOptimizedUrl } from "../../../../utils";
 import { Product, Shade } from "../../models";
 import { MediaModule } from "../../..";
 
@@ -13,7 +10,6 @@ export const uploadProductController = async (
   req: AuthorizedRequest,
   res: Response
 ) => {
-  const files = req.files as Express.Multer.File[];
   const user = req.user;
 
   const {
@@ -29,20 +25,14 @@ export const uploadProductController = async (
     commonImages,
     totalStock,
     shades,
-  } = {
-    title: req.body.title?.trim(),
-    brand: req.body.brand?.trim(),
-    originalPrice: req.body.originalPrice,
-    sellingPrice: req.body.sellingPrice,
-    description: req.body.description?.trim(),
-    howToUse: req.body.howToUse?.trim(),
-    ingredients: req.body.ingredients?.trim(),
-    additionalDetails: req.body.additionalDetails?.trim(),
-    category: req.body.category,
-    totalStock: req.body.totalStock,
-    commonImages: req.body.commonImages,
-    shades: req.body.shades,
-  };
+  } = req.body;
+
+  if (sellingPrice > originalPrice) {
+    throw new AppError(
+      "Selling price cannot be higher than original price",
+      400
+    );
+  }
 
   const finalData = {
     title,
