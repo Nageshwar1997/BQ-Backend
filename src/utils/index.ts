@@ -125,11 +125,11 @@ export const validateZodString = ({
     schema = schema.nonempty({ message: messages.non_empty });
   }
 
-  if (min !== undefined) {
+  if (nonEmpty && min !== undefined) {
     schema = schema.min(min, messages.min);
   }
 
-  if (max !== undefined) {
+  if (nonEmpty && max !== undefined) {
     schema = schema.max(max, messages.max);
   }
 

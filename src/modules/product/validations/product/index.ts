@@ -9,7 +9,7 @@ const common: Record<
   Partial<ValidateProductFieldConfigs>
 > = {
   text: { min: 2, blockMultipleSpaces: true },
-  optional: { min: 10, isOptional: true },
+  optional: { min: 10, isOptional: true, nonEmpty: false },
   number: { min: 1, nonNegative: true },
 };
 

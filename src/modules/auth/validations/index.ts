@@ -50,12 +50,14 @@ const loginFieldValidations: Record<
   email: {
     field: "email",
     isOptional: true,
+    nonEmpty: false,
     blockSingleSpace: true,
     customRegex: customRegexes.email,
   },
   phoneNumber: {
     ...common.phone,
     isOptional: true,
+    nonEmpty: false,
     field: "phoneNumber",
     customRegex: customRegexes.phoneNumber,
   },
@@ -71,8 +73,12 @@ const registerFieldValidations: Record<
   ValidateAuthFieldConfigs
 > = {
   ...loginFieldValidations,
-  email: { ...loginFieldValidations.email, isOptional: false },
-  phoneNumber: { ...loginFieldValidations.phoneNumber, isOptional: false },
+  email: { ...loginFieldValidations.email, isOptional: false, nonEmpty: true },
+  phoneNumber: {
+    ...loginFieldValidations.phoneNumber,
+    isOptional: false,
+    nonEmpty: true,
+  },
   firstName: {
     ...common.text,
     field: "firstName",
