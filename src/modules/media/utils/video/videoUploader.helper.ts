@@ -19,7 +19,7 @@ export const videoUploader = async ({
 
   const publicId = `${new Date()
     .toLocaleDateString()
-    .replace(/\//g, "_")}_${Date.now()}_${file?.originalname
+    .replace(/\//g, "-")}_${Date.now()}_${file?.originalname
     .split(" ")
     .join("_")
     .split(".")
