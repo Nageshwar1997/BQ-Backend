@@ -16,21 +16,11 @@ export function typedObjectEntries<T extends object>(
 }
 
 export const validateProductField = (props: ValidateProductFieldConfigs) => {
-  const {
-    field,
-    parentField,
-    min,
-    max,
-    blockMultipleSpaces = false,
-    blockSingleSpace = false,
-    nonEmpty = true,
-    customRegex,
-    isOptional = false,
-    mustBeInt = false,
-    nonNegative = true,
-  } = props;
+  const { field, parentField, nonEmpty = true, nonNegative = true } = props;
 
-  const nestedField = parentField ? `${parentField}.${field}` : field;
+  const nestedField = parentField
+    ? `${parentField}${parentField.includes("[") ? " " : "."}${field}`
+    : field;
 
   switch (field) {
     // For all string fields
@@ -47,17 +37,7 @@ export const validateProductField = (props: ValidateProductFieldConfigs) => {
     // For Category
     case "category":
     case "name": {
-      return validateZodString({
-        field,
-        parentField,
-        max,
-        min,
-        blockSingleSpace,
-        nonEmpty,
-        blockMultipleSpaces,
-        customRegex,
-        isOptional,
-      });
+      return validateZodString({ ...props, nonEmpty });
     }
     // For all number fields
     // For product main fields
@@ -67,12 +47,7 @@ export const validateProductField = (props: ValidateProductFieldConfigs) => {
     // For Shades Field
     case "stock": {
       return validateZodNumber({
-        field,
-        parentField,
-        min,
-        mustBeInt,
-        isOptional,
-        max,
+        ...props,
         nonNegative,
       });
     }

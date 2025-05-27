@@ -5,3 +5,4 @@ export * as Controllers from "./controllers";
 export * as Models from "./models";
 export * as Routes from "./routes";
 export * as Validations from "./validations";
+export * as Utils from "./utils";

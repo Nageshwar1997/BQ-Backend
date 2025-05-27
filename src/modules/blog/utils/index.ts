@@ -4,46 +4,22 @@ import { ValidateBlogFieldConfigs } from "../types";
 import { validateZodDate, validateZodString } from "../../../utils";
 
 export const validateBlogField = (props: ValidateBlogFieldConfigs) => {
-  const {
-    field,
-    parentField,
-    min,
-    max,
-    blockMultipleSpaces = false,
-    blockSingleSpace = false,
-    customRegex,
-    isOptional = false,
-    nonEmpty = true,
-    mustBePastDate,
-    mustBeFutureDate,
-  } = props;
-
-  const commonConfigs: ValidateBlogFieldConfigs = {
-    field,
-    parentField,
-    max,
-    min,
-    blockSingleSpace,
-    nonEmpty,
-    blockMultipleSpaces,
-    customRegex,
-    isOptional,
-  };
-
-  switch (field) {
+  const { field, nonEmpty = true } = props;
+  switch (props.field) {
     case "mainTitle":
     case "subTitle":
     case "author":
     case "description":
     case "content": {
-      return validateZodString({ ...commonConfigs, field, parentField });
+      return validateZodString({ ...props, nonEmpty });
     }
 
     case "tags": {
       return z
         .array(
           validateZodString({
-            ...commonConfigs,
+            ...props,
+            nonEmpty,
             field: "tag",
             parentField: `${field}[some_index]`,
           }),
@@ -65,13 +41,7 @@ export const validateBlogField = (props: ValidateBlogFieldConfigs) => {
     }
 
     case "publishedDate": {
-      return validateZodDate({
-        field,
-        mustBePastDate,
-        mustBeFutureDate,
-        isOptional,
-        parentField,
-      });
+      return validateZodDate(props);
     }
 
     default:

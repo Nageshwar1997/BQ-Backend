@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { validateZodString } from "../../../utils";
 import {
   emailRegex,
   nameRegex,
@@ -11,25 +10,7 @@ import {
   TRegisterFieldsOnly,
   ValidateAuthFieldConfigs,
 } from "../types";
-import { AppError } from "../../../classes";
-
-export const validateAuthField = (props: ValidateAuthFieldConfigs) => {
-  switch (props.field) {
-    case "firstName":
-    case "lastName":
-    case "email":
-    case "password":
-    case "phoneNumber":
-    case "confirmPassword": {
-      return validateZodString(props);
-    }
-    default:
-      throw new AppError(
-        `Validation for field '${props.field}' is not implemented.`,
-        500
-      );
-  }
-};
+import { validateAuthField } from "../utils";
 
 const customRegexes = {
   email: {
