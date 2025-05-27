@@ -8,6 +8,7 @@ import {
   SingleFileUploaderProps,
 } from "../../types";
 import { CLOUDINARY_MAIN_FOLDER } from "../../../../envs";
+import { getCloudinaryOptimizedUrl } from "../../../../utils";
 
 const mainFolder = CLOUDINARY_MAIN_FOLDER;
 
@@ -38,6 +39,8 @@ const uploadToCloudinary = async (
           public_id: publicId,
           resource_type: "image",
           allowed_formats: ["jpg", "jpeg", "png", "webp"],
+          format: "webp", // convert to webp
+          transformation: [{ fetch_format: "webp", quality: "auto" }],
         },
         (error, result) => {
           if (error) {
@@ -48,7 +51,9 @@ const uploadToCloudinary = async (
               )
             );
           } else if (result) {
-            resolve(result);
+            const optimizedUrl = getCloudinaryOptimizedUrl(result.secure_url);
+            const finalResult = { ...result, secure_url: optimizedUrl };
+            resolve(finalResult);
           } else {
             reject(new AppError("Failed to upload image on Cloudinary", 500));
           }
