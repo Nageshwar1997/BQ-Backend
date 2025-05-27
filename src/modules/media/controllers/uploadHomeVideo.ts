@@ -15,7 +15,6 @@ import {
   videoRemover,
   videoUploader,
 } from "../utils";
-import { getCloudinaryOptimizedUrl } from "../../../utils";
 import { HomeVideo } from "../models";
 
 export const uploadHomeVideoController = async (
@@ -105,7 +104,7 @@ export const uploadHomeVideoController = async (
       originalUrl: video.secure_url,
       public_id: video.public_id,
       duration: Math.round(video.duration),
-      posterUrl: getCloudinaryOptimizedUrl(poster.secure_url),
+      posterUrl: poster.secure_url,
       user: user?._id,
     });
     res.success(201, "Video uploaded successfully", { homeVideo });

@@ -2,7 +2,6 @@ import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
 
 import { AppError } from "../../../classes";
-import { getCloudinaryOptimizedUrl } from "../../../utils";
 import { MediaModule, UserModule } from "../..";
 import { generateToken } from "../services";
 
@@ -37,7 +36,7 @@ export const registerController = async (req: Request, res: Response) => {
       folder: "Profile_Pictures",
       cloudinaryConfigOption: "image",
     });
-    profilePic = getCloudinaryOptimizedUrl(imageResult.secure_url) ?? "";
+    profilePic = imageResult?.secure_url ?? "";
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);

@@ -4,10 +4,7 @@ import { BLOGS_THUMBNAILS } from "../constants";
 import { AppError } from "../../../classes";
 import { Blog } from "../models";
 import { AuthorizedRequest } from "../../../types";
-import {
-  getCloudinaryOptimizedUrl,
-  validateRequiredFileFields,
-} from "../../../utils";
+import { validateRequiredFileFields } from "../../../utils";
 import { MediaModule } from "../..";
 
 export const uploadBlogController = async (
@@ -52,7 +49,7 @@ export const uploadBlogController = async (
           cloudinaryConfigOption: "image",
         });
 
-        thumbnails[item] = getCloudinaryOptimizedUrl(uploadResult.secure_url);
+        thumbnails[item] = uploadResult.secure_url;
       }
     })
   );

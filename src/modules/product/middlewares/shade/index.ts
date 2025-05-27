@@ -2,7 +2,6 @@ import { Types } from "mongoose";
 import { NextFunction, Response } from "express";
 import { AuthorizedRequest } from "../../../../types";
 import { MediaModule } from "../../..";
-import { getCloudinaryOptimizedUrl } from "../../../../utils";
 import { AppError } from "../../../../classes";
 import { Shade } from "../../models";
 
@@ -48,8 +47,8 @@ export const addShadesToRequest = async (
         cloudinaryConfigOption: "product",
       });
 
-    uploadedCommonImages = uploadedCommonImagesResult.map((img) =>
-      getCloudinaryOptimizedUrl(img.secure_url)
+    uploadedCommonImages = uploadedCommonImagesResult.map(
+      (img) => img.secure_url
     );
     req.body.commonImages = uploadedCommonImages;
 
@@ -94,9 +93,7 @@ export const addShadesToRequest = async (
               cloudinaryConfigOption: "product",
             });
 
-          const images = uploadedShadeImagesResult.map((img) =>
-            getCloudinaryOptimizedUrl(img.secure_url)
-          );
+          const images = uploadedShadeImagesResult.map((img) => img.secure_url);
           uploadedAllShadesImages.push(...images);
 
           return {

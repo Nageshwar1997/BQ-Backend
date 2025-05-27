@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import { allowedOptions } from "../constants";
 import { AppError } from "../../../classes";
 import { singleImageUploader } from "../utils";
-import { getCloudinaryOptimizedUrl } from "../../../utils";
 
 export const uploadSingleImageController = async (
   req: Request,
@@ -32,6 +31,6 @@ export const uploadSingleImageController = async (
   });
 
   res.success(200, "Image uploaded successfully", {
-    cloudUrl: getCloudinaryOptimizedUrl(result.secure_url),
+    cloudUrl: result.secure_url,
   });
 };

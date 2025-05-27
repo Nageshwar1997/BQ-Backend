@@ -1,6 +1,6 @@
 import { Response } from "express";
 
-import { getCloudinaryOptimizedUrl, isValidMongoId } from "../../../utils";
+import { isValidMongoId } from "../../../utils";
 import { AppError } from "../../../classes";
 import { BlogThumbnailType } from "../types";
 import { Blog } from "../models";
@@ -48,7 +48,7 @@ export const editBlogController = async (
           folder: "Blogs",
           cloudinaryConfigOption: "image",
         });
-        updateBody[item] = getCloudinaryOptimizedUrl(uploadResult.secure_url);
+        updateBody[item] = uploadResult.secure_url;
         uploadedKeys.push(item); // Store uploaded key
       })
     );
