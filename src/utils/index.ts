@@ -114,7 +114,7 @@ export const validateZodString = ({
       : `The '${nestedField}' field does not match the required format.`,
   };
 
-  let requiredSchema = z
+  let schema = z
     .string({
       required_error: messages.required,
       invalid_type_error: messages.invalid_type,
@@ -122,99 +122,30 @@ export const validateZodString = ({
     .trim();
 
   if (nonEmpty) {
-    requiredSchema = requiredSchema.nonempty({ message: messages.non_empty });
+    schema = schema.nonempty({ message: messages.non_empty });
   }
 
   if (min !== undefined) {
-    requiredSchema = requiredSchema.min(min, messages.min);
+    schema = schema.min(min, messages.min);
   }
 
   if (max !== undefined) {
-    requiredSchema = requiredSchema.max(max, messages.max);
+    schema = schema.max(max, messages.max);
   }
 
   if (blockMultipleSpaces) {
-    requiredSchema = requiredSchema.regex(
-      singleSpaceRegex,
-      messages.multiple_spaces
-    );
+    schema = schema.regex(singleSpaceRegex, messages.multiple_spaces);
   }
 
   if (blockSingleSpace) {
-    requiredSchema = requiredSchema.regex(noSpaceRegex, messages.single_space);
+    schema = schema.regex(noSpaceRegex, messages.single_space);
   }
 
   if (customRegex && customRegex.regex) {
-    requiredSchema = requiredSchema.regex(customRegex.regex, messages.custom);
+    schema = schema.regex(customRegex.regex, messages.custom);
   }
 
-  const optionalSchema = z
-    .string()
-    .trim()
-    .default("")
-    .optional()
-    .superRefine((val, ctx) => {
-      if (val) {
-        if (typeof val !== "string") {
-          ctx.addIssue({
-            code: z.ZodIssueCode.invalid_type,
-            expected: "string",
-            received: typeof val,
-            path: ctx.path,
-            message: messages.invalid_type,
-          });
-          return;
-        }
-
-        if (min !== undefined && val.length < min && val !== "") {
-          ctx.addIssue({
-            code: z.ZodIssueCode.too_small,
-            type: "string",
-            minimum: min,
-            path: ctx.path,
-            inclusive: true,
-            message: messages.min,
-          });
-        }
-
-        if (max !== undefined && val.length > max) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.too_big,
-            type: "string",
-            maximum: max,
-            path: ctx.path,
-            inclusive: true,
-            message: messages.max,
-          });
-        }
-
-        if (blockMultipleSpaces && singleSpaceRegex.test(val)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ctx.path,
-            message: messages.multiple_spaces,
-          });
-        }
-
-        if (blockSingleSpace && noSpaceRegex.test(val)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ctx.path,
-            message: messages.single_space,
-          });
-        }
-
-        if (customRegex && customRegex?.regex && !customRegex.regex.test(val)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ctx.path,
-            message: messages.custom,
-          });
-        }
-      }
-    });
-
-  return isOptional ? optionalSchema : requiredSchema;
+  return isOptional ? schema.optional() : schema;
 };
 
 export const validateZodNumber = ({
@@ -239,87 +170,30 @@ export const validateZodNumber = ({
     max: `The '${nestedField}' field must not exceed ${max}.`,
   };
 
-  let requiredSchema = z.coerce.number({
+  let schema = z.coerce.number({
     required_error: messages.required, // mostly this error will not be thrown because of coerce
     invalid_type_error: messages.invalid_type,
   });
 
   if (nonNegative) {
-    requiredSchema = requiredSchema.nonnegative({
+    schema = schema.nonnegative({
       message: messages.non_negative,
     });
   }
 
   if (mustBeInt) {
-    requiredSchema = requiredSchema.int({ message: messages.must_be_int });
+    schema = schema.int({ message: messages.must_be_int });
   }
 
   if (min !== undefined) {
-    requiredSchema = requiredSchema.min(min, messages.min);
+    schema = schema.min(min, messages.min);
   }
 
   if (max !== undefined) {
-    requiredSchema = requiredSchema.max(max, messages.max);
+    schema = schema.max(max, messages.max);
   }
 
-  const optionalSchema = z.coerce
-    .number()
-    .optional()
-    .default(0)
-    .superRefine((val, ctx) => {
-      if (val) {
-        if (typeof val !== "number" || isNaN(val)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.invalid_type,
-            expected: "number",
-            received: typeof val,
-            path: ctx.path,
-            message: messages.invalid_type,
-          });
-          return;
-        }
-
-        if (nonNegative && val < 0) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ctx.path,
-            message: messages.non_negative,
-          });
-        }
-
-        if (mustBeInt && !Number.isInteger(val)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ctx.path,
-            message: messages.must_be_int,
-          });
-        }
-
-        if (min !== undefined && val < min) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.too_small,
-            type: "number",
-            minimum: min,
-            path: ctx.path,
-            inclusive: true,
-            message: messages.min,
-          });
-        }
-
-        if (max !== undefined && val > max) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.too_big,
-            type: "number",
-            maximum: max,
-            path: ctx.path,
-            inclusive: true,
-            message: messages.max,
-          });
-        }
-      }
-    });
-
-  return isOptional ? optionalSchema : requiredSchema;
+  return isOptional ? schema.optional() : schema;
 };
 
 export const validateZodDate = ({
