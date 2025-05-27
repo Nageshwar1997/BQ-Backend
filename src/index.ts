@@ -2,7 +2,7 @@ import "dotenv/config";
 import path from "path";
 import express, { Request, Response } from "express";
 
-import router from "./router";
+import router from "./routes";
 import { connectDB } from "./configs";
 import {
   ResponseMiddleware,
