@@ -4,40 +4,37 @@ import { createCategoryZodSchema } from "../category";
 import { addShadesZodSchema } from "../shade";
 import { TProductFieldOnly, ValidateProductFieldConfigs } from "../../types";
 
-const commonTextValidation: Partial<ValidateProductFieldConfigs> = {
-  min: 2,
-  blockMultipleSpaces: true,
-};
-
-const optionalTextValidation: Partial<ValidateProductFieldConfigs> = {
-  ...commonTextValidation,
-  min: 10,
-  isOptional: true,
-};
-
-const numberValidation: Partial<ValidateProductFieldConfigs> = {
-  min: 1,
-  nonNegative: true,
+const common: Record<
+  "text" | "optional" | "number",
+  Partial<ValidateProductFieldConfigs>
+> = {
+  text: { min: 2, blockMultipleSpaces: true },
+  optional: { min: 10, isOptional: true },
+  number: { min: 1, nonNegative: true },
 };
 
 const uploadProductFields: Record<
   TProductFieldOnly,
   ValidateProductFieldConfigs
 > = {
-  title: { ...commonTextValidation, field: "title" },
-  brand: { ...commonTextValidation, min: 1, field: "brand" },
-  originalPrice: { ...numberValidation, field: "originalPrice" },
-  sellingPrice: { ...numberValidation, field: "sellingPrice" },
+  title: { ...common.text, field: "title" },
+  brand: { ...common.text, min: 1, field: "brand" },
+  originalPrice: { ...common.number, field: "originalPrice" },
+  sellingPrice: { ...common.number, field: "sellingPrice" },
   totalStock: {
-    ...numberValidation,
+    ...common.number,
     field: "totalStock",
     min: 5,
     mustBeInt: true,
   },
-  description: { ...commonTextValidation, min: 10, field: "description" },
-  howToUse: { ...optionalTextValidation, field: "howToUse" },
-  ingredients: { ...optionalTextValidation, field: "ingredients" },
-  additionalDetails: { ...optionalTextValidation, field: "additionalDetails" },
+  description: { ...common.text, min: 10, field: "description" },
+  howToUse: { ...common.text, ...common.optional, field: "howToUse" },
+  ingredients: { ...common.text, ...common.optional, field: "ingredients" },
+  additionalDetails: {
+    ...common.text,
+    ...common.optional,
+    field: "additionalDetails",
+  },
 };
 
 export const uploadProductZodSchema = z.object({

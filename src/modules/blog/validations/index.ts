@@ -2,7 +2,7 @@ import { z } from "zod";
 import { validateBlogField } from "../utils";
 import { TBlogFieldOnly, ValidateBlogFieldConfigs } from "../types";
 
-const common: Record<string, Partial<ValidateBlogFieldConfigs>> = {
+const common: Record<"text" | "content", Partial<ValidateBlogFieldConfigs>> = {
   text: { min: 2, blockMultipleSpaces: true },
   content: { min: 10 },
 };
