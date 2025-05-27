@@ -3,6 +3,7 @@ import {
   ALLOWED_VIDEO_TYPES,
   MAX_IMAGE_FILE_SIZE,
   MAX_VIDEO_FILE_SIZE,
+  MB,
 } from "../../../constants";
 import { CustomFileErrorProps } from "../../../types";
 
@@ -16,7 +17,7 @@ export const getCustomError = ({
   // Default limits for image and video sizes
   const imageSizeLimit = customLimits?.imageSize ?? MAX_IMAGE_FILE_SIZE;
   const videoSizeLimit = customLimits?.videoSize ?? MAX_VIDEO_FILE_SIZE;
-  const otherSizeLimit = customLimits?.otherSize ?? 2 * 1024 * 1024;
+  const otherSizeLimit = customLimits?.otherSize ?? 2 * MB;
 
   // Get custom allowed file types or default ones
   const allowedImageTypes = customFileTypes?.imageTypes ?? ALLOWED_IMAGE_TYPES;
@@ -31,15 +32,15 @@ export const getCustomError = ({
       const isVideo = allowedVideoTypes.includes(mimetype);
       const isOther = allowedOtherTypes.includes(mimetype);
 
-      const fileSizeMB = (size / 1024 ** 2).toFixed(2);
+      const fileSizeMB = (size / MB).toFixed(2);
 
       let allowedSizeMB = "0";
       if (isImage) {
-        allowedSizeMB = (imageSizeLimit / 1024 ** 2).toFixed(2);
+        allowedSizeMB = (imageSizeLimit / MB).toFixed(2);
       } else if (isVideo) {
-        allowedSizeMB = (videoSizeLimit / 1024 ** 2).toFixed(2);
+        allowedSizeMB = (videoSizeLimit / MB).toFixed(2);
       } else if (isOther) {
-        allowedSizeMB = (otherSizeLimit / 1024 ** 2).toFixed(2);
+        allowedSizeMB = (otherSizeLimit / MB).toFixed(2);
       }
 
       // Check if the file size exceeds the limit
