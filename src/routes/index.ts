@@ -1,24 +1,27 @@
 import { Router } from "express";
-import authRouter from "./auth.routes";
-import blogRouter from "./blog.routes";
-import mediaRouter from "./mediaFiles.routes";
-import userRouter from "./user.routes";
-import productRouter from "./product.routes";
+import {
+  AuthModule,
+  BlogModule,
+  MediaModule,
+  ProductModule,
+  UserModule,
+} from "../modules";
 
 const router = Router();
 
 // Auth routes
-router.use("/auth", authRouter);
+router.use("/auth", AuthModule.Routes.authRouter);
 
 // User routes
-router.use("/users", userRouter);
+router.use("/users", UserModule.Routes.userRouter);
 
 // Media routes
-router.use("/media", mediaRouter);
+router.use("/media", MediaModule.Routes.mediaRouter);
 
 // Blog routes
-router.use("/blogs", blogRouter);
+router.use("/blogs", BlogModule.Routes.blogRouter);
 
-router.use("/products", productRouter);
+// Product routes
+router.use("/products", ProductModule.Routes.productRouter);
 
 export default router;
