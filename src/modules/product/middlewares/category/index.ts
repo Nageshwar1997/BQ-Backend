@@ -21,7 +21,7 @@ export const addCategoryToRequest = async (
     categoryLevelTwo.name,
     categoryLevelTwo.category,
     category_1._id,
-    1
+    2
   );
 
   // Find or Create Level-Three Category (Parent must be Level-Two)
