@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import {
   getAllProductsController,
+  getProductByIdController,
   uploadProductController,
 } from "../../controllers";
 import {
@@ -39,4 +40,9 @@ productRouter.post(
 productRouter.post(
   "/all",
   ResponseMiddleware.catchAsync(getAllProductsController)
+);
+
+productRouter.post(
+  "/product/:productId",
+  ResponseMiddleware.catchAsync(getProductByIdController)
 );
