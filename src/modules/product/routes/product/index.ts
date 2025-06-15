@@ -54,7 +54,7 @@ productRouter.post(
 productRouter.patch(
   "/product/update/:productId",
   AuthMiddleware.authorization(["ADMIN", "MASTER", "SELLER"]),
-  MulterMiddleware.validateFiles({ type: "single", fieldName: "image" }),
+  MulterMiddleware.validateFiles({ type: "any" }),
   RequestMiddleware.checkEmptyRequest({ body: true, file: true }),
   JSONParseMiddleware.JSONParse({
     fieldsToParse: [
