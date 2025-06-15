@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
   getAllProductsController,
   getProductByIdController,
+  updateProductController,
   uploadProductController,
 } from "../../controllers";
 import {
@@ -13,7 +14,10 @@ import {
   ResponseMiddleware,
   ZodMiddleware,
 } from "../../../../middlewares";
-import { uploadProductZodSchema } from "../../validations";
+import {
+  updateProductZodSchema,
+  uploadProductZodSchema,
+} from "../../validations";
 import { addCategoryToRequest, addShadesToRequest } from "../../middlewares";
 
 export const productRouter = Router();
@@ -50,8 +54,8 @@ productRouter.post(
 productRouter.patch(
   "/product/update/:productId",
   AuthMiddleware.authorization(["ADMIN", "MASTER", "SELLER"]),
-  MulterMiddleware.validateFiles({ type: "any" }),
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  MulterMiddleware.validateFiles({ type: "single", fieldName: "image" }),
+  RequestMiddleware.checkEmptyRequest({ body: true, file: true }),
   JSONParseMiddleware.JSONParse({
     fieldsToParse: [
       "categoryLevelOne",
@@ -60,16 +64,6 @@ productRouter.patch(
       "shades",
     ],
   }),
-  (req, res) => {
-    console.log(
-      "updated-with-files-shades",
-      req.body["updated-with-files-shades"]
-    );
-    // console.log("req.body", req.body);
-    console.log("req.files", req.files);
-    console.log("req.params", req.params);
-    console.log("req.query", req.query);
-    console.log("req.file", req.file);
-    res.success(200, "Product updated successfully", req.body);
-  }
+  ZodMiddleware.validateZodSchema(updateProductZodSchema),
+  ResponseMiddleware.catchAsync(updateProductController)
 );
