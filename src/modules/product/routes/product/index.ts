@@ -55,7 +55,7 @@ productRouter.patch(
   "/product/update/:productId",
   AuthMiddleware.authorization(["ADMIN", "MASTER", "SELLER"]),
   MulterMiddleware.validateFiles({ type: "any" }),
-  RequestMiddleware.checkEmptyRequest({ body: true, file: true }),
+  RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
   JSONParseMiddleware.JSONParse({
     fieldsToParse: [
       "categoryLevelOne",

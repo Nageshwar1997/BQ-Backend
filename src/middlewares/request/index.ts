@@ -4,6 +4,8 @@ import { AppError } from "../../classes";
 type CheckOptions = {
   body?: boolean;
   file?: boolean;
+  fileOrBody?: boolean;
+  filesOrBody?: boolean;
   files?: boolean;
   params?: boolean;
   query?: boolean;
@@ -13,7 +15,8 @@ export const checkEmptyRequest =
   (options: CheckOptions) =>
   (req: Request, _: Response, next: NextFunction) => {
     try {
-      const { body, file, files, params, query } = options;
+      const { body, file, files, fileOrBody, filesOrBody, params, query } =
+        options;
 
       // Define emptiness checks for each part of the request
       const isBodyEmpty = !req.body || Object.keys(req.body).length === 0;
@@ -27,7 +30,7 @@ export const checkEmptyRequest =
       const isQueryEmpty = !req.query || Object.keys(req.query).length === 0;
 
       // Case 1: If both body and files are required, and both are empty
-      if (body && files && !file && isBodyEmpty && isFilesEmpty) {
+      if (filesOrBody && !file && isBodyEmpty && isFilesEmpty) {
         throw new AppError(
           "Please provide some data in the body or files!",
           400
@@ -35,7 +38,7 @@ export const checkEmptyRequest =
       }
 
       // Case 2: If both body and file are required, and both are empty
-      if (body && file && !files && isBodyEmpty && isFileEmpty) {
+      if (fileOrBody && !files && isBodyEmpty && isFileEmpty) {
         throw new AppError(
           "Please provide some data in the body or file!",
           400
