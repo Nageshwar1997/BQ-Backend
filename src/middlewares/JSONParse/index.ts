@@ -9,13 +9,17 @@ export const JSONParse = ({
 }: ParseFieldsMiddlewareProps) => {
   return (req: Request, _: Response, next: NextFunction) => {
     fieldsToParse.forEach((key) => {
-      const value = req.body[key];
-      if (value && typeof value === "string") {
+      const value = req.body?.[key];
+
+      // Skip parsing if value is undefined or null
+      if (value === undefined || value === null) return;
+
+      if (typeof value === "string") {
         try {
           const parsed = JSON.parse(value);
 
           // Replace only if parsed is an object or array
-          if (parsed && typeof parsed === "object" && parsed !== null) {
+          if (parsed && typeof parsed === "object") {
             req.body[key] = parsed;
           }
           // Else, keep the original string value
