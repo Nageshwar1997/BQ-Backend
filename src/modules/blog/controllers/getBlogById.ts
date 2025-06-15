@@ -5,11 +5,7 @@ import { Blog } from "../models";
 
 export const getBlogByIdController = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const isValidId = isValidMongoId(id);
-
-  if (!isValidId) {
-    throw new AppError("Invalid Blog Id provided", 404);
-  }
+  isValidMongoId(id, "Invalid Blog Id provided", 404);
 
   const blog = await Blog.findById(id).lean();
 

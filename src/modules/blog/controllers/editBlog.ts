@@ -14,11 +14,7 @@ export const editBlogController = async (
 ) => {
   const { id } = req.params;
 
-  const isValidId = isValidMongoId(id);
-
-  if (!isValidId) {
-    throw new AppError("Invalid Blog Id provided for Update Blog", 404);
-  }
+  isValidMongoId(id, "Invalid Blog Id provided for Update Blog", 404);
 
   let updateBody: Record<string, any> = {};
   let uploadedKeys: BlogThumbnailType[] = []; // Store uploaded file keys

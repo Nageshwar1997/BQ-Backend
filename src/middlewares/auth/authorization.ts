@@ -10,11 +10,7 @@ export const authorization =
     try {
       const userId = AuthModule.Services.getUserIdFromToken(req);
 
-      const isValidId = isValidMongoId(userId);
-
-      if (!isValidId) {
-        throw new AppError("Invalid userId", 400);
-      }
+      isValidMongoId(userId, "Invalid userId", 400);
 
       const user = await UserModule.Services.getUserById(userId);
 

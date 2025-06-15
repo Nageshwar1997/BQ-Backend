@@ -2,7 +2,6 @@ import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "../../types";
 import { AuthModule, UserModule } from "../../modules";
 import { isValidMongoId } from "../../utils";
-import { AppError } from "../../classes";
 
 export const authenticated = async (
   req: AuthenticatedRequest,
@@ -12,11 +11,7 @@ export const authenticated = async (
   try {
     const userId = AuthModule.Services.getUserIdFromToken(req);
 
-    const isValidId = isValidMongoId(userId);
-
-    if (!isValidId) {
-      throw new AppError("Invalid userId", 400);
-    }
+    isValidMongoId(userId, "Invalid userId", 400);
 
     const user = await UserModule.Services.getUserById(userId);
 

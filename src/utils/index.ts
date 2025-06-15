@@ -10,8 +10,16 @@ import {
 import { dateRegex, noSpaceRegex, singleSpaceRegex } from "../constants";
 import { AppError } from "../classes";
 
-export const isValidMongoId = (id: string): boolean => {
-  return Types.ObjectId.isValid(id);
+export const isValidMongoId = (
+  id: string,
+  message: string,
+  statusCode?: number
+): boolean => {
+  const isValid = Types.ObjectId.isValid(id);
+
+  if (!isValid) throw new AppError(message, statusCode || 400);
+
+  return true;
 };
 
 export const getCloudinaryOptimizedUrl = (url: string): string => {
