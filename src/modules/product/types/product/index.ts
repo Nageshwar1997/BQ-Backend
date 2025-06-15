@@ -22,10 +22,33 @@ export interface ProductProps {
   ingredients?: string;
   additionalDetails?: string;
   commonImages: string[];
-  shades?: ShadeProps[];
+  shades?: Types.ObjectId[];
   category: Types.ObjectId;
   seller: Types.ObjectId;
   reviews: Types.ObjectId[];
+}
+
+export interface PopulatedProduct
+  extends Omit<ProductProps, "category" | "shades"> {
+  category: {
+    _id: Types.ObjectId;
+    name: string;
+    category: string;
+    level: number;
+    parentCategory?: {
+      _id: Types.ObjectId;
+      name: string;
+      category: string;
+      level: number;
+      parentCategory?: {
+        _id: Types.ObjectId;
+        name: string;
+        category: string;
+        level: number;
+      };
+    };
+  };
+  shades: ShadeProps[];
 }
 
 export type TProductFieldOnly =

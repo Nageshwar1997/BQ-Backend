@@ -58,6 +58,8 @@ productRouter.patch(
   RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
   JSONParseMiddleware.JSONParse({
     fieldsToParse: [
+      "removingShadeImageUrls",
+      "removingCommonImageURLs",
       "categoryLevelOne",
       "categoryLevelTwo",
       "categoryLevelThree",
