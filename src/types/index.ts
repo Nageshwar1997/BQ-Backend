@@ -12,6 +12,7 @@ export interface AuthorizedRequest extends Request {
 
 import multer from "multer";
 import { UserModule } from "../modules";
+import { Types } from "mongoose";
 
 export type MulterType = "single" | "array" | "any" | "fields" | "none";
 
@@ -51,6 +52,13 @@ export interface CustomFileErrorProps {
 export interface ValidateRequiredFileFieldsParams {
   req: Request;
   fields: string[];
+}
+
+export interface VerifyUserPermissionProps {
+  userId: string | Types.ObjectId;
+  checkId: string | Types.ObjectId;
+  message: string;
+  statusCode?: number;
 }
 
 export interface ZodCommonConfigs {
