@@ -3,6 +3,7 @@ import { AppError } from "../../classes";
 
 type CheckOptions = {
   body?: boolean;
+  file?: boolean;
   files?: boolean;
   params?: boolean;
   query?: boolean;
@@ -12,28 +13,57 @@ export const checkEmptyRequest =
   (options: CheckOptions) =>
   (req: Request, _: Response, next: NextFunction) => {
     try {
-      if (options.body && (!req.body || Object.keys(req.body).length === 0)) {
+      const { body, file, files, params, query } = options;
+
+      // Define emptiness checks for each part of the request
+      const isBodyEmpty = !req.body || Object.keys(req.body).length === 0;
+      const isFileEmpty =
+        !req.file ||
+        (typeof req.file === "object" && Object.keys(req.file).length === 0);
+      const isFilesEmpty =
+        !req.files ||
+        (typeof req.files === "object" && Object.keys(req.files).length === 0);
+      const isParamsEmpty = !req.params || Object.keys(req.params).length === 0;
+      const isQueryEmpty = !req.query || Object.keys(req.query).length === 0;
+
+      // Case 1: If both body and files are required, and both are empty
+      if (body && files && !file && isBodyEmpty && isFilesEmpty) {
+        throw new AppError(
+          "Please provide some data in the body or files!",
+          400
+        );
+      }
+
+      // Case 2: If both body and file are required, and both are empty
+      if (body && file && !files && isBodyEmpty && isFileEmpty) {
+        throw new AppError(
+          "Please provide some data in the body or file!",
+          400
+        );
+      }
+
+      // Case 3: If only body is required and is empty
+      if (!files && !file && body && isBodyEmpty) {
         throw new AppError("Please provide some data in the body!", 400);
       }
 
-      if (
-        options.files &&
-        (!req.files || Object.keys(req.files).length === 0)
-      ) {
+      // Case 4: If only files are required and are empty
+      if (files && !file && !body && isFilesEmpty) {
         throw new AppError("Please provide some files!", 400);
       }
 
-      if (
-        options.params &&
-        (!req.params || Object.keys(req.params).length === 0)
-      ) {
+      // Case 5: If only single file is required and is empty
+      if (file && !files && !body && isFileEmpty) {
+        throw new AppError("Please provide some files!", 400);
+      }
+
+      // Case 6: If params are required and are empty
+      if (params && isParamsEmpty) {
         throw new AppError("Please provide some params!", 400);
       }
 
-      if (
-        options.query &&
-        (!req.query || Object.keys(req.query).length === 0)
-      ) {
+      // Case 7: If query is required and is empty
+      if (query && isQueryEmpty) {
         throw new AppError("Please provide some query!", 400);
       }
 
