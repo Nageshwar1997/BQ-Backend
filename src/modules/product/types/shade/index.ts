@@ -1,4 +1,7 @@
+import { Types } from "mongoose";
+
 export interface ShadeProps {
+  _id?: Types.ObjectId | string;
   colorCode: string;
   shadeName: string;
   images: string[];
