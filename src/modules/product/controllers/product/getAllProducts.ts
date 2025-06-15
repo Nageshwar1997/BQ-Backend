@@ -9,7 +9,7 @@ export const getAllProductsController = async (req: Request, res: Response) => {
   const limit = Number(req.query.limit);
   const skip = page && limit ? (page - 1) * limit : 0;
 
-  const { populateFields = {} } = req.body;
+  const { populateFields = {} } = req.body ?? {};
 
   // Start building query
   let query = Product.find();
