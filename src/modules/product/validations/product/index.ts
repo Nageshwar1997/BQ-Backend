@@ -47,7 +47,7 @@ export const uploadProductZodSchema = z.object({
   categoryLevelOne: createCategoryZodSchema("categoryLevelOne"),
   categoryLevelTwo: createCategoryZodSchema("categoryLevelTwo"),
   categoryLevelThree: createCategoryZodSchema("categoryLevelThree"),
-  shades: addShadesZodSchema.optional().default([]),
+  shades: addShadesZodSchema({ isOptional: false }).optional().default([]),
 });
 
 export const updateProductZodSchema = z.object({
@@ -60,5 +60,5 @@ export const updateProductZodSchema = z.object({
   categoryLevelOne: createCategoryZodSchema("categoryLevelOne").optional(),
   categoryLevelTwo: createCategoryZodSchema("categoryLevelTwo").optional(),
   categoryLevelThree: createCategoryZodSchema("categoryLevelThree").optional(),
-  shades: addShadesZodSchema.optional().default([]),
+  shades: addShadesZodSchema({ isOptional: true }).optional(),
 });

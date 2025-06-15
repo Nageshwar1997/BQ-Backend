@@ -46,10 +46,7 @@ export const validateProductField = (props: ValidateProductFieldConfigs) => {
     case "sellingPrice":
     // For Shades Field
     case "stock": {
-      return validateZodNumber({
-        ...props,
-        nonNegative,
-      });
+      return validateZodNumber({ ...props, nonNegative });
     }
 
     default: {
