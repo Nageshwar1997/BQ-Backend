@@ -3,7 +3,7 @@ import { z, ZodType } from "zod";
 
 import {
   ValidateRequiredFileFieldsParams,
-  VerifyUserPermissionProps,
+  CheckUserPermission,
   ZodDateConfigs,
   ZodNumberConfigs,
   ZodStringConfigs,
@@ -100,7 +100,7 @@ export const checkUserPermission = ({
   checkId,
   message = "Unauthorized.",
   statusCode = 403,
-}: VerifyUserPermissionProps) => {
+}: CheckUserPermission) => {
   if (userId.toString() !== checkId.toString()) {
     throw new AppError(message, statusCode);
   }

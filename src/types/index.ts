@@ -54,7 +54,7 @@ export interface ValidateRequiredFileFieldsParams {
   fields: string[];
 }
 
-export interface VerifyUserPermissionProps {
+export interface CheckUserPermission {
   userId: string | Types.ObjectId;
   checkId: string | Types.ObjectId;
   message: string;
