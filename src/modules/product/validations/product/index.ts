@@ -3,6 +3,7 @@ import { validateProductField } from "../../utils";
 import { createCategoryZodSchema } from "../category";
 import { addShadesZodSchema } from "../shade";
 import { TProductFieldOnly, ValidateProductFieldConfigs } from "../../types";
+import { validateZodString } from "../../../../utils";
 
 const common: Record<
   "text" | "optional" | "number",
@@ -47,7 +48,9 @@ export const uploadProductZodSchema = z.object({
   categoryLevelOne: createCategoryZodSchema("categoryLevelOne"),
   categoryLevelTwo: createCategoryZodSchema("categoryLevelTwo"),
   categoryLevelThree: createCategoryZodSchema("categoryLevelThree"),
-  shades: addShadesZodSchema({ isOptional: false }).optional().default([]),
+  shades: addShadesZodSchema({ isOptional: false, _idOptional: true })
+    .optional()
+    .default([]),
 });
 
 export const updateProductZodSchema = z.object({
@@ -60,5 +63,58 @@ export const updateProductZodSchema = z.object({
   categoryLevelOne: createCategoryZodSchema("categoryLevelOne").optional(),
   categoryLevelTwo: createCategoryZodSchema("categoryLevelTwo").optional(),
   categoryLevelThree: createCategoryZodSchema("categoryLevelThree").optional(),
-  shades: addShadesZodSchema({ isOptional: true }).optional(),
+  newAddedShades: addShadesZodSchema({
+    isOptional: false,
+    _idOptional: true,
+    parentField: "newAddedShades[some_index]",
+  }).optional(),
+  updatedShadeWithFiles: addShadesZodSchema({
+    isOptional: true,
+    _idOptional: false,
+    parentField: "updatedShadeWithFiles[some_index]",
+  }).optional(),
+  updatedShadeWithoutFiles: addShadesZodSchema({
+    isOptional: true,
+    _idOptional: false,
+    parentField: "updatedShadeWithoutFiles[some_index]",
+  }).optional(),
+  removingCommonImageURLs: z
+    .array(
+      validateZodString({
+        field: "removingCommonImageURLs[some_index]",
+        blockSingleSpace: true,
+        customRegex: {
+          regex: /^(https?:\/\/)[^\s/$.?#].[^\s]*$/,
+          message: "Invalid URL",
+        },
+      })
+    )
+    .optional(),
+  removingShades: z
+    .array(
+      validateZodString({
+        field: "_id",
+        parentField: "removingCommonImageURLs[some_index]",
+        blockSingleSpace: true,
+      })
+    )
+    .optional(),
+  removingShadeImageUrls: z
+    .array(
+      z.object({
+        _id: validateZodString({
+          field: "_id",
+          parentField: "removingShades[some_index]",
+          blockSingleSpace: true,
+        }),
+        urls: z.array(
+          validateZodString({
+            field: "urls",
+            parentField: "removingShades[some_index]",
+            blockSingleSpace: true,
+          })
+        ),
+      })
+    )
+    .optional(),
 });
