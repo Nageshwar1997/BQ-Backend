@@ -22,7 +22,7 @@ export interface ProductProps {
   ingredients?: string;
   additionalDetails?: string;
   commonImages: string[];
-  shades?: Types.ObjectId[];
+  shades: Types.ObjectId[];
   category: Types.ObjectId;
   seller: Types.ObjectId;
   reviews: Types.ObjectId[];
