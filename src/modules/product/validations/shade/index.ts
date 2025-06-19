@@ -1,24 +1,35 @@
 import { z } from "zod";
 import { hexColorRegex } from "../../../../constants";
 import { validateProductField } from "../../utils";
+import { validateZodString } from "../../../../utils";
 
 export const addShadesZodSchema = ({
-  isOptional = false,
+  isOptional,
+  _idOptional,
+  parentField = "shades[some_index]",
 }: {
-  isOptional?: boolean;
+  isOptional: boolean;
+  _idOptional: boolean;
+  parentField?: string;
 }) => {
   return z.array(
     z.object({
+      _id: validateZodString({
+        field: "_id",
+        parentField,
+        blockSingleSpace: true,
+        isOptional: _idOptional,
+      }),
       shadeName: validateProductField({
         field: "shadeName",
-        parentField: "shades[some_index]",
+        parentField,
         blockMultipleSpaces: true,
         min: 2,
         isOptional,
       }),
       colorCode: validateProductField({
         field: "colorCode",
-        parentField: "shades[some_index]",
+        parentField,
         blockSingleSpace: true,
         min: 4,
         max: 9,
@@ -30,7 +41,7 @@ export const addShadesZodSchema = ({
       }),
       stock: validateProductField({
         field: "stock",
-        parentField: "shades[some_index]",
+        parentField,
         min: 5,
         isOptional,
         mustBeInt: true,
