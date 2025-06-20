@@ -354,10 +354,17 @@ export const updateProductController = async (
           );
         })
       );
-    } catch (error) {
-      if (uploadedUpdatedShadesImages.length) {
+
+      if (removedExistingShadesWithFileImages.length) {
         await MediaModule.Utils.multipleImagesRemover(
-          uploadedUpdatedShadesImages,
+          removedExistingShadesWithFileImages,
+          "product"
+        );
+      }
+    } catch (error) {
+      if (uploadedCommonImages.length) {
+        await MediaModule.Utils.multipleImagesRemover(
+          uploadedCommonImages,
           "product"
         );
       }
@@ -367,9 +374,9 @@ export const updateProductController = async (
           "product"
         );
       }
-      if (uploadedCommonImages.length) {
+      if (uploadedUpdatedShadesImages.length) {
         await MediaModule.Utils.multipleImagesRemover(
-          uploadedCommonImages,
+          uploadedUpdatedShadesImages,
           "product"
         );
       }
@@ -409,22 +416,23 @@ export const updateProductController = async (
           );
         })
       );
-    } catch (error) {
-      if (uploadedUpdatedShadesImages.length) {
+
+      if (removedExistingShadesWithOutFileImages.length) {
         await MediaModule.Utils.multipleImagesRemover(
-          uploadedUpdatedShadesImages,
+          removedExistingShadesWithOutFileImages,
+          "product"
+        );
+      }
+    } catch (error) {
+      if (uploadedCommonImages.length) {
+        await MediaModule.Utils.multipleImagesRemover(
+          uploadedCommonImages,
           "product"
         );
       }
       if (uploadedNewShadesImages.length) {
         await MediaModule.Utils.multipleImagesRemover(
           uploadedNewShadesImages,
-          "product"
-        );
-      }
-      if (uploadedCommonImages.length) {
-        await MediaModule.Utils.multipleImagesRemover(
-          uploadedCommonImages,
           "product"
         );
       }
@@ -439,6 +447,17 @@ export const updateProductController = async (
       }
       throw error;
     }
+  }
+
+  if (removingShadeImageUrls?.length) {
+    const onlyRemovedShadeImages = removingShadeImageUrls.flatMap(
+      (sh: { urls: string[] }) => sh.urls
+    );
+
+    await MediaModule.Utils.multipleImagesRemover(
+      onlyRemovedShadeImages,
+      "product"
+    );
   }
 
   try {
@@ -473,23 +492,23 @@ export const updateProductController = async (
       { new: true }
     );
 
+    if (removingCommonImageURLs?.length) {
+      await MediaModule.Utils.multipleImagesRemover(
+        removingCommonImageURLs,
+        "product"
+      );
+    }
     res.success(200, "Product updated successfully", { product });
   } catch (error) {
-    if (uploadedUpdatedShadesImages.length) {
+    if (uploadedCommonImages.length) {
       await MediaModule.Utils.multipleImagesRemover(
-        uploadedUpdatedShadesImages,
+        uploadedCommonImages,
         "product"
       );
     }
     if (uploadedNewShadesImages.length) {
       await MediaModule.Utils.multipleImagesRemover(
         uploadedNewShadesImages,
-        "product"
-      );
-    }
-    if (uploadedCommonImages.length) {
-      await MediaModule.Utils.multipleImagesRemover(
-        uploadedCommonImages,
         "product"
       );
     }
