@@ -16,9 +16,27 @@ export const updateProductController = async (
   const { productId } = req.params;
   isValidMongoId(productId, "Invalid Product Id", 400);
 
+  const existingProduct = await Product.findById(productId)
+    .populate([
+      { path: "shades" },
+      {
+        path: "category",
+        select: "name category level parentCategory",
+        populate: {
+          path: "parentCategory",
+          select: "name category level parentCategory",
+          populate: { path: "parentCategory", select: "name category level" },
+        },
+      },
+    ])
+    .lean<PopulatedProduct>()
+    .exec();
+
+  if (!existingProduct) throw new AppError("Product not found", 404);
+
   checkUserPermission({
-    userId: req.user?._id as string,
-    checkId: productId as string,
+    userId: req.user?._id as Types.ObjectId,
+    checkId: existingProduct.seller,
     message: "You are not authorized to update this product",
     statusCode: 403,
   });
@@ -65,24 +83,6 @@ export const updateProductController = async (
       (updateBody[field] as unknown) = value;
     }
   }
-
-  const existingProduct = await Product.findById(productId)
-    .populate([
-      { path: "shades" },
-      {
-        path: "category",
-        select: "name category level parentCategory",
-        populate: {
-          path: "parentCategory",
-          select: "name category level parentCategory",
-          populate: { path: "parentCategory", select: "name category level" },
-        },
-      },
-    ])
-    .lean<PopulatedProduct>()
-    .exec();
-
-  if (!existingProduct) throw new AppError("Product not found", 404);
 
   const category_1 = categoryLevelOne
     ? await findOrCreateCategory(
@@ -131,11 +131,11 @@ export const updateProductController = async (
   let uploadedCommonImages: string[] = [];
   let uploadedNewShadesImages: string[] = [];
   let uploadedUpdatedShadesImages: string[] = [];
-  let shadesTotalStock = existingProduct.totalStock;
-  let newShadeIds: Types.ObjectId[] = [];
+  let newShadeIds: string[] = [];
 
   let removedExistingShadesWithFileImages: string[] = [];
   let removedExistingShadesWithOutFileImages: string[] = [];
+  let removedShadeImages: string[] = [];
 
   const newShadeImagesMap: Record<number, Express.Multer.File[]> = {};
   const updatedShadeImagesMap: Record<number, Express.Multer.File[]> = {};
@@ -166,6 +166,13 @@ export const updateProductController = async (
       }
     }
   });
+
+  const existingShades: ShadeProps[] = existingProduct.shades;
+  let oldShadesIds: string[] = [];
+
+  if (existingShades.length) {
+    oldShadesIds = existingShades.map((shade) => shade._id as string);
+  }
 
   // Upload common images
   if (updatedCommonImageFiles?.length) {
@@ -222,8 +229,6 @@ export const updateProductController = async (
       const enrichedShades = await Promise.all(
         newShadesData.map(async (shade, idx) => {
           const shadeFiles = newShadeImagesMap[idx] || [];
-
-          shadesTotalStock += shade.stock;
           const uploadedShadeImagesResult =
             await MediaModule.Utils.multipleImagesUploader({
               files: shadeFiles,
@@ -236,28 +241,16 @@ export const updateProductController = async (
           const images = uploadedShadeImagesResult.map((img) => img.secure_url);
           uploadedNewShadesImages.push(...images);
 
-          return {
-            ...shade,
-            images,
-          };
+          return { ...shade, images };
         })
       );
 
       newShadeIds = await Promise.all(
         enrichedShades.map(async (shade) => {
           const newShade = await Shade.create(shade);
-          return new Types.ObjectId(newShade._id);
+          return newShade._id.toString();
         })
       );
-
-      updateBody.shades = [
-        ...existingProduct.shades
-          .filter(
-            (sh) => sh._id && !removingShades?.includes(sh._id.toString())
-          )
-          .map((sh) => new Types.ObjectId(sh._id)),
-        ...newShadeIds,
-      ];
     } catch (error) {
       if (uploadedNewShadesImages.length) {
         await MediaModule.Utils.multipleImagesRemover(
@@ -287,7 +280,7 @@ export const updateProductController = async (
         if (
           !(updatedShadeImagesMap[idx] && updatedShadeImagesMap[idx].length > 0)
         ) {
-          const currentShade = existingProduct.shades.find(
+          const currentShade = existingShades.find(
             (sh) => sh?._id?.toString() === shade._id?.toString()
           );
 
@@ -317,11 +310,10 @@ export const updateProductController = async (
       const enrichedUpdatedShades = await Promise.all(
         updatedShadesData.map(async (shade, idx) => {
           const shadeFiles = updatedShadeImagesMap[idx] || [];
-          const currentShade = existingProduct.shades.find(
+          const currentShade = existingShades.find(
             (sh) => sh?._id?.toString() === shade._id?.toString()
           );
           if (!currentShade) return;
-          // totalStock += shade.stock;
           const uploadedShadeImagesResult =
             await MediaModule.Utils.multipleImagesUploader({
               files: shadeFiles,
@@ -348,12 +340,6 @@ export const updateProductController = async (
             currentShade.images.filter(
               (img) => !currentShadeRemovingImages.includes(img)
             ) || [];
-
-          if (shade.stock) {
-            shadesTotalStock +=
-              shadesTotalStock - currentShade.stock + shade.stock;
-          }
-
           return {
             ...shade,
             images: [...existingShadeImgUrls, ...images],
@@ -399,7 +385,7 @@ export const updateProductController = async (
     try {
       await Promise.all(
         updatedShadeWithoutFiles.map(async (shade: Partial<ShadeProps>) => {
-          const currentShade = existingProduct.shades.find(
+          const currentShade = existingShades.find(
             (sh) => sh?._id?.toString() === shade._id?.toString()
           );
 
@@ -416,11 +402,6 @@ export const updateProductController = async (
           removedExistingShadesWithOutFileImages.push(
             ...currentShadeRemovingImages
           );
-
-          if (shade.stock) {
-            shadesTotalStock +=
-              shadesTotalStock - currentShade.stock + shade.stock;
-          }
 
           await Shade.findByIdAndUpdate(
             { _id: shade._id },
@@ -461,11 +442,29 @@ export const updateProductController = async (
   }
 
   try {
-    if (totalStock ?? existingProduct.totalStock !== shadesTotalStock) {
-      throw new AppError(
-        "Total stock should be equal to sum of shades stock",
-        400
-      );
+    // Remove Shades
+    let removingIds: string[] = [];
+    if (removingShades?.length) {
+      removingIds = removingShades.map((id: string) => id);
+
+      // Fetch shades to be removed
+      const shadesToDelete = await Shade.find({ _id: { $in: removingIds } });
+
+      removedShadeImages =
+        shadesToDelete?.flatMap((shade) => shade.images) || [];
+      await Shade.deleteMany({ _id: { $in: removingIds } });
+    }
+
+    const finalShadeIds: string[] = oldShadesIds.filter(
+      (id) => id && !removingIds.includes(id.toString())
+    );
+
+    if (newShadeIds.length) {
+      finalShadeIds.push(...newShadeIds);
+    }
+
+    if (finalShadeIds.length) {
+      updateBody.shades = finalShadeIds.map((id) => new Types.ObjectId(id));
     }
 
     const product = await Product.findByIdAndUpdate(
@@ -473,21 +472,6 @@ export const updateProductController = async (
       updateBody,
       { new: true }
     );
-
-    // Remove Shades
-    let removedShadeImages: string[] = [];
-    if (removingShades?.length) {
-      const objectIds = removingShades.map(
-        (id: string) => new Types.ObjectId(id)
-      );
-
-      // Fetch shades to be removed
-      const shadesToDelete = await Shade.find({ _id: { $in: objectIds } });
-
-      removedShadeImages =
-        shadesToDelete.flatMap((shade) => shade.images) || [];
-      await Shade.deleteMany({ _id: { $in: objectIds } });
-    }
 
     res.success(200, "Product updated successfully", { product });
   } catch (error) {
@@ -518,6 +502,12 @@ export const updateProductController = async (
     if (removedExistingShadesWithOutFileImages.length) {
       await MediaModule.Utils.multipleImagesRemover(
         removedExistingShadesWithOutFileImages,
+        "product"
+      );
+    }
+    if (removedShadeImages.length) {
+      await MediaModule.Utils.multipleImagesRemover(
+        removedShadeImages,
         "product"
       );
     }
