@@ -67,6 +67,7 @@ productRouter.patch(
       "newAddedShades",
       "updatedShadeWithFiles",
       "updatedShadeWithoutFiles",
+      "removedQuillImageURLs",
     ],
   }),
   ZodMiddleware.validateZodSchema(updateProductZodSchema),

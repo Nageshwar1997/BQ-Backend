@@ -117,4 +117,5 @@ export const updateProductZodSchema = z.object({
       })
     )
     .optional(),
+  removedQuillImageURLs: z.array(z.string()).optional(),
 });

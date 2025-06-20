@@ -82,6 +82,7 @@ export const updateProductController = async (
     removingShades,
     updatedShadeWithFiles,
     updatedShadeWithoutFiles,
+    removedQuillImageURLs,
   } = req.body;
 
   const productBodyData: Partial<ProductProps> = {
@@ -453,6 +454,10 @@ export const updateProductController = async (
 
     if (removingCommonImageURLs?.length) {
       await removeImages(removingCommonImageURLs);
+    }
+
+    if (removedQuillImageURLs?.length) {
+      await removeImages(removedQuillImageURLs);
     }
     res.success(200, "Product updated successfully", { product });
   } catch (error) {
