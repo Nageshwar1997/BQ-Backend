@@ -9,6 +9,28 @@ import { findOrCreateCategory } from "../../services";
 import { checkUserPermission, isValidMongoId } from "../../../../utils";
 import { possibleUpdateProductFields } from "../../constants";
 
+const removeImages = async (imageUrls: string[]): Promise<void> => {
+  if (imageUrls.length) {
+    await MediaModule.Utils.multipleImagesRemover(imageUrls, "product");
+  }
+};
+
+const uploadImages = async (
+  files: Express.Multer.File[],
+  folder: string
+): Promise<string[]> => {
+  if (files?.length) {
+    const result = await MediaModule.Utils.multipleImagesUploader({
+      files,
+      folder,
+      cloudinaryConfigOption: "product",
+    });
+
+    return result.map((img) => img.secure_url);
+  }
+  return [];
+};
+
 export const updateProductController = async (
   req: AuthorizedRequest,
   res: Response
@@ -170,28 +192,22 @@ export const updateProductController = async (
   const existingShades: ShadeProps[] = existingProduct.shades;
   let oldShadesIds: string[] = [];
 
-  if (existingShades.length) {
+  if (existingShades?.length) {
     oldShadesIds = existingShades.map((shade) => shade._id as string);
   }
 
   // Upload common images
   if (updatedCommonImageFiles?.length) {
-    const uploadedCommonImagesResult =
-      await MediaModule.Utils.multipleImagesUploader({
-        files: updatedCommonImageFiles,
-        folder: `Products/${title ?? existingProduct.title}/Common_Images`,
-        cloudinaryConfigOption: "product",
-      });
-
-    uploadedCommonImages = uploadedCommonImagesResult.map(
-      (img) => img.secure_url
+    uploadedCommonImages = await uploadImages(
+      updatedCommonImageFiles,
+      `Products/${title ?? existingProduct.title}/Common_Images`
     );
 
     updateBody.commonImages = [
       ...uploadedCommonImages,
-      ...existingProduct.commonImages.filter(
+      ...(existingProduct.commonImages.filter(
         (img) => !removingCommonImageURLs.includes(img)
-      ),
+      ) || []),
     ];
   }
 
@@ -229,16 +245,12 @@ export const updateProductController = async (
       const enrichedShades = await Promise.all(
         newShadesData.map(async (shade, idx) => {
           const shadeFiles = newShadeImagesMap[idx] || [];
-          const uploadedShadeImagesResult =
-            await MediaModule.Utils.multipleImagesUploader({
-              files: shadeFiles,
-              folder: `Products/${title ?? existingProduct.title}/Shades/${
-                shade.shadeName
-              }`,
-              cloudinaryConfigOption: "product",
-            });
-
-          const images = uploadedShadeImagesResult.map((img) => img.secure_url);
+          const images = await uploadImages(
+            shadeFiles,
+            `Products/${title ?? existingProduct.title}/Shades/${
+              shade.shadeName
+            }`
+          );
           uploadedNewShadesImages.push(...images);
 
           return { ...shade, images };
@@ -246,24 +258,13 @@ export const updateProductController = async (
       );
 
       newShadeIds = await Promise.all(
-        enrichedShades.map(async (shade) => {
+        enrichedShades?.map(async (shade) => {
           const newShade = await Shade.create(shade);
           return newShade._id.toString();
         })
       );
     } catch (error) {
-      if (uploadedNewShadesImages.length) {
-        await MediaModule.Utils.multipleImagesRemover(
-          uploadedNewShadesImages,
-          "product"
-        );
-      }
-      if (uploadedCommonImages.length) {
-        await MediaModule.Utils.multipleImagesRemover(
-          uploadedCommonImages,
-          "product"
-        );
-      }
+      await removeImages([...uploadedNewShadesImages, ...uploadedCommonImages]);
       throw new AppError("Failed to create shades", 500);
     }
   }
@@ -308,22 +309,18 @@ export const updateProductController = async (
       }
 
       const enrichedUpdatedShades = await Promise.all(
-        updatedShadesData.map(async (shade, idx) => {
+        updatedShadesData?.map(async (shade, idx) => {
           const shadeFiles = updatedShadeImagesMap[idx] || [];
           const currentShade = existingShades.find(
             (sh) => sh?._id?.toString() === shade._id?.toString()
           );
           if (!currentShade) return;
-          const uploadedShadeImagesResult =
-            await MediaModule.Utils.multipleImagesUploader({
-              files: shadeFiles,
-              folder: `Products/${title || existingProduct.title}/Shades/${
-                shade.shadeName || currentShade.shadeName
-              }`,
-              cloudinaryConfigOption: "product",
-            });
-
-          const images = uploadedShadeImagesResult.map((img) => img.secure_url);
+          const images = await uploadImages(
+            shadeFiles,
+            `Products/${title || existingProduct.title}/Shades/${
+              shade.shadeName || currentShade.shadeName
+            }`
+          );
           uploadedUpdatedShadesImages.push(...images);
 
           const currentShadeRemovingImages =
@@ -355,31 +352,14 @@ export const updateProductController = async (
         })
       );
 
-      if (removedExistingShadesWithFileImages.length) {
-        await MediaModule.Utils.multipleImagesRemover(
-          removedExistingShadesWithFileImages,
-          "product"
-        );
-      }
+      await removeImages(removedExistingShadesWithFileImages);
     } catch (error) {
-      if (uploadedCommonImages.length) {
-        await MediaModule.Utils.multipleImagesRemover(
-          uploadedCommonImages,
-          "product"
-        );
-      }
-      if (uploadedNewShadesImages.length) {
-        await MediaModule.Utils.multipleImagesRemover(
-          uploadedNewShadesImages,
-          "product"
-        );
-      }
-      if (uploadedUpdatedShadesImages.length) {
-        await MediaModule.Utils.multipleImagesRemover(
-          uploadedUpdatedShadesImages,
-          "product"
-        );
-      }
+      await removeImages([
+        ...uploadedCommonImages,
+        ...uploadedNewShadesImages,
+        ...uploadedUpdatedShadesImages,
+      ]);
+
       if (newShadeIds.length) {
         await Shade.deleteMany({ _id: { $in: newShadeIds } });
       }
@@ -417,31 +397,14 @@ export const updateProductController = async (
         })
       );
 
-      if (removedExistingShadesWithOutFileImages.length) {
-        await MediaModule.Utils.multipleImagesRemover(
-          removedExistingShadesWithOutFileImages,
-          "product"
-        );
-      }
+      await removeImages(removedExistingShadesWithOutFileImages);
     } catch (error) {
-      if (uploadedCommonImages.length) {
-        await MediaModule.Utils.multipleImagesRemover(
-          uploadedCommonImages,
-          "product"
-        );
-      }
-      if (uploadedNewShadesImages.length) {
-        await MediaModule.Utils.multipleImagesRemover(
-          uploadedNewShadesImages,
-          "product"
-        );
-      }
-      if (removedExistingShadesWithFileImages.length) {
-        await MediaModule.Utils.multipleImagesRemover(
-          removedExistingShadesWithFileImages,
-          "product"
-        );
-      }
+      await removeImages([
+        ...uploadedCommonImages,
+        ...uploadedNewShadesImages,
+        ...uploadedUpdatedShadesImages,
+        ...removedExistingShadesWithFileImages,
+      ]);
       if (newShadeIds.length) {
         await Shade.deleteMany({ _id: { $in: newShadeIds } });
       }
@@ -453,11 +416,7 @@ export const updateProductController = async (
     const onlyRemovedShadeImages = removingShadeImageUrls.flatMap(
       (sh: { urls: string[] }) => sh.urls
     );
-
-    await MediaModule.Utils.multipleImagesRemover(
-      onlyRemovedShadeImages,
-      "product"
-    );
+    await removeImages(onlyRemovedShadeImages);
   }
 
   try {
@@ -493,43 +452,17 @@ export const updateProductController = async (
     );
 
     if (removingCommonImageURLs?.length) {
-      await MediaModule.Utils.multipleImagesRemover(
-        removingCommonImageURLs,
-        "product"
-      );
+      await removeImages(removingCommonImageURLs);
     }
     res.success(200, "Product updated successfully", { product });
   } catch (error) {
-    if (uploadedCommonImages.length) {
-      await MediaModule.Utils.multipleImagesRemover(
-        uploadedCommonImages,
-        "product"
-      );
-    }
-    if (uploadedNewShadesImages.length) {
-      await MediaModule.Utils.multipleImagesRemover(
-        uploadedNewShadesImages,
-        "product"
-      );
-    }
-    if (removedExistingShadesWithFileImages.length) {
-      await MediaModule.Utils.multipleImagesRemover(
-        removedExistingShadesWithFileImages,
-        "product"
-      );
-    }
-    if (removedExistingShadesWithOutFileImages.length) {
-      await MediaModule.Utils.multipleImagesRemover(
-        removedExistingShadesWithOutFileImages,
-        "product"
-      );
-    }
-    if (removedShadeImages.length) {
-      await MediaModule.Utils.multipleImagesRemover(
-        removedShadeImages,
-        "product"
-      );
-    }
+    await removeImages([
+      ...removedShadeImages,
+      ...uploadedCommonImages,
+      ...uploadedNewShadesImages,
+      ...removedExistingShadesWithFileImages,
+      ...removedExistingShadesWithOutFileImages,
+    ]);
     if (newShadeIds.length) {
       await Shade.deleteMany({ _id: { $in: newShadeIds } });
     }
