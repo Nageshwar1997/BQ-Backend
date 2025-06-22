@@ -194,7 +194,9 @@ export const updateProductController = async (
   let oldShadesIds: string[] = [];
 
   if (existingShades?.length) {
-    oldShadesIds = existingShades.map((shade) => shade._id as string);
+    oldShadesIds = existingShades.map(
+      (shade) => shade._id?.toString() as string
+    );
   }
 
   // Upload common images
@@ -446,8 +448,12 @@ export const updateProductController = async (
       finalShadeIds.push(...newShadeIds);
     }
 
-    if (finalShadeIds.length) {
-      updateBody.shades = finalShadeIds.map((id) => new Types.ObjectId(id));
+    if (newShadeIds.length || removingShades?.length) {
+      if (finalShadeIds.length) {
+        updateBody.shades = finalShadeIds.map((id) => new Types.ObjectId(id));
+      } else {
+        updateBody.shades = [];
+      }
     }
 
     const product = await Product.findByIdAndUpdate(
