@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import {
+  deleteProductController,
   getAllProductsController,
   getProductByIdController,
   updateProductController,
@@ -72,4 +73,10 @@ productRouter.patch(
   }),
   ZodMiddleware.validateZodSchema(updateProductZodSchema),
   ResponseMiddleware.catchAsync(updateProductController)
+);
+
+productRouter.delete(
+  "/product/delete/:productId",
+  AuthMiddleware.authorization(["ADMIN", "MASTER", "SELLER"]),
+  ResponseMiddleware.catchAsync(deleteProductController)
 );
