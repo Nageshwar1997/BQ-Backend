@@ -19,8 +19,8 @@ export interface ProductProps {
   discount: number;
   description: string;
   howToUse: string;
-  ingredients?: string;
-  additionalDetails?: string;
+  ingredients: string;
+  additionalDetails: string;
   commonImages: string[];
   shades: Types.ObjectId[];
   category: Types.ObjectId;
