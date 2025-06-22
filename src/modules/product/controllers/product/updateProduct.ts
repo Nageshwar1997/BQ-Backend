@@ -349,7 +349,7 @@ export const updateProductController = async (
           await Shade.findByIdAndUpdate(
             { _id: shade._id },
             { $set: { ...shade } }
-          );
+          ).lean();
         })
       );
 
@@ -394,7 +394,7 @@ export const updateProductController = async (
           await Shade.findByIdAndUpdate(
             { _id: shade._id },
             { $set: { ...shade } }
-          );
+          ).lean();
         })
       );
 
@@ -427,15 +427,19 @@ export const updateProductController = async (
       removingIds = removingShades.map((id: string) => id);
 
       // Fetch shades to be removed
-      const shadesToDelete = await Shade.find({ _id: { $in: removingIds } });
+      const shadesToDelete = await Shade.find({
+        _id: { $in: removingIds },
+      }).lean();
 
       removedShadeImages =
         shadesToDelete?.flatMap((shade) => shade.images) || [];
       await Shade.deleteMany({ _id: { $in: removingIds } });
+
+      await removeImages(removedShadeImages);
     }
 
     const finalShadeIds: string[] = oldShadesIds.filter(
-      (id) => id && !removingIds.includes(id.toString())
+      (id) => id && !removingIds.includes(id)
     );
 
     if (newShadeIds.length) {
@@ -450,7 +454,7 @@ export const updateProductController = async (
       { _id: productId },
       updateBody,
       { new: true }
-    );
+    ).lean();
 
     if (removingCommonImageURLs?.length) {
       await removeImages(removingCommonImageURLs);
