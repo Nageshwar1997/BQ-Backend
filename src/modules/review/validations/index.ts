@@ -14,3 +14,30 @@ export const createReviewZodSchema = z.object({
     blockMultipleSpaces: true,
   }),
 });
+
+export const updateReviewZodSchema = createReviewZodSchema.partial().extend({
+  productTitle: validateZodString({
+    field: "productTitle",
+    min: 2,
+    blockMultipleSpaces: true,
+    isOptional: true,
+  }),
+  removedImages: z
+    .array(
+      validateZodString({
+        field: "removedImages[some_index]",
+        blockSingleSpace: true,
+      })
+    )
+    .optional()
+    .default([]),
+  removedVideos: z
+    .array(
+      validateZodString({
+        field: "removedVideos[some_index]",
+        blockSingleSpace: true,
+      })
+    )
+    .optional()
+    .default([]),
+});
