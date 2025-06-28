@@ -8,28 +8,7 @@ import { PopulatedProduct, ProductProps, ShadeProps } from "../../types";
 import { findOrCreateCategory } from "../../services";
 import { checkUserPermission, isValidMongoId } from "../../../../utils";
 import { possibleUpdateProductFields } from "../../constants";
-
-const removeImages = async (imageUrls: string[]): Promise<void> => {
-  if (imageUrls.length) {
-    await MediaModule.Utils.multipleImagesRemover(imageUrls, "product");
-  }
-};
-
-const uploadImages = async (
-  files: Express.Multer.File[],
-  folder: string
-): Promise<string[]> => {
-  if (files?.length) {
-    const result = await MediaModule.Utils.multipleImagesUploader({
-      files,
-      folder,
-      cloudinaryConfigOption: "product",
-    });
-
-    return result.map((img) => img.secure_url);
-  }
-  return [];
-};
+import { removeImages, uploadImages } from "../../utils";
 
 export const updateProductController = async (
   req: AuthorizedRequest,

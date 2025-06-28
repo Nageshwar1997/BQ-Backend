@@ -1,3 +1,4 @@
+import { MediaModule } from "../../..";
 import { AppError } from "../../../../classes";
 import { validateZodNumber, validateZodString } from "../../../../utils";
 import { ValidateProductFieldConfigs } from "../../types";
@@ -56,4 +57,26 @@ export const validateProductField = (props: ValidateProductFieldConfigs) => {
       );
     }
   }
+};
+
+export const removeImages = async (imageUrls: string[]): Promise<void> => {
+  if (imageUrls?.length) {
+    await MediaModule.Utils.multipleImagesRemover(imageUrls, "product");
+  }
+};
+
+export const uploadImages = async (
+  files: Express.Multer.File[],
+  folder: string
+): Promise<string[]> => {
+  if (files?.length) {
+    const result = await MediaModule.Utils.multipleImagesUploader({
+      files,
+      folder,
+      cloudinaryConfigOption: "product",
+    });
+
+    return result.map((img) => img.secure_url);
+  }
+  return [];
 };
