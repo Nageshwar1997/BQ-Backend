@@ -4,6 +4,7 @@ import {
   BlogModule,
   MediaModule,
   ProductModule,
+  ReviewModule,
   UserModule,
 } from "../modules";
 
@@ -23,5 +24,8 @@ router.use("/blogs", BlogModule.Routes.blogRouter);
 
 // Product routes
 router.use("/products", ProductModule.Routes.productRouter);
+
+// Review routes
+router.use("/reviews", ReviewModule.Routes.reviewRouter);
 
 export default router;
