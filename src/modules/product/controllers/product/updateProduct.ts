@@ -86,6 +86,20 @@ export const updateProductController = async (
     }
   }
 
+  if (sellingPrice || originalPrice) {
+    const currentSellPrice = sellingPrice ?? existingProduct.sellingPrice;
+    const currentOrgPrice = originalPrice ?? existingProduct.originalPrice;
+
+    if (currentSellPrice > currentOrgPrice) {
+      throw new AppError(
+        "Selling price cannot be greater than original price",
+        400
+      );
+    }
+    updateBody.discount =
+      ((currentOrgPrice - currentSellPrice) / currentOrgPrice) * 100;
+  }
+
   const category_1 = categoryLevelOne
     ? await findOrCreateCategory(
         categoryLevelOne.name,
