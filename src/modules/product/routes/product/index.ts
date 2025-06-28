@@ -19,7 +19,6 @@ import {
   updateProductZodSchema,
   uploadProductZodSchema,
 } from "../../validations";
-import { addCategoryToRequest, addShadesToRequest } from "../../middlewares";
 
 export const productRouter = Router();
 
@@ -37,8 +36,6 @@ productRouter.post(
     ],
   }),
   ZodMiddleware.validateZodSchema(uploadProductZodSchema),
-  ResponseMiddleware.catchAsync(addCategoryToRequest), // Add Category to Request
-  ResponseMiddleware.catchAsync(addShadesToRequest), // Add Shades to Request & and add common images
   ResponseMiddleware.catchAsync(uploadProductController)
 );
 
