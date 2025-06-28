@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { createReviewController } from "../controllers";
+import {
+  createReviewController,
+  deleteReviewController,
+  updateReviewController,
+} from "../controllers";
 import {
   AuthMiddleware,
   JSONParseMiddleware,
@@ -9,7 +13,6 @@ import {
   ZodMiddleware,
 } from "../../../middlewares";
 import { createReviewZodSchema, updateReviewZodSchema } from "../validations";
-import { updateReviewController } from "../controllers/updateReview";
 
 export const reviewRouter = Router();
 
@@ -44,4 +47,11 @@ reviewRouter.patch(
   }),
   ZodMiddleware.validateZodSchema(updateReviewZodSchema),
   ResponseMiddleware.catchAsync(updateReviewController)
+);
+
+reviewRouter.delete(
+  "/:productId/:reviewId",
+  RequestMiddleware.checkEmptyRequest({ params: true }),
+  AuthMiddleware.authenticated,
+  ResponseMiddleware.catchAsync(deleteReviewController)
 );
