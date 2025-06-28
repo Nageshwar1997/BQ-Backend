@@ -17,7 +17,7 @@ const uploadVideoToCloudinary = async (
   file: Express.Multer.File,
   folder: string,
   cloudinaryConfigOption: CloudinaryConfigOption
-): Promise<UploadApiResponse> => {
+): Promise<UploadApiResponse & { playback_url: string }> => {
   const bufferStream = Readable.from(file.buffer);
   const subFolder = folder?.split(" ").join("_") || "Common_Folder";
 
@@ -32,34 +32,38 @@ const uploadVideoToCloudinary = async (
 
   const cloudinary = myCloudinary(cloudinaryConfigOption);
 
-  return new Promise<UploadApiResponse>((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        resource_type: "video",
-        folder: `${mainFolder}/${subFolder}`,
-        public_id: publicId,
-        allowed_formats: ["mp4", "webm"],
-        overwrite: true,
-        invalidate: true,
-      },
-      (error, result) => {
-        if (error) {
-          return reject(
-            new AppError(
-              error.message || "Failed to upload video to Cloudinary",
-              500
-            )
-          );
-        } else if (result) {
-          resolve(result);
-        } else {
-          reject(new AppError("Unknown error during video upload", 500));
+  return new Promise<UploadApiResponse & { playback_url: string }>(
+    (resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: "video",
+          folder: `${mainFolder}/${subFolder}`,
+          public_id: publicId,
+          allowed_formats: ["mp4", "webm"],
+          overwrite: true,
+          invalidate: true,
+        },
+        (error, result) => {
+          if (error) {
+            return reject(
+              new AppError(
+                error.message || "Failed to upload video to Cloudinary",
+                500
+              )
+            );
+          } else if (result) {
+            // Add playback_url property to match the expected type
+            const playback_url = result.playback_url || result.secure_url;
+            resolve({ ...result, playback_url });
+          } else {
+            reject(new AppError("Unknown error during video upload", 500));
+          }
         }
-      }
-    );
+      );
 
-    bufferStream.pipe(uploadStream);
-  });
+      bufferStream.pipe(uploadStream);
+    }
+  );
 };
 
 // ========== SINGLE VIDEO UPLOADER ==========
