@@ -33,7 +33,7 @@ export const deleteReviewController = async (
 
   if (req.user?.role !== "MASTER") {
     checkUserPermission({
-      checkId: review.userId,
+      checkId: review.user,
       userId: req.user?._id as string,
       message: "You are not authorized to delete this review",
       statusCode: 403,

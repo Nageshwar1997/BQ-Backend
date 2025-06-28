@@ -3,11 +3,13 @@ import { CategoryProps, TCategoryFieldOnly } from "../category";
 import { ShadeProps, TShadesFieldOnly } from "../shade";
 import { UserProps } from "../../../user/types";
 import { ValidateZodFieldConfigs } from "../../../../types";
+import { ReviewModule } from "../../..";
 
 export interface ProductPopulateFieldsProps {
   category: (keyof CategoryProps)[];
   shades: (keyof ShadeProps)[];
   seller: (keyof UserProps)[];
+  reviews: (keyof ReviewModule.Types.ReviewProps)[];
 }
 
 export interface ProductProps {
