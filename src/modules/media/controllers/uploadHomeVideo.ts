@@ -12,8 +12,8 @@ import {
 import {
   singleImageRemover,
   singleImageUploader,
-  videoRemover,
-  videoUploader,
+  singleVideoRemover,
+  singleVideoUploader,
 } from "../utils";
 import { HomeVideo } from "../models";
 
@@ -81,7 +81,7 @@ export const uploadHomeVideoController = async (
   }
 
   // Upload video
-  const video = await videoUploader({
+  const video = await singleVideoUploader({
     file: videoFile,
     folder: `Home/Videos/${title}`,
     cloudinaryConfigOption,
@@ -111,7 +111,7 @@ export const uploadHomeVideoController = async (
   } catch (dbError) {
     // Clean up uploaded files from Cloudinary
     await Promise.all([
-      videoRemover(video.playback_url, cloudinaryConfigOption),
+      singleVideoRemover(video.secure_url, cloudinaryConfigOption),
       singleImageRemover(poster.secure_url, cloudinaryConfigOption),
     ]);
     throw new AppError("Failed to save video metadata", 500);
