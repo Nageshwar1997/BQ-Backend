@@ -23,8 +23,8 @@ export const createReviewController = async (
   let uploadedVideos: string[] = [];
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
-  const images = files.images;
-  const videos = files.videos;
+  const images = files?.images;
+  const videos = files?.videos;
 
   const product = await ProductModule.Models.Product.findById(productId);
 
