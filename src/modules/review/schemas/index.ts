@@ -3,7 +3,7 @@ import { ReviewProps } from "../types";
 
 const reviewSchema = new Schema<ReviewProps>(
   {
-    productId: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     rating: { type: Number, min: 1, max: 5, required: true, default: 1 },
     title: { type: String, trim: true, required: false },

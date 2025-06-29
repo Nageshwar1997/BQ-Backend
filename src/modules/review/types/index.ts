@@ -4,7 +4,7 @@ export interface ReviewProps {
   rating: number;
   title: string;
   comment: string;
-  productId: Types.ObjectId;
+  product: Types.ObjectId;
   user: Types.ObjectId;
   images: string[];
   videos: string[];

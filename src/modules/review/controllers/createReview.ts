@@ -17,7 +17,7 @@ export const createReviewController = async (
   isValidMongoId(productId, "Invalid Product Id provided", 404);
 
   const body = req.body;
-  const userId = req.user?._id;
+  const user = req.user;
 
   let uploadedImages: string[] = [];
   let uploadedVideos: string[] = [];
@@ -51,8 +51,8 @@ export const createReviewController = async (
   }
 
   const review = await Review.create({
-    productId,
-    userId,
+    product: productId,
+    user: user?._id,
     rating: body.rating,
     title: body.title,
     comment: body.comment,
