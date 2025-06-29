@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createReviewController,
   deleteReviewController,
+  getReviewsByIdController,
   updateReviewController,
 } from "../controllers";
 import {
@@ -54,4 +55,10 @@ reviewRouter.delete(
   RequestMiddleware.checkEmptyRequest({ params: true }),
   AuthMiddleware.authenticated,
   ResponseMiddleware.catchAsync(deleteReviewController)
+);
+
+reviewRouter.get(
+  "/:productId",
+  RequestMiddleware.checkEmptyRequest({ params: true }),
+  ResponseMiddleware.catchAsync(getReviewsByIdController)
 );
