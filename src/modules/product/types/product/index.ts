@@ -1,13 +1,14 @@
 import { Types } from "mongoose";
 import { CategoryProps, TCategoryFieldOnly } from "../category";
 import { ShadeProps, TShadesFieldOnly } from "../shade";
-import { UserProps } from "../../../user/types";
+import { ReviewModule, UserModule } from "../../..";
 import { ValidateZodFieldConfigs } from "../../../../types";
 
 export interface ProductPopulateFieldsProps {
   category: (keyof CategoryProps)[];
   shades: (keyof ShadeProps)[];
-  seller: (keyof UserProps)[];
+  seller: (keyof UserModule.Types.UserProps)[];
+  reviews: (keyof ReviewModule.Types.ReviewProps)[];
 }
 
 export interface ProductProps {

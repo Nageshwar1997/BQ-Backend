@@ -1,18 +1,10 @@
 import { UploadApiResponse } from "cloudinary";
-
 import { AppError } from "../../../../classes";
 import { CloudinaryConfigOption } from "../../types";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
 
-export const videoRemover = async (
-  videoUrl: string,
-  cloudinaryConfigOption: CloudinaryConfigOption = "video"
-) => {
-  if (!videoUrl) {
-    throw new AppError("Video URL is required", 400);
-  }
-
-  // Updated regex to handle .mp4, .webm, and .m3u8
+// ========== HELPER: Extract publicId from Video URL ==========
+const extractVideoPublicId = (videoUrl: string): string => {
   const regex = /\/v\d+\/(.+?)\.(mp4|webm|m3u8)$/;
   const match = videoUrl.match(regex);
 
@@ -20,45 +12,80 @@ export const videoRemover = async (
     throw new AppError("Invalid Cloudinary video URL", 400);
   }
 
-  const publicId = match[1];
+  return match[1];
+};
 
-  // Cloudinary Connectivity Test
+// ========== COMMON VIDEO REMOVER FUNCTION ==========
+const removeVideoFromCloudinary = async (
+  publicId: string,
+  cloudinaryConfigOption: CloudinaryConfigOption = "video"
+): Promise<UploadApiResponse> => {
+  const cloudinary = myCloudinary(cloudinaryConfigOption);
+
+  return new Promise<UploadApiResponse>((resolve, reject) => {
+    cloudinary.uploader.destroy(
+      publicId,
+      { resource_type: "video" },
+      (error, result) => {
+        if (error) {
+          return reject(
+            new AppError(
+              error.message || "Failed to remove video from Cloudinary",
+              500
+            )
+          );
+        }
+        resolve(result);
+      }
+    );
+  });
+};
+
+// ========== SINGLE VIDEO REMOVER ==========
+export const singleVideoRemover = async (
+  videoUrl: string,
+  cloudinaryConfigOption: CloudinaryConfigOption = "video"
+) => {
+  if (!videoUrl) {
+    throw new AppError("Video URL is required", 400);
+  }
+
   const cloudinaryConnectionTest = await cloudinaryConnection(
     cloudinaryConfigOption
   );
-
   if (cloudinaryConnectionTest.error) {
     throw new AppError(cloudinaryConnectionTest.message, 500);
   }
 
-  try {
-    const cloudinary = myCloudinary(cloudinaryConfigOption);
+  const publicId = extractVideoPublicId(videoUrl);
+  const result = await removeVideoFromCloudinary(
+    publicId,
+    cloudinaryConfigOption
+  );
+  return result;
+};
 
-    const result: UploadApiResponse = await new Promise((resolve, reject) => {
-      cloudinary.uploader.destroy(
-        publicId,
-        { resource_type: "video" },
-        (error, result) => {
-          if (error) {
-            return reject(
-              new AppError(
-                error.message || "Failed to remove video from Cloudinary",
-                500
-              )
-            );
-          }
-          resolve(result);
-        }
-      );
-    });
-
-    return result;
-  } catch (error) {
-    throw new AppError(
-      error instanceof Error
-        ? error.message
-        : "Unexpected error during video removal",
-      500
-    );
+// ========== MULTIPLE VIDEOS REMOVER ==========
+export const multipleVideosRemover = async (
+  videoUrls: string[],
+  cloudinaryConfigOption: CloudinaryConfigOption = "video"
+) => {
+  if (!videoUrls || !Array.isArray(videoUrls) || videoUrls.length === 0) {
+    throw new AppError("Video URLs are required", 400);
   }
+
+  const cloudinaryConnectionTest = await cloudinaryConnection(
+    cloudinaryConfigOption
+  );
+  if (cloudinaryConnectionTest.error) {
+    throw new AppError(cloudinaryConnectionTest.message, 500);
+  }
+
+  const removePromises = videoUrls.map(async (url) => {
+    const publicId = extractVideoPublicId(url);
+    return removeVideoFromCloudinary(publicId, cloudinaryConfigOption);
+  });
+
+  const removeResults = await Promise.all(removePromises);
+  return removeResults; // Array of UploadApiResponse
 };

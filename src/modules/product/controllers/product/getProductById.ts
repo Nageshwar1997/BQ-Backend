@@ -40,6 +40,17 @@ export const getProductByIdController = async (req: Request, res: Response) => {
             },
           },
         });
+      } else if (path === "reviews") {
+        query = query.populate({
+          path: "reviews",
+          select: safeFields.join(" "),
+          ...(safeFields.includes("user") && {
+            populate: {
+              path: "user",
+              select: "-password -role",
+            },
+          }),
+        });
       } else {
         query = query.populate({
           path,

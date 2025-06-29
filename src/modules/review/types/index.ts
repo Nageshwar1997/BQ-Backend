@@ -2,8 +2,10 @@ import { Types } from "mongoose";
 
 export interface ReviewProps {
   rating: number;
-  review: string;
-  productId: Types.ObjectId;
-  userId: Types.ObjectId;
+  title: string;
+  comment: string;
+  product: Types.ObjectId;
+  user: Types.ObjectId;
   images: string[];
+  videos: string[];
 }

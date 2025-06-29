@@ -3,7 +3,6 @@ import { Response } from "express";
 import { AuthorizedRequest } from "../../../../types";
 import { Product, Shade } from "../../models";
 import { AppError } from "../../../../classes";
-import { MediaModule } from "../../..";
 import { PopulatedProduct, ProductProps, ShadeProps } from "../../types";
 import { findOrCreateCategory } from "../../services";
 import { checkUserPermission, isValidMongoId } from "../../../../utils";
@@ -35,12 +34,14 @@ export const updateProductController = async (
 
   if (!existingProduct) throw new AppError("Product not found", 404);
 
-  checkUserPermission({
-    userId: req.user?._id as Types.ObjectId,
-    checkId: existingProduct.seller,
-    message: "You are not authorized to update this product",
-    statusCode: 403,
-  });
+  if (req.user?.role !== "MASTER") {
+    checkUserPermission({
+      userId: req.user?._id as Types.ObjectId,
+      checkId: existingProduct.seller,
+      message: "You are not authorized to update this product",
+      statusCode: 403,
+    });
+  }
 
   const {
     title,

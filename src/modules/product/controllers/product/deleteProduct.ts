@@ -32,12 +32,14 @@ export const deleteProductController = async (
     throw new AppError("Product not found", 404);
   }
 
-  checkUserPermission({
-    checkId: product.seller,
-    userId: userId as Types.ObjectId,
-    message: "You are not authorized to delete this product",
-    statusCode: 403,
-  });
+  if (req.user?.role !== "MASTER") {
+    checkUserPermission({
+      checkId: product.seller,
+      userId: userId as Types.ObjectId,
+      message: "You are not authorized to delete this product",
+      statusCode: 403,
+    });
+  }
 
   await product.deleteOne();
 
