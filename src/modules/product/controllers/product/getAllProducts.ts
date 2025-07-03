@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import { Product } from "../../models";
 import { ProductPopulateFieldsProps } from "../../types";
-import { productPopulateFields } from "../../constants";
+import {
+  POSSIBLE_PRODUCT_REQUIRED_FIELDS,
+  PRODUCT_POPULATE_FIELDS,
+} from "../../constants";
 import { isSafePopulateField } from "../../utils";
 
 export const getAllProductsController = async (req: Request, res: Response) => {
@@ -9,17 +12,25 @@ export const getAllProductsController = async (req: Request, res: Response) => {
   const limit = Number(req.query.limit);
   const skip = page && limit ? (page - 1) * limit : 0;
 
-  const { populateFields = {} } = req.body ?? {};
+  const { populateFields = {}, requiredFields = [] } = req.body ?? {};
 
   // Start building query
   let query = Product.find();
 
-  // Dynamic populate
+  // --- 1. Handle top-level selected fields ---
+  if (Array.isArray(requiredFields) && requiredFields.length > 0) {
+    const safeTopLevelFields = requiredFields.filter((field) =>
+      POSSIBLE_PRODUCT_REQUIRED_FIELDS.includes(field)
+    );
+    query = query.select(safeTopLevelFields.join(" "));
+  }
+
+  // --- 2. Handle population of subdocuments ---
   for (const [path, requestedFields] of Object.entries(populateFields) as [
     keyof ProductPopulateFieldsProps,
     string[]
   ][]) {
-    const allowedFields = productPopulateFields[path];
+    const allowedFields = PRODUCT_POPULATE_FIELDS[path];
 
     const safeFields = requestedFields.filter(
       (field): field is (typeof allowedFields)[number] =>
@@ -49,11 +60,12 @@ export const getAllProductsController = async (req: Request, res: Response) => {
     }
   }
 
-  // Handle pagination
+  // --- 3. Pagination ---
   if (page && limit) {
     query = query.skip(skip).limit(limit);
   }
 
+  // --- 4. Execute query ---
   const products = await query.lean();
 
   const totalProducts = await Product.countDocuments();
