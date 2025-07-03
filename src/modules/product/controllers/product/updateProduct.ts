@@ -6,7 +6,7 @@ import { AppError } from "../../../../classes";
 import { PopulatedProduct, ProductProps, ShadeProps } from "../../types";
 import { findOrCreateCategory } from "../../services";
 import { checkUserPermission, isValidMongoId } from "../../../../utils";
-import { possibleUpdateProductFields } from "../../constants";
+import { POSSIBLE_UPDATE_PRODUCT_FIELDS } from "../../constants";
 import { removeImages, uploadImages } from "../../utils";
 
 export const updateProductController = async (
@@ -79,7 +79,7 @@ export const updateProductController = async (
 
   const updateBody: Partial<ProductProps> = {};
 
-  for (const field of possibleUpdateProductFields) {
+  for (const field of POSSIBLE_UPDATE_PRODUCT_FIELDS) {
     const value = productBodyData[field];
 
     if (value !== undefined && value !== null) {

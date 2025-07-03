@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Product } from "../../models";
 import { ProductPopulateFieldsProps } from "../../types";
-import { productPopulateFields } from "../../constants";
+import { PRODUCT_POPULATE_FIELDS } from "../../constants";
 import { isSafePopulateField } from "../../utils";
 import { isValidMongoId } from "../../../../utils";
 
@@ -19,7 +19,7 @@ export const getProductByIdController = async (req: Request, res: Response) => {
     keyof ProductPopulateFieldsProps,
     string[]
   ][]) {
-    const allowedFields = productPopulateFields[path];
+    const allowedFields = PRODUCT_POPULATE_FIELDS[path];
 
     const safeFields = requestedFields.filter(
       (field): field is (typeof allowedFields)[number] =>
