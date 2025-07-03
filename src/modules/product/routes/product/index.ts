@@ -4,7 +4,6 @@ import {
   deleteProductController,
   getAllProductsController,
   getProductByIdController,
-  getProductsByCategoryController,
   updateProductController,
   uploadProductController,
 } from "../../controllers";
@@ -77,10 +76,4 @@ productRouter.delete(
   "/product/delete/:productId",
   AuthMiddleware.authorization(["ADMIN", "MASTER", "SELLER"]),
   ResponseMiddleware.catchAsync(deleteProductController)
-);
-
-productRouter.post(
-  "/category",
-  RequestMiddleware.checkEmptyRequest({ query: true }),
-  ResponseMiddleware.catchAsync(getProductsByCategoryController)
 );
