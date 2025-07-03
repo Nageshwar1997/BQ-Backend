@@ -27,6 +27,9 @@ export interface ProductProps {
   category: Types.ObjectId;
   seller: Types.ObjectId;
   reviews: Types.ObjectId[];
+  createdAt: Date;
+  updatedAt: Date;
+  _id: Types.ObjectId;
 }
 
 export interface PopulatedProduct
