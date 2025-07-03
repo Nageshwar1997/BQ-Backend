@@ -19,6 +19,7 @@ import {
   updateProductZodSchema,
   uploadProductZodSchema,
 } from "../../validations";
+import { POSSIBLE_PARSED_FIELDS } from "../../constants";
 
 export const productRouter = Router();
 
@@ -28,12 +29,7 @@ productRouter.post(
   MulterMiddleware.validateFiles({ type: "any" }),
   RequestMiddleware.checkEmptyRequest({ body: true, files: true }),
   JSONParseMiddleware.JSONParse({
-    fieldsToParse: [
-      "categoryLevelOne",
-      "categoryLevelTwo",
-      "categoryLevelThree",
-      "shades",
-    ],
+    fieldsToParse: POSSIBLE_PARSED_FIELDS,
   }),
   ZodMiddleware.validateZodSchema(uploadProductZodSchema),
   ResponseMiddleware.catchAsync(uploadProductController)
@@ -55,18 +51,7 @@ productRouter.patch(
   MulterMiddleware.validateFiles({ type: "any" }),
   RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
   JSONParseMiddleware.JSONParse({
-    fieldsToParse: [
-      "removingShadeImageUrls",
-      "removingCommonImageURLs",
-      "categoryLevelOne",
-      "categoryLevelTwo",
-      "categoryLevelThree",
-      "removingShades",
-      "newAddedShades",
-      "updatedShadeWithFiles",
-      "updatedShadeWithoutFiles",
-      "removedQuillImageURLs",
-    ],
+    fieldsToParse: POSSIBLE_PARSED_FIELDS,
   }),
   ZodMiddleware.validateZodSchema(updateProductZodSchema),
   ResponseMiddleware.catchAsync(updateProductController)

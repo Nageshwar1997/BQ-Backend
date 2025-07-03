@@ -31,3 +31,17 @@ export const POSSIBLE_PRODUCT_REQUIRED_FIELDS: (keyof ProductProps)[] = [
   "createdAt",
   "updatedAt",
 ];
+
+export const POSSIBLE_PARSED_FIELDS = [
+  "shades",
+  "removingShadeImageUrls",
+  "removingCommonImageURLs",
+  "categoryLevelOne",
+  "categoryLevelTwo",
+  "categoryLevelThree",
+  "removingShades",
+  "newAddedShades",
+  "updatedShadeWithFiles",
+  "updatedShadeWithoutFiles",
+  "removedQuillImageURLs",
+];
