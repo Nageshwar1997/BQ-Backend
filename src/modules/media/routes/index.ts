@@ -61,10 +61,7 @@ mediaRouter.post(
   AuthMiddleware.authorization(["MASTER"]),
   MulterMiddleware.validateFiles({
     type: "fields",
-    fieldsConfig: [
-      { name: "video", maxCount: 1 },
-      { name: "poster", maxCount: 1 },
-    ],
+    fieldsConfig: ["video", "poster"].map((name) => ({ name, maxCount: 1 })),
   }),
   ResponseMiddleware.catchAsync(uploadHomeVideoController)
 );
