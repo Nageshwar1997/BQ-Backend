@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Product, Category } from "../../models";
-import { ProductPopulateFieldsProps } from "../../types";
+import { PopulatedProduct, ProductPopulateFieldsProps } from "../../types";
 import {
   POSSIBLE_PRODUCT_REQUIRED_FIELDS,
   PRODUCT_POPULATE_FIELDS,
@@ -13,7 +13,7 @@ export const getAllProductsController = async (req: Request, res: Response) => {
   const limit = Number(req.query.limit);
   const skip = page && limit ? (page - 1) * limit : 0;
 
-  const { populateFields = {}, requiredFields = [] } = req.body ?? {};
+  const { populateFields = {}, requiredFields = [] } = req.query ?? {};
   const { category_1, category_2, category_3 } = req.query;
 
   // --- 1. Handle category filtering logic ---
@@ -139,9 +139,14 @@ export const getAllProductsController = async (req: Request, res: Response) => {
 
   // --- 3. Select specific top-level fields ---
   if (Array.isArray(requiredFields) && requiredFields.length > 0) {
-    const safeTopLevelFields = requiredFields.filter((field) =>
-      POSSIBLE_PRODUCT_REQUIRED_FIELDS.includes(field)
+    const safeTopLevelFields = requiredFields.filter(
+      (field): field is keyof PopulatedProduct =>
+        typeof field === "string" &&
+        POSSIBLE_PRODUCT_REQUIRED_FIELDS.includes(
+          field as keyof PopulatedProduct
+        )
     );
+
     query = query.select(safeTopLevelFields.join(" "));
   }
 

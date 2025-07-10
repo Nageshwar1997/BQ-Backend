@@ -35,12 +35,12 @@ productRouter.post(
   ResponseMiddleware.catchAsync(uploadProductController)
 );
 
-productRouter.post(
+productRouter.get(
   "/all",
   ResponseMiddleware.catchAsync(getAllProductsController)
 );
 
-productRouter.post(
+productRouter.get(
   "/product/:productId",
   ResponseMiddleware.catchAsync(getProductByIdController)
 );
