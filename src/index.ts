@@ -1,6 +1,7 @@
 import "dotenv/config";
 import path from "path";
 import express, { Request, Response } from "express";
+import QueryString from "qs";
 
 import router from "./routes";
 import { connectDB } from "./configs";
@@ -16,8 +17,8 @@ const port = PORT || 5454;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(express.static(path.resolve("public")));
+app.set("query parser", (str: string) => QueryString.parse(str));
 
 // Custom Middlewares
 app.use(ResponseMiddleware.success);
