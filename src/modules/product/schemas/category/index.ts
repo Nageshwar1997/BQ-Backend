@@ -17,4 +17,5 @@ export const categorySchema = new Schema<CategoryProps>(
 
 // Indexing for faster queries
 categorySchema.index({ name: 1 });
+categorySchema.index({ category: 1 });
 categorySchema.index({ parentCategory: 1 });

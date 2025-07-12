@@ -1,12 +1,19 @@
 import { Request, Response } from "express";
 import { Product, Category } from "../../models";
-import { PopulatedProduct, ProductPopulateFieldsProps } from "../../types";
+import { FilterQuery } from "mongoose";
+
+import {
+  PopulatedProduct,
+  ProductPopulateFieldsProps,
+  ProductProps,
+} from "../../types";
 import {
   POSSIBLE_PRODUCT_REQUIRED_FIELDS,
   PRODUCT_POPULATE_FIELDS,
 } from "../../constants";
 import { isSafePopulateField } from "../../utils";
 import { AppError } from "../../../../classes";
+import { escapeRegexSpecialChars } from "../../../../utils";
 
 export const getAllProductsController = async (req: Request, res: Response) => {
   const page = Number(req.query.page);
@@ -14,7 +21,7 @@ export const getAllProductsController = async (req: Request, res: Response) => {
   const skip = page && limit ? (page - 1) * limit : 0;
 
   const { populateFields = {}, requiredFields = [] } = req.query ?? {};
-  const { category_1, category_2, category_3 } = req.query;
+  const { category_1, category_2, category_3, search = "" } = req.query ?? {};
 
   // --- 1. Handle category filtering logic ---
   let categoryFilter: string[] | null = null;
@@ -132,14 +139,41 @@ export const getAllProductsController = async (req: Request, res: Response) => {
     categoryFilter = level3CategoryIds;
   }
 
-  // --- 2. Build base query with optional category filter ---
-  let query = Product.find(
-    categoryFilter ? { category: { $in: categoryFilter } } : {}
-  );
+  // --- 2. Build query filters (category + title search) ---
+  const filters: FilterQuery<ProductProps> = {};
 
-  // --- 3. Select specific top-level fields ---
+  if (categoryFilter) {
+    filters.category = { $in: categoryFilter };
+  }
+
+  // --- Search on title brand and category ---
+  if (search && typeof search === "string") {
+    const escaped = escapeRegexSpecialChars(search.trim()); // it will escape special chars
+
+    const matchedCats = await Category.find({
+      $or: [
+        { name: { $regex: escaped, $options: "i" } },
+        { category: { $regex: escaped, $options: "i" } },
+      ],
+    })
+      .select("_id")
+      .lean();
+
+    const matchedCatIds = matchedCats?.map((c) => c._id);
+
+    filters.$or = [
+      { title: { $regex: escaped, $options: "i" } },
+      { brand: { $regex: escaped, $options: "i" } },
+      { category: { $in: matchedCatIds } },
+    ];
+  }
+
+  // --- 3. Start building query ---
+  let query = Product.find(filters);
+
+  // --- 4. Select specific fields ---
   if (Array.isArray(requiredFields) && requiredFields.length > 0) {
-    const safeTopLevelFields = requiredFields.filter(
+    const safeFields = requiredFields.filter(
       (field): field is keyof PopulatedProduct =>
         typeof field === "string" &&
         POSSIBLE_PRODUCT_REQUIRED_FIELDS.includes(
@@ -147,66 +181,56 @@ export const getAllProductsController = async (req: Request, res: Response) => {
         )
     );
 
-    query = query.select(safeTopLevelFields.join(" "));
+    query = query.select(safeFields.join(" "));
   }
 
-  // --- 4. Populate subDocuments ---
+  // --- 5. Populate sub-documents safely ---
   for (const [path, requestedFields] of Object.entries(populateFields) as [
     keyof ProductPopulateFieldsProps,
     string[]
   ][]) {
-    const allowedFields = PRODUCT_POPULATE_FIELDS[path];
-
-    const safeFields = requestedFields.filter(
-      (field): field is (typeof allowedFields)[number] =>
-        isSafePopulateField(field, allowedFields)
+    const allowed = PRODUCT_POPULATE_FIELDS[path];
+    const safe = requestedFields.filter((f): f is (typeof allowed)[number] =>
+      isSafePopulateField(f, allowed)
     );
 
-    if (safeFields.length) {
-      if (path === "category" && safeFields.includes("parentCategory")) {
-        query = query.populate({
-          path: "category",
-          select: safeFields.join(" "),
+    if (!safe.length) continue;
+
+    if (path === "category" && safe.includes("parentCategory")) {
+      query = query.populate({
+        path: "category",
+        select: safe.join(" "),
+        populate: {
+          path: "parentCategory",
+          select: "name category level",
           populate: {
             path: "parentCategory",
             select: "name category level",
-            populate: {
-              path: "parentCategory",
-              select: "name category level",
-            },
           },
-        });
-      } else if (path === "reviews") {
-        query = query.populate({
-          path: "reviews",
-          select: safeFields.join(" "),
-          ...(safeFields.includes("user") && {
-            populate: {
-              path: "user",
-              select: "-password -role",
-            },
-          }),
-        });
-      } else {
-        query = query.populate({
-          path,
-          select: safeFields.join(" "),
-        });
-      }
+        },
+      });
+    } else if (path === "reviews") {
+      query = query.populate({
+        path: "reviews",
+        select: safe.join(" "),
+        ...(safe.includes("user") && {
+          populate: { path: "user", select: "-password -role" },
+        }),
+      });
+    } else {
+      query = query.populate({ path, select: safe.join(" ") });
     }
   }
 
-  // --- 5. Pagination ---
+  // --- 6. Pagination ---
   if (page && limit) {
     query = query.skip(skip).limit(limit);
   }
 
-  // --- 6. Execute query ---
+  // --- 7. Execute query and respond ---
   const [products, totalProducts] = await Promise.all([
     query.lean(),
-    Product.countDocuments(
-      categoryFilter ? { category: { $in: categoryFilter } } : {}
-    ),
+    Product.countDocuments(filters),
   ]);
 
   res.success(200, "Products fetched successfully", {

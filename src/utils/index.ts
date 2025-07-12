@@ -10,6 +10,7 @@ import {
 } from "../types";
 import { dateRegex, noSpaceRegex, singleSpaceRegex } from "../constants";
 import { AppError } from "../classes";
+import { regexes } from "../constants/regex";
 
 export const isValidMongoId = (
   id: string,
@@ -280,4 +281,8 @@ export const validateZodDate = ({
     : refinedSchema.refine((val) => val !== undefined, {
         message: messages.required,
       })) as unknown as ZodType<Date | undefined>;
+};
+
+export const escapeRegexSpecialChars = (value: string): string => {
+  return value.replace(regexes.escapeSpecialChars, "\\$&");
 };
