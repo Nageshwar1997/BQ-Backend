@@ -8,9 +8,8 @@ import {
   ZodNumberConfigs,
   ZodStringConfigs,
 } from "../types";
-import { dateRegex, noSpaceRegex, singleSpaceRegex } from "../constants";
 import { AppError } from "../classes";
-import { regexes } from "../constants/regex";
+import { regexes } from "../constants";
 
 export const isValidMongoId = (
   id: string,
@@ -156,11 +155,11 @@ export const validateZodString = ({
   }
 
   if (blockMultipleSpaces) {
-    schema = schema.regex(singleSpaceRegex, messages.multiple_spaces);
+    schema = schema.regex(regexes.singleSpace, messages.multiple_spaces);
   }
 
   if (blockSingleSpace) {
-    schema = schema.regex(noSpaceRegex, messages.single_space);
+    schema = schema.regex(regexes.noSpace, messages.single_space);
   }
 
   if (customRegex && customRegex.regex) {
@@ -242,7 +241,7 @@ export const validateZodDate = ({
       required_error: messages.required,
       invalid_type_error: messages.invalid_format,
     })
-    .refine((val) => dateRegex.test(val), {
+    .refine((val) => regexes.validDate.test(val), {
       message: messages.invalid_format,
     })
     .transform((val) => {

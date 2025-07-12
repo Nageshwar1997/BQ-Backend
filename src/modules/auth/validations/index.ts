@@ -1,10 +1,5 @@
 import { z } from "zod";
-import {
-  emailRegex,
-  nameRegex,
-  passwordRegex,
-  phoneRegex,
-} from "../../../constants";
+import { regexes } from "../../../constants";
 import {
   TLoginFieldsOnly,
   TRegisterFieldsOnly,
@@ -14,21 +9,21 @@ import { validateAuthField } from "../utils";
 
 const customRegexes = {
   email: {
-    regex: emailRegex,
+    regex: regexes.validEmail,
     message: "please provide a valid email address, like example@domain.com",
   },
   name: {
-    regex: nameRegex,
+    regex: regexes.validName,
     message:
       "can only contain letters and only one space is allowed between words",
   },
   phoneNumber: {
-    regex: phoneRegex,
+    regex: regexes.validPhone,
     message:
       "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
   },
   password: {
-    regex: passwordRegex,
+    regex: regexes.validPassword,
     message:
       "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
   },
