@@ -25,9 +25,8 @@ export const productSchema = new Schema<ProductProps>(
   { versionKey: false, timestamps: true }
 );
 
-productSchema.index({ title: 1 });
-
 // Indexing for performance
+productSchema.index({ title: 1 });
 productSchema.index({ category: 1 });
 productSchema.index({ brand: 1 });
 productSchema.index({ seller: 1 });
