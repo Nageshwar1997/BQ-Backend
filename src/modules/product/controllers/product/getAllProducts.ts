@@ -55,7 +55,9 @@ export const getAllProductsController = async (req: Request, res: Response) => {
     const cat1 = await Category.findOne({
       category: category_1,
       level: 1,
-    }).lean();
+    })
+      .lean()
+      .select("_id");
 
     if (!cat1) {
       return res.success(200, "Products fetched successfully", {
