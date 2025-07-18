@@ -21,7 +21,17 @@ export const getAllProductsController = async (req: Request, res: Response) => {
   const skip = page && limit ? (page - 1) * limit : 0;
 
   const { populateFields = {}, requiredFields = [] } = req.query ?? {};
-  const { category_1, category_2, category_3, search = "" } = req.query ?? {};
+  const {
+    category_1,
+    category_2,
+    category_3,
+    search = "",
+    sortBy = "",
+  } = req.query ?? {};
+  const inStock = req.query?.inStock === "true";
+  const minPrice = Number(req.query?.min);
+  const maxPrice = Number(req.query?.max);
+  const discount = Number(req.query?.discount);
 
   // --- 1. Handle category filtering logic ---
   let categoryFilter: string[] | null = null;
@@ -146,6 +156,33 @@ export const getAllProductsController = async (req: Request, res: Response) => {
     filters.category = { $in: categoryFilter };
   }
 
+  if (inStock) {
+    filters.totalStock = { $gt: 0 };
+  }
+
+  if (minPrice && maxPrice) {
+    filters.sellingPrice = { $gte: minPrice, $lte: maxPrice };
+  } else if (minPrice) {
+    filters.sellingPrice = { $gte: minPrice };
+  } else if (maxPrice) {
+    filters.sellingPrice = { $lte: maxPrice };
+  }
+
+  if (discount) {
+    filters.discount = { $gte: discount };
+  }
+
+  // --- Logic for sort ---
+  if (sortBy) {
+    if (sortBy === "featured") {
+      filters.shades = { $exists: true, $ne: [] };
+    } else if (sortBy === "best-selling") {
+      filters.totalSales = { $gte: 0 };
+    } else if (sortBy === "top-rated") {
+      filters.rating = { $gte: 2.5 };
+    }
+  }
+
   // --- Search on title brand and category ---
   if (search && typeof search === "string") {
     const escaped = escapeRegexSpecialChars(search.trim()); // it will escape special chars
@@ -168,8 +205,27 @@ export const getAllProductsController = async (req: Request, res: Response) => {
     ];
   }
 
+  const sortMap: Record<string, any> = {
+    "a-z": { title: 1 },
+    "z-a": { title: -1 },
+    "price-asc": { sellingPrice: 1 },
+    "price-desc": { sellingPrice: -1 },
+    new: { createdAt: 1 },
+    old: { createdAt: -1 },
+  };
+
   // --- 3. Start building query ---
   let query = Product.find(filters);
+
+  // Logic for sortBy - sort query
+  if (sortBy && typeof sortBy === "string" && sortMap[sortBy]) {
+    query = query.sort(sortMap[sortBy]);
+
+    // Add collation only when sorting by title
+    if (sortBy === "a-z" || sortBy === "z-a") {
+      query = query.collation({ locale: "en", strength: 1 });
+    }
+  }
 
   // --- 4. Select specific fields ---
   if (Array.isArray(requiredFields) && requiredFields.length > 0) {
@@ -232,6 +288,8 @@ export const getAllProductsController = async (req: Request, res: Response) => {
     query.lean(),
     Product.countDocuments(filters),
   ]);
+
+  console.log("products", products?.[0]);
 
   res.success(200, "Products fetched successfully", {
     products,

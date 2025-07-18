@@ -21,6 +21,8 @@ export const productSchema = new Schema<ProductProps>(
       type: [{ type: Schema.Types.ObjectId, ref: "Review" }],
       default: [],
     },
+    rating: { type: Number, default: 0, min: 0, max: 5 },
+    totalSales: { type: Number, default: 0 },
   },
   { versionKey: false, timestamps: true }
 );

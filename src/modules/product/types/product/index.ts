@@ -27,8 +27,10 @@ export interface ProductProps {
   category: Types.ObjectId;
   seller: Types.ObjectId;
   reviews: Types.ObjectId[];
+  rating: number;
   createdAt: Date;
   updatedAt: Date;
+  totalSales: number;
   _id: Types.ObjectId;
 }
 
