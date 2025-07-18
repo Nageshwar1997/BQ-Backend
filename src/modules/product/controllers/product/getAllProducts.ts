@@ -289,8 +289,6 @@ export const getAllProductsController = async (req: Request, res: Response) => {
     Product.countDocuments(filters),
   ]);
 
-  console.log("products", products?.[0]);
-
   res.success(200, "Products fetched successfully", {
     products,
     totalProducts,
