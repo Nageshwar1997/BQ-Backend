@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { Schema, Types } from "mongoose";
 import { ReviewProps } from "../types";
 
 const reviewSchema = new Schema<ReviewProps>(
@@ -10,12 +10,19 @@ const reviewSchema = new Schema<ReviewProps>(
     comment: { type: String, trim: true, required: false },
     images: { type: [String], default: [] },
     videos: { type: [String], default: [] },
+    likes: { type: [Types.ObjectId], default: [] },
+    dislikes: { type: [Types.ObjectId], default: [] },
+    helpful: { type: [Types.ObjectId], default: [] },
   },
   { timestamps: true, versionKey: false }
 );
-reviewSchema.index({ productId: 1 });
-reviewSchema.index({ userId: 1 });
+reviewSchema.index({ product: 1 });
+reviewSchema.index({ user: 1 });
 reviewSchema.index({ rating: 1 });
 reviewSchema.index({ createdAt: 1 });
+reviewSchema.index({ images: 1 });
+reviewSchema.index({ videos: 1 });
+reviewSchema.index({ likes: 1 });
+reviewSchema.index({ dislikes: 1 });
 
 export default reviewSchema;
