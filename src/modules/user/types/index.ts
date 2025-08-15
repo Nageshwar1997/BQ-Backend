@@ -1,8 +1,8 @@
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 
 export type UserRoleType = "USER" | "SELLER" | "ADMIN" | "MASTER";
 
-export interface UserProps extends Document {
+export interface UserProps {
   _id: string | Types.ObjectId;
   firstName: string;
   lastName: string;
@@ -11,4 +11,6 @@ export interface UserProps extends Document {
   password: string;
   role: UserRoleType;
   profilePic?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
