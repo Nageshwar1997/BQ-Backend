@@ -1,10 +1,42 @@
 import { ProductPopulateFieldsProps, ProductProps } from "../types";
 
 export const PRODUCT_POPULATE_FIELDS: ProductPopulateFieldsProps = {
-  category: ["name", "category", "level", "parentCategory"],
-  shades: ["shadeName", "colorCode", "images", "stock"],
-  seller: ["firstName", "lastName", "phoneNumber", "email", "profilePic"],
-  reviews: ["rating", "title", "comment", "images", "videos", "user"],
+  category: [
+    "name",
+    "category",
+    "level",
+    "parentCategory",
+    "createdAt",
+    "updatedAt",
+  ],
+  shades: [
+    "shadeName",
+    "colorCode",
+    "images",
+    "stock",
+    "createdAt",
+    "updatedAt",
+  ],
+  seller: [
+    "firstName",
+    "lastName",
+    "phoneNumber",
+    "email",
+    "profilePic",
+    "createdAt",
+    "updatedAt",
+  ],
+  reviews: [
+    "rating",
+    "title",
+    "comment",
+    "images",
+    "videos",
+    "user",
+    "product",
+    "createdAt",
+    "updatedAt",
+  ],
 };
 
 export const POSSIBLE_UPDATE_PRODUCT_FIELDS: (keyof ProductProps)[] = [
