@@ -58,6 +58,9 @@ export const createReviewController = async (
     comment: body.comment,
     images: uploadedImages,
     videos: uploadedVideos,
+    likes: [],
+    dislikes: [],
+    helpful: [],
   });
 
   if (!review) {
