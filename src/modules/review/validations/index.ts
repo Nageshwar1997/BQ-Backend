@@ -41,3 +41,15 @@ export const updateReviewZodSchema = createReviewZodSchema.partial().extend({
     .optional()
     .default([]),
 });
+
+export const updateLikeDislikeHelpfulSchema = z.object({
+  liked: z
+    .boolean({ invalid_type_error: "Liked must be a boolean" })
+    .optional(),
+  disliked: z
+    .boolean({ invalid_type_error: "Disliked must be a boolean" })
+    .optional(),
+  isHelpful: z
+    .boolean({ invalid_type_error: "IsHelpful must be a boolean" })
+    .optional(),
+});
