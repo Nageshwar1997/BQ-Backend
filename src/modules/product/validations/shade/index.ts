@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { hexColorRegex } from "../../../../constants";
+import { regexes } from "../../../../constants";
 import { validateProductField } from "../../utils";
 import { validateZodString } from "../../../../utils";
 
@@ -33,9 +33,9 @@ export const addShadesZodSchema = ({
         blockSingleSpace: true,
         min: 4,
         max: 9,
-        isOptional,
+        isOptional: true,
         customRegex: {
-          regex: hexColorRegex,
+          regex: regexes.validHexColorCode,
           message: "Color code must be a valid hex color code.",
         },
       }),

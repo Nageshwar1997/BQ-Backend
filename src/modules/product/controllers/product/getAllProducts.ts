@@ -1,20 +1,37 @@
 import { Request, Response } from "express";
 import { Product, Category } from "../../models";
-import { ProductPopulateFieldsProps } from "../../types";
+import { FilterQuery } from "mongoose";
+
+import {
+  PopulatedProduct,
+  ProductPopulateFieldsProps,
+  ProductProps,
+} from "../../types";
 import {
   POSSIBLE_PRODUCT_REQUIRED_FIELDS,
   PRODUCT_POPULATE_FIELDS,
 } from "../../constants";
 import { isSafePopulateField } from "../../utils";
 import { AppError } from "../../../../classes";
+import { escapeRegexSpecialChars } from "../../../../utils";
 
 export const getAllProductsController = async (req: Request, res: Response) => {
   const page = Number(req.query.page);
   const limit = Number(req.query.limit);
   const skip = page && limit ? (page - 1) * limit : 0;
 
-  const { populateFields = {}, requiredFields = [] } = req.body ?? {};
-  const { category_1, category_2, category_3 } = req.query;
+  const { populateFields = {}, requiredFields = [] } = req.query ?? {};
+  const {
+    category_1,
+    category_2,
+    category_3,
+    search = "",
+    sortBy = "",
+  } = req.query ?? {};
+  const inStock = req.query?.inStock === "true";
+  const minPrice = Number(req.query?.min);
+  const maxPrice = Number(req.query?.max);
+  const discount = Number(req.query?.discount);
 
   // --- 1. Handle category filtering logic ---
   let categoryFilter: string[] | null = null;
@@ -38,7 +55,9 @@ export const getAllProductsController = async (req: Request, res: Response) => {
     const cat1 = await Category.findOne({
       category: category_1,
       level: 1,
-    }).lean();
+    })
+      .lean()
+      .select("_id");
 
     if (!cat1) {
       return res.success(200, "Products fetched successfully", {
@@ -132,76 +151,144 @@ export const getAllProductsController = async (req: Request, res: Response) => {
     categoryFilter = level3CategoryIds;
   }
 
-  // --- 2. Build base query with optional category filter ---
-  let query = Product.find(
-    categoryFilter ? { category: { $in: categoryFilter } } : {}
-  );
+  // --- 2. Build query filters (category + title search) ---
+  const filters: FilterQuery<ProductProps> = {};
 
-  // --- 3. Select specific top-level fields ---
-  if (Array.isArray(requiredFields) && requiredFields.length > 0) {
-    const safeTopLevelFields = requiredFields.filter((field) =>
-      POSSIBLE_PRODUCT_REQUIRED_FIELDS.includes(field)
-    );
-    query = query.select(safeTopLevelFields.join(" "));
+  if (categoryFilter) {
+    filters.category = { $in: categoryFilter };
   }
 
-  // --- 4. Populate subDocuments ---
+  if (inStock) {
+    filters.totalStock = { $gt: 0 };
+  }
+
+  if (minPrice && maxPrice) {
+    filters.sellingPrice = { $gte: minPrice, $lte: maxPrice };
+  } else if (minPrice) {
+    filters.sellingPrice = { $gte: minPrice };
+  } else if (maxPrice) {
+    filters.sellingPrice = { $lte: maxPrice };
+  }
+
+  if (discount) {
+    filters.discount = { $gte: discount };
+  }
+
+  // --- Logic for sort ---
+  if (sortBy) {
+    if (sortBy === "featured") {
+      filters.shades = { $exists: true, $ne: [] };
+    } else if (sortBy === "best-selling") {
+      filters.totalSales = { $gte: 0 };
+    } else if (sortBy === "top-rated") {
+      filters.rating = { $gte: 2.5 };
+    }
+  }
+
+  // --- Search on title brand and category ---
+  if (search && typeof search === "string") {
+    const escaped = escapeRegexSpecialChars(search.trim()); // it will escape special chars
+
+    const matchedCats = await Category.find({
+      $or: [
+        { name: { $regex: escaped, $options: "i" } },
+        { category: { $regex: escaped, $options: "i" } },
+      ],
+    })
+      .select("_id")
+      .lean();
+
+    const matchedCatIds = matchedCats?.map((c) => c._id);
+
+    filters.$or = [
+      { title: { $regex: escaped, $options: "i" } },
+      { brand: { $regex: escaped, $options: "i" } },
+      { category: { $in: matchedCatIds } },
+    ];
+  }
+
+  const sortMap: Record<string, any> = {
+    "a-z": { title: 1 },
+    "z-a": { title: -1 },
+    "price-asc": { sellingPrice: 1 },
+    "price-desc": { sellingPrice: -1 },
+    new: { createdAt: 1 },
+    old: { createdAt: -1 },
+  };
+
+  // --- 3. Start building query ---
+  let query = Product.find(filters);
+
+  // Logic for sortBy - sort query
+  if (sortBy && typeof sortBy === "string" && sortMap[sortBy]) {
+    query = query.sort(sortMap[sortBy]);
+
+    // Add collation only when sorting by title
+    if (sortBy === "a-z" || sortBy === "z-a") {
+      query = query.collation({ locale: "en", strength: 1 });
+    }
+  }
+
+  // --- 4. Select specific fields ---
+  if (Array.isArray(requiredFields) && requiredFields.length > 0) {
+    const safeFields = requiredFields.filter(
+      (field): field is keyof PopulatedProduct =>
+        typeof field === "string" &&
+        POSSIBLE_PRODUCT_REQUIRED_FIELDS.includes(
+          field as keyof PopulatedProduct
+        )
+    );
+
+    query = query.select(safeFields.join(" "));
+  }
+
+  // --- 5. Populate sub-documents safely ---
   for (const [path, requestedFields] of Object.entries(populateFields) as [
     keyof ProductPopulateFieldsProps,
     string[]
   ][]) {
-    const allowedFields = PRODUCT_POPULATE_FIELDS[path];
-
-    const safeFields = requestedFields.filter(
-      (field): field is (typeof allowedFields)[number] =>
-        isSafePopulateField(field, allowedFields)
+    const allowed = PRODUCT_POPULATE_FIELDS[path];
+    const safe = requestedFields.filter((f): f is (typeof allowed)[number] =>
+      isSafePopulateField(f, allowed)
     );
 
-    if (safeFields.length) {
-      if (path === "category" && safeFields.includes("parentCategory")) {
-        query = query.populate({
-          path: "category",
-          select: safeFields.join(" "),
+    if (!safe.length) continue;
+
+    if (path === "category" && safe.includes("parentCategory")) {
+      query = query.populate({
+        path: "category",
+        select: safe.join(" "),
+        populate: {
+          path: "parentCategory",
+          select: "name category level",
           populate: {
             path: "parentCategory",
             select: "name category level",
-            populate: {
-              path: "parentCategory",
-              select: "name category level",
-            },
           },
-        });
-      } else if (path === "reviews") {
-        query = query.populate({
-          path: "reviews",
-          select: safeFields.join(" "),
-          ...(safeFields.includes("user") && {
-            populate: {
-              path: "user",
-              select: "-password -role",
-            },
-          }),
-        });
-      } else {
-        query = query.populate({
-          path,
-          select: safeFields.join(" "),
-        });
-      }
+        },
+      });
+    } else if (path === "reviews") {
+      query = query.populate({
+        path: "reviews",
+        select: safe.join(" "),
+        ...(safe.includes("user") && {
+          populate: { path: "user", select: "-password -role" },
+        }),
+      });
+    } else {
+      query = query.populate({ path, select: safe.join(" ") });
     }
   }
 
-  // --- 5. Pagination ---
+  // --- 6. Pagination ---
   if (page && limit) {
     query = query.skip(skip).limit(limit);
   }
 
-  // --- 6. Execute query ---
+  // --- 7. Execute query and respond ---
   const [products, totalProducts] = await Promise.all([
     query.lean(),
-    Product.countDocuments(
-      categoryFilter ? { category: { $in: categoryFilter } } : {}
-    ),
+    Product.countDocuments(filters),
   ]);
 
   res.success(200, "Products fetched successfully", {

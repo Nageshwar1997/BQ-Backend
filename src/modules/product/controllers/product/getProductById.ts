@@ -6,7 +6,7 @@ import { isSafePopulateField } from "../../utils";
 import { isValidMongoId } from "../../../../utils";
 
 export const getProductByIdController = async (req: Request, res: Response) => {
-  const { populateFields = {} } = req.body ?? {};
+  const { populateFields = {} } = req.query ?? {};
   const { productId } = req.params;
 
   isValidMongoId(productId, "Invalid Product Id provided", 404);

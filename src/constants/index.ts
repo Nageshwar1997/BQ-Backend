@@ -1,3 +1,3 @@
 export * from "./file";
 export * from "./other";
-export * from "./zod";
+export * from "./regex";
