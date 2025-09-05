@@ -1,8 +1,9 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
-import { CartModule, CartProductModule } from "../..";
+import { CartModule } from "../..";
 import { AppError } from "../../../classes";
 import { isValidMongoId } from "../../../utils";
+import { CartProduct } from "../models";
 
 export const addProductToCartController = async (
   req: AuthenticatedRequest,
@@ -30,7 +31,7 @@ export const addProductToCartController = async (
   }
 
   // 2️ Check if cartProduct already exists
-  const existCartProduct = await CartProductModule.Models.CartProduct.findOne({
+  const existCartProduct = await CartProduct.findOne({
     cart: cart._id,
     product: productId,
     shade: shadeId ?? null,
@@ -41,7 +42,7 @@ export const addProductToCartController = async (
   }
 
   // 3️ Create new CartProduct
-  const cartProduct = await CartProductModule.Models.CartProduct.create({
+  const cartProduct = await CartProduct.create({
     cart: cart._id,
     product: productId,
     shade: shadeId ?? null,
