@@ -54,7 +54,13 @@ export const registerController = async (req: Request, res: Response) => {
     const token = generateToken(user._id);
 
     // create cart
-    await CartModule.Models.Cart.create({ user: user._id, products: [] });
+    const cart = new CartModule.Models.Cart({
+      user: user._id,
+      products: [],
+      charges: 0,
+    });
+
+    await cart.save();
 
     res.success(201, "User registered successfully", {
       token,
