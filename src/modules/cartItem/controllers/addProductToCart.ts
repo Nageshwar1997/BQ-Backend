@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
-import { CartModule } from "../..";
+import { CartModule, CartProductModule } from "../..";
 import { AppError } from "../../../classes";
 import { isValidMongoId } from "../../../utils";
 
@@ -13,16 +13,44 @@ export const addProductToCartController = async (
   const { shadeId } = req.query;
 
   if (!productId) {
-    throw new AppError("User or product information missing", 400);
+    throw new AppError("Product Id is required", 400);
   }
 
   isValidMongoId(productId, "Invalid Product Id provided", 404);
 
+  // 1️ Ensure cart exists (create if not)
   const cart = await CartModule.Models.Cart.findOneAndUpdate(
     { user: userId },
-    { $push: { products: { productId, shade: shadeId ?? null } } },
-    { new: true, upsert: true } // If cart not found, create a new one
+    { $setOnInsert: { user: userId, products: [], charges: 0 } },
+    { new: true, upsert: true }
   );
 
-  res.success(200, "Product added to cart successfully", { cart });
+  if (!cart) {
+    throw new AppError("Failed to create or fetch cart", 500);
+  }
+
+  // 2️ Check if cartProduct already exists
+  const existCartProduct = await CartProductModule.Models.CartProduct.findOne({
+    cart: cart._id,
+    product: productId,
+    shade: shadeId ?? null,
+  });
+
+  if (existCartProduct) {
+    throw new AppError("Product already exists in cart", 400);
+  }
+
+  // 3️ Create new CartProduct
+  const cartProduct = await CartProductModule.Models.CartProduct.create({
+    cart: cart._id,
+    product: productId,
+    shade: shadeId ?? null,
+    quantity: 1,
+  });
+
+  // 4️ Ensure CartProduct reference is in cart
+  cart.products.push(cartProduct._id);
+  await cart.save();
+
+  res.success(200, "Product added to cart successfully");
 };
