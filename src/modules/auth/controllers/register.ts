@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
 
 import { AppError } from "../../../classes";
-import { MediaModule, UserModule } from "../..";
+import { CartModule, MediaModule, UserModule } from "../..";
 import { generateToken } from "../services";
 
 export const registerController = async (req: Request, res: Response) => {
@@ -50,7 +50,11 @@ export const registerController = async (req: Request, res: Response) => {
       password: hashedPassword,
       profilePic,
     });
+
     const token = generateToken(user._id);
+
+    // create cart
+    await CartModule.Models.Cart.create({ user: user._id, products: [] });
 
     res.success(201, "User registered successfully", {
       token,
