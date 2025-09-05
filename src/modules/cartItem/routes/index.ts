@@ -5,9 +5,11 @@ import {
   ResponseMiddleware,
   ZodMiddleware,
 } from "../../../middlewares";
-import { addProductToCartController } from "../controllers";
+import {
+  addProductToCartController,
+  updateCartProductQuantityController,
+} from "../controllers";
 import { updateCartProductQuantityZodSchema } from "../validations";
-import { updateCartProductQuantityController } from "../controllers/updateCartProductQuantity";
 
 export const cartProductRouter = Router();
 
