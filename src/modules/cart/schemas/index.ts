@@ -9,7 +9,7 @@ export const cartSchema = new Schema<ICart>(
       required: true,
       unique: true,
     },
-    products: { type: [{ type: Schema.Types.ObjectId, ref: "CartItem" }] },
+    products: { type: [{ type: Schema.Types.ObjectId, ref: "Cart-Product" }] },
     charges: { type: Number, min: 0 },
   },
   { timestamps: true, versionKey: false }

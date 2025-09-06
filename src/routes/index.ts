@@ -31,9 +31,9 @@ router.use("/products", ProductModule.Routes.productRouter);
 router.use("/reviews", ReviewModule.Routes.reviewRouter);
 
 // Cart routes
-router.use("/cart", CartModule.Routes.cartRouter);
+router.use("/carts", CartModule.Routes.cartRouter);
 
 // Cart Product Routes
-router.use("/cart-product", CartProductModule.Routes.cartProductRouter);
+router.use("/cart-products", CartProductModule.Routes.cartProductRouter);
 
 export default router;
