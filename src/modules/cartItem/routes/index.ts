@@ -7,6 +7,7 @@ import {
 } from "../../../middlewares";
 import {
   addProductToCartController,
+  removeProductFromCartController,
   updateCartProductQuantityController,
 } from "../controllers";
 import { updateCartProductQuantityZodSchema } from "../validations";
@@ -25,4 +26,10 @@ cartProductRouter.patch(
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ZodMiddleware.validateZodSchema(updateCartProductQuantityZodSchema),
   ResponseMiddleware.catchAsync(updateCartProductQuantityController)
+);
+
+cartProductRouter.delete(
+  "/delete/:id",
+  AuthMiddleware.authenticated,
+  ResponseMiddleware.catchAsyncWithTransaction(removeProductFromCartController)
 );
