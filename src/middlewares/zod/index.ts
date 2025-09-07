@@ -25,6 +25,8 @@ export const validateZodSchema = (schema: ZodSchema) => {
       );
     }
 
+    console.log("REQ.BODY", req.body);
+
     const payload = {
       ...req.body,
       ...(req.file && { file: req.file }),
@@ -33,10 +35,12 @@ export const validateZodSchema = (schema: ZodSchema) => {
 
     const result = schema.safeParse(payload);
 
+    console.log("payload", payload);
+
     if (!result.success) {
       const errors = result.error?.errors;
 
-      console.log("errors", errors);
+      // console.log("errors", errors);
       // To make a zod error readable
       const errorMessage = errors
         .map(
