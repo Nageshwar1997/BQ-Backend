@@ -1,0 +1,35 @@
+import { Router } from "express";
+import {
+  AuthMiddleware,
+  RequestMiddleware,
+  ResponseMiddleware,
+  ZodMiddleware,
+} from "../../../middlewares";
+import {
+  addProductToCartController,
+  removeProductFromCartController,
+  updateCartProductQuantityController,
+} from "../controllers";
+import { updateCartProductQuantityZodSchema } from "../validations";
+
+export const cartProductRouter = Router();
+
+cartProductRouter.post(
+  "/add/:productId",
+  AuthMiddleware.authenticated,
+  ResponseMiddleware.catchAsyncWithTransaction(addProductToCartController)
+);
+
+cartProductRouter.patch(
+  "/update/:id",
+  AuthMiddleware.authenticated,
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  ZodMiddleware.validateZodSchema(updateCartProductQuantityZodSchema),
+  ResponseMiddleware.catchAsync(updateCartProductQuantityController)
+);
+
+cartProductRouter.delete(
+  "/remove/:id",
+  AuthMiddleware.authenticated,
+  ResponseMiddleware.catchAsyncWithTransaction(removeProductFromCartController)
+);

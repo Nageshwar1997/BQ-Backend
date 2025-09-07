@@ -2,6 +2,8 @@ import { Router } from "express";
 import {
   AuthModule,
   BlogModule,
+  CartModule,
+  CartProductModule,
   MediaModule,
   ProductModule,
   ReviewModule,
@@ -27,5 +29,11 @@ router.use("/products", ProductModule.Routes.productRouter);
 
 // Review routes
 router.use("/reviews", ReviewModule.Routes.reviewRouter);
+
+// Cart routes
+router.use("/carts", CartModule.Routes.cartRouter);
+
+// Cart Product Routes
+router.use("/cart-products", CartProductModule.Routes.cartProductRouter);
 
 export default router;
