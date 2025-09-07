@@ -16,12 +16,13 @@ export const getCartController = async (
       {
         path: "product", // Product Path
         model: "Product", // Product Model
-        select: "title brand originalPrice sellingPrice discount commonImages", // Required Product Fields
+        select:
+          "title brand originalPrice sellingPrice discount commonImages totalStock", // Required Product Fields
       },
       {
         path: "shade", // Shade Path
         model: "Shade", // Shade Model
-        select: "shadeName colorCode images", // Required Shade Fields
+        select: "shadeName colorCode images stock", // Required Shade Fields
       },
     ],
   });
