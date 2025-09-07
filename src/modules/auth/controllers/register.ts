@@ -50,7 +50,6 @@ export const registerController = async (req: Request, res: Response) => {
       password: hashedPassword,
       profilePic,
     });
-
     const token = generateToken(user._id);
 
     res.success(201, "User registered successfully", {
