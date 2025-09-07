@@ -12,7 +12,7 @@ export const updateCartProductQuantityController = async (
 
   isValidMongoId(id, "Invalid Cart Product Id provided", 404);
 
-  const { quantity } = req.body ?? {};
+  const { quantity = 1 } = req.body ?? {};
 
   const cartProduct = await CartProduct.findByIdAndUpdate(
     id,

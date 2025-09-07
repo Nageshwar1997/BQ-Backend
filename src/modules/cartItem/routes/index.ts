@@ -17,7 +17,7 @@ export const cartProductRouter = Router();
 cartProductRouter.post(
   "/add/:productId",
   AuthMiddleware.authenticated,
-  ResponseMiddleware.catchAsync(addProductToCartController)
+  ResponseMiddleware.catchAsyncWithTransaction(addProductToCartController)
 );
 
 cartProductRouter.patch(
@@ -29,7 +29,7 @@ cartProductRouter.patch(
 );
 
 cartProductRouter.delete(
-  "/delete/:id",
+  "/remove/:id",
   AuthMiddleware.authenticated,
   ResponseMiddleware.catchAsyncWithTransaction(removeProductFromCartController)
 );
