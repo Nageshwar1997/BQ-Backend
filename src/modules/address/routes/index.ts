@@ -8,9 +8,13 @@ import {
 
 export const addressRouter = Router();
 
+// Address Routes
+
 addressRouter.post(
   "/add",
   AuthMiddleware.authenticated,
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ResponseMiddleware.catchAsync(addAddressController)
 );
+
+// User Address Routes
