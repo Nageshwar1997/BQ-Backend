@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import { UserModule } from "../..";
-import { ADDRESS_TYPES } from "../constants";
+import { ADDRESS_TYPES, ALLOWED_COUNTRIES } from "../constants";
 
 export interface IAddress
   extends Pick<
@@ -13,8 +13,8 @@ export interface IAddress
   landmark?: string;
   city: string;
   state: string;
-  pinCode: number;
-  country: string;
+  pinCode: string;
+  country: (typeof ALLOWED_COUNTRIES)[number];
   gst?: string;
   type: (typeof ADDRESS_TYPES)[number];
 }

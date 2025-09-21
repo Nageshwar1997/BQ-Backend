@@ -4,7 +4,9 @@ import {
   AuthMiddleware,
   RequestMiddleware,
   ResponseMiddleware,
+  ZodMiddleware,
 } from "../../../middlewares";
+import { addAddressSchema } from "../validations";
 
 export const addressRouter = Router();
 
@@ -14,6 +16,7 @@ addressRouter.post(
   "/add",
   AuthMiddleware.authenticated,
   RequestMiddleware.checkEmptyRequest({ body: true }),
+  ZodMiddleware.validateZodSchema(addAddressSchema),
   ResponseMiddleware.catchAsync(addAddressController)
 );
 

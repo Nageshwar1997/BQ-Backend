@@ -8,7 +8,7 @@ export const addressSchema = new Schema<IAddress>(
     landmark: { type: String },
     city: { type: String, required: true },
     state: { type: String, required: true },
-    pinCode: { type: Number, required: true },
+    pinCode: { type: String, required: true, minlength: 6, maxlength: 6 },
     country: {
       type: String,
       required: true,
