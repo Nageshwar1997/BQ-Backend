@@ -4,33 +4,11 @@ import { AppError } from "../../classes";
 
 export const validateZodSchema = (schema: ZodSchema) => {
   return (req: Request, _: Response, next: NextFunction) => {
-    let filePayload: Record<
-      string,
-      Express.Multer.File | Express.Multer.File[]
-    > = {};
-
-    if (Array.isArray(req.files)) {
-      // Group files by fieldname
-      filePayload = req.files.reduce((acc, file) => {
-        if (!acc[file.fieldname]) {
-          acc[file.fieldname] = [];
-        }
-        (acc[file.fieldname] as Express.Multer.File[]).push(file);
-        return acc;
-      }, {} as Record<string, Express.Multer.File[]>);
-    } else {
-      // Multer's field-based object format
-      filePayload = Object.fromEntries(
-        Object.entries(req.files || {}).map(([key, value]) => [key, value])
-      );
-    }
-
     const result = schema.safeParse(req.body);
 
     if (!result.success) {
       const errors = result.error?.errors;
 
-      // console.log("errors", errors);
       // To make a zod error readable
       const errorMessage = errors
         .map(
