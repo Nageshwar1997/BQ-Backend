@@ -25,17 +25,7 @@ export const validateZodSchema = (schema: ZodSchema) => {
       );
     }
 
-    console.log("REQ.BODY", req.body);
-
-    const payload = {
-      ...req.body,
-      ...(req.file && { file: req.file }),
-      ...filePayload,
-    };
-
-    const result = schema.safeParse(payload);
-
-    console.log("payload", payload);
+    const result = schema.safeParse(req.body);
 
     if (!result.success) {
       const errors = result.error?.errors;
