@@ -34,7 +34,17 @@ export const addressSchema = new Schema<IAddress>(
 
 export const userAddressesSchema = new Schema<IUserAddresses>(
   {
-    addresses: { type: [{ type: Schema.Types.ObjectId, ref: "Address" }] },
+    addresses: {
+      type: [{ type: Schema.Types.ObjectId, ref: "Address" }],
+      default: [],
+      validate: {
+        validator: function (addresses) {
+          return addresses.length <= 5; // You can add max 5 addresses
+        },
+        message:
+          "You can add max 5 addresses only. Remove some addresses to add more.",
+      },
+    },
     defaultAddress: { type: Schema.Types.ObjectId, ref: "Address" },
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
