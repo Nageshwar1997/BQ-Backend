@@ -149,10 +149,7 @@ export const uploadProductController = async (
 
       const insertedShades = await Shade.insertMany(enrichedShades);
 
-      console.log("insertedShades", insertedShades);
       newShadeIds = insertedShades.map((shade) => shade._id);
-
-      console.log("newShadeIds", newShadeIds);
     }
   } catch (error) {
     removeImages([...uploadedCommonImages, ...uploadedAllShadesImages]);
