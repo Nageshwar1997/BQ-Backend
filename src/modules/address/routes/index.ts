@@ -9,6 +9,7 @@ import { addAddressSchema, updateAddressSchema } from "../validations";
 import {
   addAddressController,
   getUserAddressesController,
+  removeAddressController,
   updateAddressController,
 } from "../controllers";
 
@@ -25,9 +26,16 @@ addressRouter.post(
 addressRouter.patch(
   "/update/:addressId",
   AuthMiddleware.authenticated,
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  RequestMiddleware.checkEmptyRequest({ body: true, params: true }),
   ZodMiddleware.validateZodSchema(updateAddressSchema),
   ResponseMiddleware.catchAsyncWithTransaction(updateAddressController)
+);
+
+addressRouter.delete(
+  "/remove/:addressId",
+  AuthMiddleware.authenticated,
+  RequestMiddleware.checkEmptyRequest({ params: true }),
+  ResponseMiddleware.catchAsyncWithTransaction(removeAddressController)
 );
 
 // User Address Routes
