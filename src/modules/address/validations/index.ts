@@ -127,3 +127,5 @@ export const addAddressSchema = z.object({
     .default(false)
     .optional(),
 });
+
+export const updateAddressSchema = addAddressSchema.partial();
