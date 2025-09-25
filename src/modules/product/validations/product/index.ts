@@ -83,10 +83,12 @@ export const updateProductZodSchema = z.object({
       validateZodString({
         field: "removingCommonImageURLs[some_index]",
         blockSingleSpace: true,
-        customRegex: {
-          regex: /^(https?:\/\/)[^\s/$.?#].[^\s]*$/,
-          message: "Invalid URL",
-        },
+        customRegexes: [
+          {
+            regex: /^(https?:\/\/)[^\s/$.?#].[^\s]*$/,
+            message: "Invalid URL",
+          },
+        ],
       })
     )
     .optional(),
@@ -94,7 +96,7 @@ export const updateProductZodSchema = z.object({
     .array(
       validateZodString({
         field: "_id",
-        parentField: "removingCommonImageURLs[some_index]",
+        parentField: "removingShades[some_index]",
         blockSingleSpace: true,
       })
     )
@@ -104,13 +106,13 @@ export const updateProductZodSchema = z.object({
       z.object({
         _id: validateZodString({
           field: "_id",
-          parentField: "removingShades[some_index]",
+          parentField: "removingShadeImageUrls[some_index]",
           blockSingleSpace: true,
         }),
         urls: z.array(
           validateZodString({
             field: "urls",
-            parentField: "removingShades[some_index]",
+            parentField: "removingShadeImageUrls[some_index]",
             blockSingleSpace: true,
           })
         ),

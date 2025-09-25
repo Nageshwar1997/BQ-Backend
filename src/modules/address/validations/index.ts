@@ -26,10 +26,12 @@ export const addAddressSchema = z.object({
     blockSingleSpace: true,
     min: 15,
     max: 15,
-    customRegex: {
-      regex: regexes.validGST,
-      message: "Please provide a valid GST number",
-    },
+    customRegexes: [
+      {
+        regex: regexes.validGST,
+        message: "Please provide a valid GST number",
+      },
+    ],
     isOptional: true,
     nonEmpty: false,
   }),
@@ -38,10 +40,12 @@ export const addAddressSchema = z.object({
     min: 6,
     max: 6,
     blockSingleSpace: true,
-    customRegex: {
-      regex: regexes.validPinCode,
-      message: "Please provide a valid Pin Code",
-    },
+    customRegexes: [
+      {
+        regex: regexes.validPinCode,
+        message: "Please provide a valid Pin Code",
+      },
+    ],
   }),
   state: validateZodString({
     field: "state",
@@ -69,41 +73,50 @@ export const addAddressSchema = z.object({
     blockMultipleSpaces: true,
     min: 2,
     max: 50,
-    customRegex: {
-      regex: regexes.validName,
-      message:
-        "can only contain letters and only one space is allowed between words",
-    },
+    customRegexes: [
+      {
+        regex: regexes.validName,
+        message:
+          "can only contain letters and only one space is allowed between words",
+      },
+    ],
   }),
   lastName: validateZodString({
     field: "lastName",
     blockMultipleSpaces: true,
     min: 2,
     max: 50,
-    customRegex: {
-      regex: regexes.validName,
-      message:
-        "can only contain letters and only one space is allowed between words",
-    },
+    customRegexes: [
+      {
+        regex: regexes.validName,
+        message:
+          "can only contain letters and only one space is allowed between words",
+      },
+    ],
   }),
   email: validateZodString({
     field: "email",
     blockSingleSpace: true,
-    customRegex: {
-      regex: regexes.validEmail,
-      message: "please provide a valid email address, like example@domain.com",
-    },
+    customRegexes: [
+      {
+        regex: regexes.validEmail,
+        message:
+          "please provide a valid email address, like example@domain.com",
+      },
+    ],
   }),
   phoneNumber: validateZodString({
     field: "phoneNumber",
     blockSingleSpace: true,
     min: 10,
     max: 10,
-    customRegex: {
-      regex: regexes.validPhone,
-      message:
-        "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
-    },
+    customRegexes: [
+      {
+        regex: regexes.validPhone,
+        message:
+          "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
+      },
+    ],
   }),
   altPhoneNumber: validateZodString({
     field: "altPhoneNumber",
@@ -112,11 +125,13 @@ export const addAddressSchema = z.object({
     nonEmpty: false,
     min: 10,
     max: 10,
-    customRegex: {
-      regex: regexes.validPhone,
-      message:
-        "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
-    },
+    customRegexes: [
+      {
+        regex: regexes.validPhone,
+        message:
+          "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
+      },
+    ],
   }),
   isDefaultAddress: z.coerce
     .boolean({
