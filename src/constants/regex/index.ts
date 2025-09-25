@@ -9,6 +9,7 @@ type RegexKeys =
   | "validHexColorCode"
   | "escapeSpecialChars"
   | "validGST"
+  | "validUrl"
   | "validPinCode";
 
 export const regexes: Record<RegexKeys, RegExp> = {
@@ -27,4 +28,5 @@ export const regexes: Record<RegexKeys, RegExp> = {
   escapeSpecialChars: /[.*+?^${}()|[\]\\]/g,
   validGST: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i,
   validPinCode: /^[1-9][0-9]{5}$/,
+  validUrl: /^(https?:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/,
 };
