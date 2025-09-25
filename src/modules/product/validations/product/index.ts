@@ -3,7 +3,7 @@ import { validateProductField } from "../../utils";
 import { createCategoryZodSchema } from "../category";
 import { addShadesZodSchema } from "../shade";
 import { TProductFieldOnly, ValidateProductFieldConfigs } from "../../types";
-import { validateZodString } from "../../../../utils";
+import { validateZodString, validateZodUrl } from "../../../../utils";
 
 const common: Record<
   "text" | "optional" | "number",
@@ -80,15 +80,9 @@ export const updateProductZodSchema = z.object({
   }).optional(),
   removingCommonImageURLs: z
     .array(
-      validateZodString({
-        field: "removingCommonImageURLs[some_index]",
-        blockSingleSpace: true,
-        customRegexes: [
-          {
-            regex: /^(https?:\/\/)[^\s/$.?#].[^\s]*$/,
-            message: "Invalid URL",
-          },
-        ],
+      validateZodUrl({
+        field: "urls",
+        parentField: "removingCommonImageURLs[some_index]",
       })
     )
     .optional(),
@@ -110,14 +104,20 @@ export const updateProductZodSchema = z.object({
           blockSingleSpace: true,
         }),
         urls: z.array(
-          validateZodString({
+          validateZodUrl({
             field: "urls",
             parentField: "removingShadeImageUrls[some_index]",
-            blockSingleSpace: true,
           })
         ),
       })
     )
     .optional(),
-  removedQuillImageURLs: z.array(z.string()).optional(),
+  removedQuillImageURLs: z
+    .array(
+      validateZodUrl({
+        field: "url",
+        parentField: "removedQuillImageURLs[some_index]",
+      })
+    )
+    .optional(),
 });
