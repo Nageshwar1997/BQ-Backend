@@ -11,6 +11,7 @@ import {
 import {
   AuthMiddleware,
   MulterMiddleware,
+  RequestMiddleware,
   ResponseMiddleware,
 } from "../../../middlewares";
 
@@ -25,6 +26,7 @@ mediaRouter.post(
     type: "single",
     fieldName: "image",
   }),
+  RequestMiddleware.checkEmptyRequest({ file: true, fileOrBody: true }),
   ResponseMiddleware.catchAsync(uploadSingleImageController)
 );
 
@@ -37,12 +39,14 @@ mediaRouter.post(
     fieldName: "images",
     maxCount: 10,
   }),
+  RequestMiddleware.checkEmptyRequest({ files: true, filesOrBody: true }),
   ResponseMiddleware.catchAsync(uploadMultipleImagesController)
 );
 
 // For Single Image Remove
 mediaRouter.delete(
   "/image/delete",
+  RequestMiddleware.checkEmptyRequest({ body: true }),
   AuthMiddleware.authorization(["MASTER", "ADMIN", "SELLER"]),
   ResponseMiddleware.catchAsync(removeSingleImageController)
 );
@@ -50,6 +54,7 @@ mediaRouter.delete(
 // For Multiple Images Remove
 mediaRouter.delete(
   "/images/delete",
+  RequestMiddleware.checkEmptyRequest({ body: true }),
   AuthMiddleware.authorization(["MASTER", "ADMIN", "SELLER"]),
   ResponseMiddleware.catchAsync(removeMultipleImagesController)
 );

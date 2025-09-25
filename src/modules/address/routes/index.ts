@@ -15,17 +15,17 @@ import {
 
 export const addressRouter = Router();
 
+addressRouter.use(AuthMiddleware.authenticated);
+
 // Address Routes
 addressRouter.post(
   "/add",
-  AuthMiddleware.authenticated,
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ZodMiddleware.validateZodSchema(addAddressSchema),
   ResponseMiddleware.catchAsyncWithTransaction(addAddressController)
 );
 addressRouter.patch(
   "/update/:addressId",
-  AuthMiddleware.authenticated,
   RequestMiddleware.checkEmptyRequest({ body: true, params: true }),
   ZodMiddleware.validateZodSchema(updateAddressSchema),
   ResponseMiddleware.catchAsyncWithTransaction(updateAddressController)
@@ -33,7 +33,6 @@ addressRouter.patch(
 
 addressRouter.delete(
   "/remove/:addressId",
-  AuthMiddleware.authenticated,
   RequestMiddleware.checkEmptyRequest({ params: true }),
   ResponseMiddleware.catchAsyncWithTransaction(removeAddressController)
 );
@@ -41,6 +40,5 @@ addressRouter.delete(
 // User Address Routes
 addressRouter.get(
   "/",
-  AuthMiddleware.authenticated,
   ResponseMiddleware.catchAsync(getUserAddressesController)
 );

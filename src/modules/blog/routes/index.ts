@@ -25,6 +25,7 @@ blogRouter.get("/all", ResponseMiddleware.catchAsync(getAllBlogsController));
 // Get Blog By Id Route
 blogRouter.get(
   "/blog/:id",
+  RequestMiddleware.checkEmptyRequest({ params: true }),
   ResponseMiddleware.catchAsync(getBlogByIdController)
 );
 
@@ -56,6 +57,7 @@ blogRouter.patch(
       maxCount: 1,
     })),
   }),
+  RequestMiddleware.checkEmptyRequest({ fileOrBody: true, params: true }),
   ZodMiddleware.validateZodSchema(editBlogZodSchema),
   ResponseMiddleware.catchAsync(editBlogController)
 );

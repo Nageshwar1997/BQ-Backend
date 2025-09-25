@@ -14,22 +14,23 @@ import { updateCartProductQuantityZodSchema } from "../validations";
 
 export const cartProductRouter = Router();
 
+cartProductRouter.use(AuthMiddleware.authenticated);
+
 cartProductRouter.post(
   "/add/:productId",
-  AuthMiddleware.authenticated,
+  RequestMiddleware.checkEmptyRequest({ params: true }),
   ResponseMiddleware.catchAsyncWithTransaction(addProductToCartController)
 );
 
 cartProductRouter.patch(
   "/update/:id",
-  AuthMiddleware.authenticated,
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  RequestMiddleware.checkEmptyRequest({ body: true, params: true }),
   ZodMiddleware.validateZodSchema(updateCartProductQuantityZodSchema),
   ResponseMiddleware.catchAsync(updateCartProductQuantityController)
 );
 
 cartProductRouter.delete(
   "/remove/:id",
-  AuthMiddleware.authenticated,
+  RequestMiddleware.checkEmptyRequest({ params: true }),
   ResponseMiddleware.catchAsyncWithTransaction(removeProductFromCartController)
 );

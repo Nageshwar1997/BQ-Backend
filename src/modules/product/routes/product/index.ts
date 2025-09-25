@@ -42,6 +42,7 @@ productRouter.get(
 
 productRouter.get(
   "/product/:productId",
+  RequestMiddleware.checkEmptyRequest({ params: true }),
   ResponseMiddleware.catchAsync(getProductByIdController)
 );
 
@@ -59,6 +60,7 @@ productRouter.patch(
 
 productRouter.delete(
   "/product/delete/:productId",
+  RequestMiddleware.checkEmptyRequest({ params: true }),
   AuthMiddleware.authorization(["ADMIN", "MASTER", "SELLER"]),
   ResponseMiddleware.catchAsync(deleteProductController)
 );
