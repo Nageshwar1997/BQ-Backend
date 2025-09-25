@@ -39,7 +39,7 @@ mediaRouter.post(
     fieldName: "images",
     maxCount: 10,
   }),
-  RequestMiddleware.checkEmptyRequest({ files: true, filesOrBody: true }),
+  RequestMiddleware.checkEmptyRequest({ files: true, body: true }),
   ResponseMiddleware.catchAsync(uploadMultipleImagesController)
 );
 
