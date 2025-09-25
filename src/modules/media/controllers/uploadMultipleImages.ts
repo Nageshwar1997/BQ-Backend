@@ -8,34 +8,18 @@ export const uploadMultipleImagesController = async (
   req: Request,
   res: Response
 ) => {
-  if (!req.files || !(req.files instanceof Array)) {
-    throw new AppError("No files uploaded", 400);
-  }
-
-  const cloudinaryConfigOption = req.body?.cloudinaryConfigOption;
-
-  if (
-    !cloudinaryConfigOption ||
-    !allowedOptions.includes(cloudinaryConfigOption)
-  ) {
-    throw new AppError(
-      `Invalid cloudinary config option. Allowed options are "image", "video", or "product".`,
-      400
-    );
-  }
+  const { cloudinaryConfigOption, folderName } = req.body;
 
   const files = req.files as Express.Multer.File[];
 
   const uploadPromises = files.map(async (file) => {
     const result = await singleImageUploader({
       file,
-      folder: req?.body?.folderName,
+      folder: folderName,
       cloudinaryConfigOption,
     });
 
-    return {
-      cloudUrl: result.secure_url,
-    };
+    return { cloudUrl: result.secure_url };
   });
 
   const uploadedImages = await Promise.all(uploadPromises);
