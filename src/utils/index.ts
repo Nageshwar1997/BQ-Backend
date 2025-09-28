@@ -188,7 +188,7 @@ export const validateZodEnums = (
 ) => {
   return z.enum([props.enums[0], ...props.enums.slice(1)], {
     errorMap: () => ({
-      message: `Invalid option. Must be '${props.enums.join("'/'")}'.`,
+      message: `Invalid option. Must be '${props.enums.join(", ")}'.`,
     }),
   });
 };
