@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { validateZodString } from "../../../utils";
+import { validateZodEnums, validateZodString } from "../../../utils";
 import { regexes } from "../../../constants";
 import { ADDRESS_TYPES, ALLOWED_COUNTRIES } from "../constants";
 
@@ -52,22 +52,14 @@ export const addAddressSchema = z.object({
     blockMultipleSpaces: true,
     min: 2,
   }),
-  country: z
-    .enum(ALLOWED_COUNTRIES, {
-      errorMap: () => ({
-        message: `Invalid country. Must be '${ALLOWED_COUNTRIES.join("'/'")}'.`,
-      }),
-    })
-    .default("India"),
-  type: z
-    .enum(ADDRESS_TYPES, {
-      errorMap: () => ({
-        message: `Invalid address type. Must be '${ADDRESS_TYPES.join(
-          "'/'"
-        )}'.`,
-      }),
-    })
-    .default("both"),
+  country: validateZodEnums({
+    field: "country",
+    enums: ALLOWED_COUNTRIES,
+  }).default("India"),
+  type: validateZodEnums({
+    field: "type",
+    enums: ADDRESS_TYPES,
+  }).default("both"),
   firstName: validateZodString({
     field: "firstName",
     blockMultipleSpaces: true,
