@@ -18,7 +18,7 @@ export const validateZodSchema = (schema: ZodSchema) => {
         .join(" ");
       return next(new AppError(errorMessage, 400));
     }
-    req.body = { ...result.data };
+    req.body = result.data;
     next();
   };
 };
