@@ -34,10 +34,12 @@ export const addShadesZodSchema = ({
         min: 4,
         max: 9,
         isOptional: true,
-        customRegex: {
-          regex: regexes.validHexColorCode,
-          message: "Color code must be a valid hex color code.",
-        },
+        customRegexes: [
+          {
+            regex: regexes.validHexColorCode,
+            message: "Color code must be a valid hex color code.",
+          },
+        ],
       }),
       stock: validateProductField({
         field: "stock",

@@ -8,24 +8,19 @@ import { isSafePopulateField } from "../../product/utils";
 import { REVIEW_POPULATE_FIELDS } from "../constants";
 import { ReviewPopulateFieldsProps, ReviewProps } from "../types";
 
-type ReviewDoc = ReviewProps & Document;
-
 export const getReviewsByProductIdController = async (
   req: Request,
   res: Response
 ) => {
   const { productId } = req.params;
 
-  if (!productId) {
-    throw new AppError("Product Id is required", 400);
-  }
-
   isValidMongoId(productId, "Invalid Product Id provided", 404);
 
   const { sortBy = "most-recent", populateFields = {} } = req.query ?? {};
   const page = Number(req.query.page);
   const limit = Number(req.query.limit);
-  const skip = page && limit ? (page - 1) * limit : 0;
+  const hasPagination = page && limit;
+  const skip = hasPagination ? (page - 1) * limit : 0;
 
   const filters: FilterQuery<ReviewProps> = {
     product: new Types.ObjectId(productId),
@@ -62,13 +57,13 @@ export const getReviewsByProductIdController = async (
       sortOptions = { updatedAt: -1 };
   }
 
-  let query: Query<ReviewDoc[], ReviewDoc> = Review.find(filters);
+  let query = Review.find(filters);
 
   // Apply DB sorting for normal cases
   if (sortBy !== "most-liked" && sortBy !== "most-disliked") {
     query = query.sort(sortOptions);
-    if (page && limit) {
-      query = query.skip((page - 1) * limit).limit(limit);
+    if (hasPagination) {
+      query = query.skip(skip).limit(limit);
     }
   }
 
@@ -107,20 +102,16 @@ export const getReviewsByProductIdController = async (
 
   // Apply pagination for in-memory sorting
   if (sortBy === "most-liked" || sortBy === "most-disliked") {
-    reviews = reviews.slice((page - 1) * limit, page * limit);
+    reviews = reviews.slice(skip, page * limit);
   }
 
   // Get total count for pagination metadata
-  let total: number | undefined;
-
-  if (page && limit) {
-    total = await Review.countDocuments(filters);
-  }
+  let total = await Review.countDocuments(filters);
 
   res.success(200, "Reviews fetched successfully", {
     reviews,
     totalReviews: total ?? reviews.length,
-    currentPage: page || 1,
-    totalPages: total ? Math.ceil(total / limit) : 1,
+    currentPage: hasPagination ? page : 1,
+    totalPages: hasPagination ? Math.ceil(total / limit) : 1,
   });
 };

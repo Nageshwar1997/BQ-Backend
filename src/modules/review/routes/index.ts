@@ -31,7 +31,7 @@ reviewRouter.post(
       { name: "videos", maxCount: 5 },
     ],
   }),
-  RequestMiddleware.checkEmptyRequest({ body: true, files: false }),
+  RequestMiddleware.checkEmptyRequest({ body: true }),
   AuthMiddleware.authenticated,
   ZodMiddleware.validateZodSchema(createReviewZodSchema),
   ResponseMiddleware.catchAsync(createReviewController)
@@ -57,7 +57,7 @@ reviewRouter.patch(
 
 reviewRouter.patch(
   "/:reviewId",
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  RequestMiddleware.checkEmptyRequest({ body: true, params: true }),
   AuthMiddleware.authenticated,
   ZodMiddleware.validateZodSchema(updateLikeDislikeHelpfulSchema),
   ResponseMiddleware.catchAsync(likeDislikeHelpfulController)

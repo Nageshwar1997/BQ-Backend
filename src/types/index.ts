@@ -76,10 +76,10 @@ export interface ZodStringConfigs extends ZodCommonConfigs, ZodCompareConfigs {
   blockMultipleSpaces?: boolean;
   blockSingleSpace?: boolean;
   nonEmpty?: boolean;
-  customRegex?: {
+  customRegexes?: {
     regex: RegExp;
     message: string | number;
-  };
+  }[];
 }
 
 export interface ZodNumberConfigs extends ZodCommonConfigs, ZodCompareConfigs {

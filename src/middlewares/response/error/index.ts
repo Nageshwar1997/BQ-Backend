@@ -38,16 +38,36 @@ export const error = (
   res: Response,
   __: NextFunction
 ): void => {
-  const error =
-    err instanceof AppError
-      ? err
-      : new AppError(
-          NODE_ENV === "development"
-            ? err.message ?? "Internal Server Error!"
-            : "Internal Server Error!",
-          500,
-          false
-        );
+  let error: AppError;
+
+  if (err instanceof MongooseError.ValidationError) {
+    const entries = Object.entries(err.errors);
+
+    let joinedMessage: string;
+
+    if (entries.length === 1) {
+      const [field, errorObj] = entries[0];
+      joinedMessage = `${field}: ${errorObj.message}`;
+    } else {
+      joinedMessage = entries
+        .map(
+          ([field, errorObj], idx) =>
+            `${idx + 1}. ${field}: ${errorObj.message}`
+        )
+        .join("\n");
+    }
+    error = new AppError(joinedMessage, 400, true);
+  } else if (err instanceof AppError) {
+    error = err;
+  } else {
+    error = new AppError(
+      NODE_ENV === "development"
+        ? err.message ?? "Internal Server Error!"
+        : "Internal Server Error!",
+      500,
+      false
+    );
+  }
 
   error.statusCode ||= 500;
   error.isOperational ??= false;

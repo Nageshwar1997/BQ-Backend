@@ -3,7 +3,7 @@ import { validateProductField } from "../../utils";
 import { createCategoryZodSchema } from "../category";
 import { addShadesZodSchema } from "../shade";
 import { TProductFieldOnly, ValidateProductFieldConfigs } from "../../types";
-import { validateZodString } from "../../../../utils";
+import { validateZodString, validateZodUrl } from "../../../../utils";
 
 const common: Record<
   "text" | "optional" | "number",
@@ -80,13 +80,9 @@ export const updateProductZodSchema = z.object({
   }).optional(),
   removingCommonImageURLs: z
     .array(
-      validateZodString({
-        field: "removingCommonImageURLs[some_index]",
-        blockSingleSpace: true,
-        customRegex: {
-          regex: /^(https?:\/\/)[^\s/$.?#].[^\s]*$/,
-          message: "Invalid URL",
-        },
+      validateZodUrl({
+        field: "urls",
+        parentField: "removingCommonImageURLs[some_index]",
       })
     )
     .optional(),
@@ -94,7 +90,7 @@ export const updateProductZodSchema = z.object({
     .array(
       validateZodString({
         field: "_id",
-        parentField: "removingCommonImageURLs[some_index]",
+        parentField: "removingShades[some_index]",
         blockSingleSpace: true,
       })
     )
@@ -104,18 +100,24 @@ export const updateProductZodSchema = z.object({
       z.object({
         _id: validateZodString({
           field: "_id",
-          parentField: "removingShades[some_index]",
+          parentField: "removingShadeImageUrls[some_index]",
           blockSingleSpace: true,
         }),
         urls: z.array(
-          validateZodString({
+          validateZodUrl({
             field: "urls",
-            parentField: "removingShades[some_index]",
-            blockSingleSpace: true,
+            parentField: "removingShadeImageUrls[some_index]",
           })
         ),
       })
     )
     .optional(),
-  removedQuillImageURLs: z.array(z.string()).optional(),
+  removedQuillImageURLs: z
+    .array(
+      validateZodUrl({
+        field: "url",
+        parentField: "removedQuillImageURLs[some_index]",
+      })
+    )
+    .optional(),
 });

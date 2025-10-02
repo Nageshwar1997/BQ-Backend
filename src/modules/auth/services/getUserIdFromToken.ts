@@ -10,7 +10,7 @@ export const getUserIdFromToken = (req: Request) => {
     const token = req.get("Authorization");
 
     if (!token) {
-      throw new AppError("Token not found, please login", 401);
+      throw new AppError("You are not authenticated, please login", 401);
     }
 
     const tokenWithoutBearer = token.startsWith("Bearer ")

@@ -8,25 +8,12 @@ export const uploadSingleImageController = async (
   req: Request,
   res: Response
 ) => {
-  const cloudinaryConfigOption = req.body.cloudinaryConfigOption;
-
-  if (
-    !cloudinaryConfigOption ||
-    !allowedOptions.includes(cloudinaryConfigOption)
-  ) {
-    throw new AppError(
-      `Invalid cloudinary config option. Allowed options are "image", "video", or "product".`,
-      400
-    );
-  }
-
-  if (!req.file) {
-    throw new AppError("Image file is required", 404);
-  }
+  const { cloudinaryConfigOption, folderName } = req.body;
+  const file = req.file as Express.Multer.File;
 
   const result = await singleImageUploader({
-    file: req.file,
-    folder: req?.body?.folderName,
+    file,
+    folder: folderName,
     cloudinaryConfigOption,
   });
 

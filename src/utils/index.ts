@@ -7,6 +7,7 @@ import {
   ZodDateConfigs,
   ZodNumberConfigs,
   ZodStringConfigs,
+  ZodCommonConfigs,
 } from "../types";
 import { AppError } from "../classes";
 import { regexes } from "../constants";
@@ -115,7 +116,7 @@ export const validateZodString = ({
   blockSingleSpace,
   blockMultipleSpaces,
   parentField,
-  customRegex,
+  customRegexes,
   isOptional = false,
 }: ZodStringConfigs) => {
   const nestedField = parentField
@@ -130,9 +131,10 @@ export const validateZodString = ({
     max: `The '${nestedField}' field must not exceed ${max} characters.`,
     multiple_spaces: `The '${nestedField}' field must not contain multiple consecutive spaces.`,
     single_space: `The '${nestedField}' field must not contain any spaces.`,
-    custom: customRegex?.message
-      ? `The '${nestedField}' field ${customRegex?.message}.`
-      : `The '${nestedField}' field does not match the required format.`,
+    custom: (msg: string | number) =>
+      msg
+        ? `The '${nestedField}' field ${msg}.`
+        : `The '${nestedField}' field does not match the required format.`,
   };
 
   let schema = z
@@ -162,11 +164,33 @@ export const validateZodString = ({
     schema = schema.regex(regexes.noSpace, messages.single_space);
   }
 
-  if (customRegex && customRegex.regex) {
-    schema = schema.regex(customRegex.regex, messages.custom);
+  if (customRegexes?.length) {
+    customRegexes.forEach(({ regex, message }) => {
+      schema = schema.regex(regex, `${messages.custom(message)}`);
+    });
   }
 
   return isOptional ? schema.optional() : schema;
+};
+
+export const validateZodUrl = ({ ...props }: ZodCommonConfigs) => {
+  return validateZodString({
+    ...props,
+    blockSingleSpace: true,
+    customRegexes: [
+      { regex: regexes.validUrl, message: "must be a valid URL" },
+    ],
+  });
+};
+
+export const validateZodEnums = (
+  props: ZodCommonConfigs & { enums: string[] }
+) => {
+  return z.enum([props.enums[0], ...props.enums.slice(1)], {
+    errorMap: () => ({
+      message: `Invalid option. Must be '${props.enums.join(", ")}'.`,
+    }),
+  });
 };
 
 export const validateZodNumber = ({

@@ -12,16 +12,21 @@ export const getAllHomeVideosController = async (
   const limit = Number(req.query.limit);
   const skip = (page - 1) * limit;
 
-  const videos = await HomeVideo.find()
-    .skip(page && limit ? skip : 0)
-    .limit(page && limit ? limit : 0)
-    .lean();
+  const query = HomeVideo.find();
+
+  if (page && limit) {
+    query.skip(skip);
+    query.limit(limit);
+  }
+
+  const [videos, totalVideos] = await Promise.all([
+    query.lean(),
+    HomeVideo.countDocuments(),
+  ]);
 
   if (!videos) {
     throw new AppError("Videos not found", 404);
   }
-
-  const totalVideos = await HomeVideo.countDocuments();
 
   res.success(200, "Videos retrieved successfully", {
     videos,

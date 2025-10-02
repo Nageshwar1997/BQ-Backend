@@ -15,7 +15,7 @@ export const authRouter = Router();
 authRouter.post(
   "/register",
   MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
-  RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
+  RequestMiddleware.checkEmptyRequest({ filesOrBody: true, body: true }),
   ZodMiddleware.validateZodSchema(registerZodSchema),
   ResponseMiddleware.catchAsync(registerController)
 );
@@ -23,7 +23,7 @@ authRouter.post(
 // Login Route
 authRouter.post(
   "/login",
-  RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
+  RequestMiddleware.checkEmptyRequest({ body: true }),
   ZodMiddleware.validateZodSchema(loginZodSchema),
   ResponseMiddleware.catchAsync(loginController)
 );

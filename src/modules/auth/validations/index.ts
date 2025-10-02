@@ -47,19 +47,19 @@ const loginFieldValidations: Record<
     isOptional: true,
     nonEmpty: false,
     blockSingleSpace: true,
-    customRegex: customRegexes.email,
+    customRegexes: [customRegexes.email],
   },
   phoneNumber: {
     ...common.phone,
     isOptional: true,
     nonEmpty: false,
     field: "phoneNumber",
-    customRegex: customRegexes.phoneNumber,
+    customRegexes: [customRegexes.phoneNumber],
   },
   password: {
     ...common.password,
     field: "password",
-    customRegex: customRegexes.password,
+    customRegexes: [customRegexes.password],
   },
 };
 
@@ -77,17 +77,17 @@ const registerFieldValidations: Record<
   firstName: {
     ...common.text,
     field: "firstName",
-    customRegex: customRegexes.name,
+    customRegexes: [customRegexes.name],
   },
   lastName: {
     ...common.text,
     field: "lastName",
-    customRegex: customRegexes.name,
+    customRegexes: [customRegexes.name],
   },
   confirmPassword: {
     ...common.password,
     field: "confirmPassword",
-    customRegex: customRegexes.password,
+    customRegexes: [customRegexes.password],
   },
 };
 

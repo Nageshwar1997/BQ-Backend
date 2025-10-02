@@ -11,8 +11,16 @@ import {
 import {
   AuthMiddleware,
   MulterMiddleware,
+  RequestMiddleware,
   ResponseMiddleware,
+  ZodMiddleware,
 } from "../../../middlewares";
+import {
+  removeMultipleImagesZodSchema,
+  removeSingleImageZodSchema,
+  uploadHomeVideoZodSchema,
+  uploadImageZodSchema,
+} from "../validations";
 
 export const mediaRouter = Router();
 
@@ -25,6 +33,8 @@ mediaRouter.post(
     type: "single",
     fieldName: "image",
   }),
+  RequestMiddleware.checkEmptyRequest({ file: true, fileOrBody: true }),
+  ZodMiddleware.validateZodSchema(uploadImageZodSchema),
   ResponseMiddleware.catchAsync(uploadSingleImageController)
 );
 
@@ -37,20 +47,26 @@ mediaRouter.post(
     fieldName: "images",
     maxCount: 10,
   }),
+  RequestMiddleware.checkEmptyRequest({ files: true, body: true }),
+  ZodMiddleware.validateZodSchema(uploadImageZodSchema),
   ResponseMiddleware.catchAsync(uploadMultipleImagesController)
 );
 
 // For Single Image Remove
 mediaRouter.delete(
   "/image/delete",
+  RequestMiddleware.checkEmptyRequest({ body: true }),
   AuthMiddleware.authorization(["MASTER", "ADMIN", "SELLER"]),
+  ZodMiddleware.validateZodSchema(removeSingleImageZodSchema),
   ResponseMiddleware.catchAsync(removeSingleImageController)
 );
 
 // For Multiple Images Remove
 mediaRouter.delete(
   "/images/delete",
+  RequestMiddleware.checkEmptyRequest({ body: true }),
   AuthMiddleware.authorization(["MASTER", "ADMIN", "SELLER"]),
+  ZodMiddleware.validateZodSchema(removeMultipleImagesZodSchema),
   ResponseMiddleware.catchAsync(removeMultipleImagesController)
 );
 
@@ -63,6 +79,7 @@ mediaRouter.post(
     type: "fields",
     fieldsConfig: ["video", "poster"].map((name) => ({ name, maxCount: 1 })),
   }),
+  ZodMiddleware.validateZodSchema(uploadHomeVideoZodSchema),
   ResponseMiddleware.catchAsync(uploadHomeVideoController)
 );
 
