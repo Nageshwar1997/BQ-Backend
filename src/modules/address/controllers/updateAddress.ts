@@ -30,6 +30,7 @@ export const updateAddressController = async (
           Pick<IAddress, "altPhoneNumber" | "gst" | "landmark">
         >
       ) => {
+        // if the optional fields removed then make them empty
         updateBody[field] = "";
       }
     );
