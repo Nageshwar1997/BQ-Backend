@@ -4,6 +4,7 @@ import { Address, UserAddress } from "../models";
 import { AppError } from "../../../classes";
 import { ClientSession } from "mongoose";
 import { isValidMongoId } from "../../../utils";
+import { IAddress } from "../types";
 
 export const updateAddressController = async (
   req: AuthenticatedRequest,
@@ -16,11 +17,27 @@ export const updateAddressController = async (
 
   isValidMongoId(addressId, "Invalid Address Id provided", 404);
 
-  const { isDefaultAddress, ...restBody } = req.body ?? {};
+  const { isDefaultAddress, removedOptionalFields, ...restBody } =
+    req.body ?? {};
+
+  console.log("removedOptionalFields C", removedOptionalFields);
+  const updateBody = { ...restBody };
+
+  if (removedOptionalFields?.length) {
+    removedOptionalFields.forEach(
+      (
+        field: keyof Partial<
+          Pick<IAddress, "altPhoneNumber" | "gst" | "landmark">
+        >
+      ) => {
+        updateBody[field] = "";
+      }
+    );
+  }
 
   const updatedAddress = await Address.findOneAndUpdate(
     { _id: addressId, user: userId },
-    { $set: { ...restBody } },
+    { $set: updateBody },
     { new: true, session }
   );
 
