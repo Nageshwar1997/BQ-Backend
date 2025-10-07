@@ -1,5 +1,6 @@
 import { Schema } from "mongoose";
 import { UserProps } from "../types";
+import { ROLES } from "../../../constants";
 
 export const userSchema = new Schema<UserProps>(
   {
@@ -8,11 +9,7 @@ export const userSchema = new Schema<UserProps>(
     phoneNumber: { type: String, trim: true },
     email: { type: String, trim: true, lowercase: true },
     profilePic: { type: String, default: "", trim: true },
-    role: {
-      type: String,
-      enum: ["USER", "SELLER", "ADMIN", "MASTER"],
-      default: "MASTER",
-    },
+    role: { type: String, enum: ROLES, default: "USER" },
     password: { type: String, trim: true },
     // addresses: [{ type: Schema.Types.ObjectId, ref: "Address" }],
     // cart: [{ type: Schema.Types.ObjectId, ref: "Cart" }],

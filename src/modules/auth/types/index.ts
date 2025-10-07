@@ -1,15 +1,18 @@
 import { JwtPayload } from "jsonwebtoken";
 import { ValidateZodFieldConfigs } from "../../../types";
+import { UserModule } from "../..";
 
 export interface DecodedToken extends JwtPayload {
   userId: string; // Assuming userId is a string
 }
 
-export type TLoginFieldsOnly = "email" | "phoneNumber" | "password";
+export type TLoginFieldsOnly = keyof Pick<
+  UserModule.Types.UserProps,
+  "email" | "phoneNumber" | "password"
+>;
 export type TRegisterFieldsOnly =
   | TLoginFieldsOnly
-  | "firstName"
-  | "lastName"
+  | keyof Pick<UserModule.Types.UserProps, "firstName" | "lastName">
   | "confirmPassword";
 
 export interface ValidateAuthFieldConfigs extends ValidateZodFieldConfigs {

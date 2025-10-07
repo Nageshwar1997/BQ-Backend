@@ -26,7 +26,7 @@ export const addressSchema = new Schema<IAddress>(
     },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    email: { type: String, required: true },
+    email: { type: String, required: true, lowercase: true },
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true, versionKey: false }
