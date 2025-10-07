@@ -18,27 +18,25 @@ export const updateAddressController = async (
 
   const { isDefaultAddress, ...restBody } = req.body ?? {};
 
-  const [updatedAddress, updatedUserAddress] = await Promise.all([
-    Address.findOneAndUpdate(
-      { _id: addressId, user: userId },
-      { $set: { ...restBody } },
-      { new: true, session }
-    ),
-    isDefaultAddress
-      ? UserAddress.findOneAndUpdate(
-          { user: userId },
-          { $set: { defaultAddress: addressId } },
-          { new: true, session }
-        )
-      : Promise.resolve(null),
-  ]);
+  const updatedAddress = await Address.findOneAndUpdate(
+    { _id: addressId, user: userId },
+    { $set: { ...restBody } },
+    { new: true, session }
+  );
 
   if (!updatedAddress) {
     throw new AppError("Address not found", 404);
   }
 
-  if (!updatedUserAddress && isDefaultAddress) {
-    throw new AppError("User addresses not found", 404);
+  if (isDefaultAddress) {
+    const updatedUserAddress = await UserAddress.findOneAndUpdate(
+      { user: userId },
+      { $set: { defaultAddress: addressId } },
+      { new: true, session }
+    );
+    if (!updatedUserAddress) {
+      throw new AppError("User addresses not found", 404);
+    }
   }
 
   res.success(200, "Address updated successfully");
