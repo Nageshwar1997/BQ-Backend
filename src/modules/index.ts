@@ -7,3 +7,4 @@ export * as ReviewModule from "./review";
 export * as CartModule from "./cart";
 export * as CartProductModule from "./cartProduct";
 export * as AddressModule from "./address";
+export * as OrderModule from "./order";

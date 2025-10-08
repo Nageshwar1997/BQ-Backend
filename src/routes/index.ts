@@ -6,6 +6,7 @@ import {
   CartModule,
   CartProductModule,
   MediaModule,
+  OrderModule,
   ProductModule,
   ReviewModule,
   UserModule,
@@ -39,5 +40,8 @@ router.use("/cart-products", CartProductModule.Routes.cartProductRouter);
 
 // Address routes
 router.use("/addresses", AddressModule.Routes.addressRouter);
+
+// Order routes
+router.use("/orders", OrderModule.Routes.orderRouter);
 
 export default router;
