@@ -6,6 +6,7 @@ import { Order } from "../models";
 import { AddressModule, CartModule, CartProductModule } from "../..";
 import { AppError } from "../../../classes";
 import { IOrder } from "../types";
+import { razorpay } from "../../../configs";
 
 export const createOrder = async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.user?._id;
@@ -56,14 +57,29 @@ export const createOrder = async (req: AuthenticatedRequest, res: Response) => {
     );
   }
 
+  const razorpayOrder = await razorpay.orders.create({
+    amount: totalPrice * 100,
+    currency: "INR",
+    receipt: `receipt_${Date.now()}`,
+  });
+
   const orderBody: Pick<
     IOrder,
-    "user" | "products" | "addresses" | "totalPrice" | "discount" | "charges"
+    | "user"
+    | "products"
+    | "addresses"
+    | "totalPrice"
+    | "discount"
+    | "charges"
+    | "currency"
+    | "paymentMode"
   > = {
     user: new Types.ObjectId(userId),
     products: cart.products || [],
     discount,
     totalPrice,
+    paymentMode: "ONLINE",
+    currency: "INR",
     charges: updatedCart?.charges ?? 0,
     addresses: { shipping: null, billing: null, both: null },
   };
@@ -80,9 +96,5 @@ export const createOrder = async (req: AuthenticatedRequest, res: Response) => {
 
   const order = new Order(orderBody);
   const createdOrder = await order.save();
-  res.success(201, "Order created successfully", {
-    cart,
-    createdOrder,
-    orderBody,
-  });
+  res.success(201, "Order created successfully", { order: createdOrder });
 };

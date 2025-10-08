@@ -2,6 +2,7 @@ import { Schema } from "mongoose";
 import { IOrder } from "../types";
 import { AddressModule, CartProductModule } from "../..";
 import { TCartProduct } from "../../cartProduct/types";
+import { ALLOWED_PAYMENT_MODE } from "../constants";
 
 export const orderAddressSchema = new Schema<
   Omit<AddressModule.Types.IAddress, "user">
@@ -23,7 +24,12 @@ export const orderSchema = new Schema<IOrder>(
       billing: orderAddressSchema,
       both: orderAddressSchema,
     },
-    // paymentMethod: { type: String, required: true },
+    paymentMode: {
+      type: String,
+      enum: ALLOWED_PAYMENT_MODE,
+      default: "ONLINE",
+    },
+    currency: { type: String, enum: ["INR"], default: "INR" },
     // paymentResult: {
     //   id: { type: String },
     //   status: { type: String },
