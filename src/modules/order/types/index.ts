@@ -17,6 +17,8 @@ export interface IOrder {
     email: string;
   };
   totalPrice: number;
+  discount: number;
+  charges: number;
   isPaid: boolean;
   paidAt?: Date;
   isDelivered: boolean;

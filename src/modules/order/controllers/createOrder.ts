@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 
 import { AuthenticatedRequest } from "../../../types";
 import { Order } from "../models";
-import { AddressModule, CartModule } from "../..";
+import { AddressModule, CartModule, CartProductModule } from "../..";
 import { AppError } from "../../../classes";
 import { IOrder } from "../types";
 
@@ -38,13 +38,24 @@ export const createOrder = async (req: AuthenticatedRequest, res: Response) => {
     throw new AppError("Address not found", 404);
   }
 
-  const orderBody: Pick<IOrder, "user" | "products" | "addresses"> = {
+  const totalPrice = cart.products.reduce((acc, product) => {
+    return acc + product.product.sellingPrice * product.quantity;
+  }, 0);
+
+  const discount = cart.products.reduce((acc, product) => {
+    return acc + product.product.discount;
+  }, 0);
+  const orderBody: Pick<
+    IOrder,
+    "user" | "products" | "addresses" | "totalPrice" | "discount" | "charges"
+  > = {
     user: new Types.ObjectId(userId),
     products: cart.products || [],
+    discount,
+    totalPrice,
+    charges: cart.charges,
     addresses: { shipping: null, billing: null, both: null },
   };
-
-  console.log("orderBody", orderBody);
 
   foundAddresses.forEach((address) => {
     if (address.type === "shipping") {
@@ -57,12 +68,10 @@ export const createOrder = async (req: AuthenticatedRequest, res: Response) => {
   });
 
   const order = new Order(orderBody);
-
   const createdOrder = await order.save();
-
   res.success(201, "Order created successfully", {
     cart,
-    cartProducts: cart.products,
+    cartProducts: cart,
     createdOrder,
     orderBody,
   });
