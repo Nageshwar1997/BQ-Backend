@@ -45,6 +45,17 @@ export const createOrder = async (req: AuthenticatedRequest, res: Response) => {
   const discount = cart.products.reduce((acc, product) => {
     return acc + product.product.discount;
   }, 0);
+
+  let updatedCart;
+
+  if (totalPrice < 499) {
+    updatedCart = await CartModule.Models.Cart.findOneAndUpdate(
+      { user: userId },
+      { $set: { charges: 40 } },
+      { new: true }
+    );
+  }
+
   const orderBody: Pick<
     IOrder,
     "user" | "products" | "addresses" | "totalPrice" | "discount" | "charges"
@@ -53,7 +64,7 @@ export const createOrder = async (req: AuthenticatedRequest, res: Response) => {
     products: cart.products || [],
     discount,
     totalPrice,
-    charges: cart.charges,
+    charges: updatedCart?.charges ?? 0,
     addresses: { shipping: null, billing: null, both: null },
   };
 
@@ -71,7 +82,6 @@ export const createOrder = async (req: AuthenticatedRequest, res: Response) => {
   const createdOrder = await order.save();
   res.success(201, "Order created successfully", {
     cart,
-    cartProducts: cart,
     createdOrder,
     orderBody,
   });
