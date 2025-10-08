@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { getUserCart } from "../services/getUserCart";
+import { getUserCart } from "../services";
 import { AuthenticatedRequest } from "../../../types";
 
 export const getCartController = async (
