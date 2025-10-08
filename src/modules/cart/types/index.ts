@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { CartProductModule } from "../..";
 
 export interface ICart {
   _id: Types.ObjectId;
@@ -7,4 +8,8 @@ export interface ICart {
   charges: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IPopulatedCart extends Omit<ICart, "products"> {
+  products: CartProductModule.Types.IPopulatedCartProduct[];
 }

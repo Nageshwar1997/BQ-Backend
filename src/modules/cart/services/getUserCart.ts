@@ -1,6 +1,7 @@
 import { AuthenticatedRequest } from "../../../types";
 import { AppError } from "../../../classes";
 import { Cart } from "../models";
+import { IPopulatedCart } from "../types";
 
 export const getUserCart = async (req: AuthenticatedRequest) => {
   const userId = req.user?._id;
@@ -29,5 +30,5 @@ export const getUserCart = async (req: AuthenticatedRequest) => {
     throw new AppError("Cart not found", 404);
   }
 
-  return cart;
+  return cart as unknown as IPopulatedCart;
 };
