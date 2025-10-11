@@ -16,25 +16,27 @@ export interface IOrder {
     billing: Omit<AddressModule.Types.IAddress, "user"> | null;
     both: Omit<AddressModule.Types.IAddress, "user"> | null;
   };
-  paymentMode: (typeof ALLOWED_PAYMENT_MODE)[number];
-  currency: (typeof ALLOWED_CURRENCIES)[number];
-  paymentResult?: {
+  razorpay_payment_result: {
+    payment_mode: (typeof ALLOWED_PAYMENT_MODE)[number];
+    currency: (typeof ALLOWED_CURRENCIES)[number];
     rzp_order_id: string;
     rzp_payment_id: string;
     rzp_signature: string;
     rzp_payment_method: (typeof RAZORPAY_PAYMENT_METHODS)[number];
     rzp_payment_status: (typeof RAZORPAY_PAYMENT_STATUS)[number];
-    email: string;
-    phoneNumber: string;
+    rzp_payment_receipt: string;
   };
-  orderStatus: (typeof ORDER_STATUS)[number];
-  totalPrice: number;
-  discount: number;
-  charges: number;
-  returnedAt?: Date;
-  paidAt?: Date;
-  cancelledAt?: Date;
-  deliveredAt?: Date;
+  order_result: {
+    order_status: (typeof ORDER_STATUS)[number];
+    price: number;
+    discount: number;
+    charges: number;
+    order_receipt: string;
+    paid_at?: Date;
+    delivered_at?: Date;
+    cancelled_at?: Date;
+    returned_at?: Date;
+  };
   createdAt: Date;
   updatedAt: Date;
 }

@@ -194,7 +194,9 @@ export const validateZodEnums = (
 
   const baseEnum = z.enum([enums[0], ...enums.slice(1)], {
     errorMap: () => ({
-      message: `Invalid option of ${nestedField}. Must be '${enums.join(", ")}'.`,
+      message: `Invalid option of ${nestedField}. Must be '${enums.join(
+        ", "
+      )}'.`,
     }),
   });
 

@@ -20,7 +20,7 @@ export const RAZORPAY_PAYMENT_METHODS = [
 ];
 
 export const RAZORPAY_PAYMENT_STATUS = [
-  "PENDING",
+  "UNPAID",
   "PAID",
   "FAILED",
   "REFUNDED",
