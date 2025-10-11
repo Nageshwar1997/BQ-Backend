@@ -5,6 +5,7 @@ import { Order } from "../models";
 import { AppError } from "../../../classes";
 import { RAZORPAY_KEY_SECRET } from "../../../envs";
 import { AuthenticatedRequest } from "../../../types";
+import { razorpay } from "../../../configs";
 
 export const verifyPaymentController = async (
   req: AuthenticatedRequest,
@@ -34,6 +35,14 @@ export const verifyPaymentController = async (
     throw new AppError("Invalid signature", 400);
   }
 
+  const payment = await razorpay.payments.fetch(razorpay_payment_id);
+
+  if (!payment || payment.status !== "captured") {
+    throw new AppError("Payment not captured", 400);
+  }
+
+  console.log("payment", payment);
+
   const order = await Order.findByIdAndUpdate(
     orderDBId,
     {
@@ -42,7 +51,7 @@ export const verifyPaymentController = async (
         "razorpay_payment_result.rzp_payment_id": razorpay_payment_id,
         "razorpay_payment_result.rzp_signature": razorpay_signature,
         "razorpay_payment_result.rzp_payment_status": "PAID",
-        "order_result.paid_at": new Date(),
+        "order_result.paid_at": new Date(payment.created_at * 1000),
         "order_result.order_status": "CONFIRMED",
         "order_result.payment_receipt": `payment_receipt_${Date.now()}`,
       },
@@ -52,5 +61,5 @@ export const verifyPaymentController = async (
 
   if (!order) throw new AppError("Order not found", 404);
 
-  res.success(200, "Payment verified successfully", { order });
+  res.success(200, "Payment verified successfully", { order, payment });
 };
