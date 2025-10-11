@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { createOrder } from "../controllers";
-import { authenticated } from "../../../middlewares/auth";
+import { createOrderController, verifyPaymentController } from "../controllers";
 import {
   AuthMiddleware,
   RequestMiddleware,
@@ -13,5 +12,12 @@ orderRouter.post(
   "/create",
   RequestMiddleware.checkEmptyRequest({ body: true }),
   AuthMiddleware.authenticated,
-  ResponseMiddleware.catchAsync(createOrder)
+  ResponseMiddleware.catchAsync(createOrderController)
+);
+
+orderRouter.patch(
+  "/verify-payment",
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  AuthMiddleware.authenticated,
+  ResponseMiddleware.catchAsync(verifyPaymentController)
 );

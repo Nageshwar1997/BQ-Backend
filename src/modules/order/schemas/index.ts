@@ -40,8 +40,7 @@ export const orderSchema = new Schema<IOrder>(
       rzp_order_id: { type: String },
       rzp_payment_id: { type: String },
       rzp_signature: { type: String },
-      rzp_payment_receipt: { type: String },
-      rzp_payment_method: { type: String, enum: RAZORPAY_PAYMENT_METHODS },
+      payment_method: { type: String, enum: RAZORPAY_PAYMENT_METHODS },
       rzp_payment_status: {
         type: String,
         enum: RAZORPAY_PAYMENT_STATUS,

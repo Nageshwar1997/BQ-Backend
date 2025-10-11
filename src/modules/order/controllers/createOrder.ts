@@ -54,7 +54,7 @@ export const createOrderController = async (
     razorpayOrder = await razorpay.orders.create({
       amount: (totalPrice + charges) * 100, // Price in paise
       currency: "INR", // Currency
-      receipt: `receipt_${Date.now()}`,
+      receipt: `payment_receipt_${Date.now()}`,
       payment_capture: true,
       notes: {
         buyer_id: `${user?._id}`,
@@ -80,8 +80,6 @@ export const createOrderController = async (
     products: cart.products || [],
     addresses: { shipping: null, billing: null, both: null },
     razorpay_payment_result: {
-      rzp_order_id: razorpayOrder.id,
-      rzp_payment_receipt: razorpayOrder.receipt ?? "",
       rzp_payment_status: "UNPAID",
       currency: "INR",
       payment_mode: "ONLINE",
@@ -91,7 +89,7 @@ export const createOrderController = async (
       charges,
       discount,
       price: totalPrice,
-      order_receipt: razorpayOrder.receipt,
+      order_receipt: razorpayOrder.receipt, // Todo:- Check orderId with rzp_payment_id
     },
   };
   foundAddresses.forEach((address) => {

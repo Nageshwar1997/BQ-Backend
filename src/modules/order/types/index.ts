@@ -22,9 +22,8 @@ export interface IOrder {
     rzp_order_id: string;
     rzp_payment_id: string;
     rzp_signature: string;
-    rzp_payment_method: (typeof RAZORPAY_PAYMENT_METHODS)[number];
+    payment_method: (typeof RAZORPAY_PAYMENT_METHODS)[number];
     rzp_payment_status: (typeof RAZORPAY_PAYMENT_STATUS)[number];
-    rzp_payment_receipt: string;
   };
   order_result: {
     order_status: (typeof ORDER_STATUS)[number];
