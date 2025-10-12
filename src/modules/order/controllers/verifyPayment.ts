@@ -6,6 +6,7 @@ import { AppError } from "../../../classes";
 import { RAZORPAY_KEY_SECRET } from "../../../envs";
 import { AuthenticatedRequest } from "../../../types";
 import { razorpay } from "../../../configs";
+import { ProductModule } from "../..";
 
 export const verifyPaymentController = async (
   req: AuthenticatedRequest,
@@ -115,6 +116,20 @@ export const verifyPaymentController = async (
       );
 
       if (!order) throw new AppError("Order not found", 404);
+
+      for (const item of order.products) {
+        await ProductModule.Models.Product.updateOne(
+          { _id: item.product._id },
+          { $inc: { totalStock: -item.quantity } }
+        );
+
+        if (item.shade?._id) {
+          await ProductModule.Models.Shade.updateOne(
+            { _id: item.shade._id },
+            { $inc: { stock: -item.quantity } }
+          );
+        }
+      }
     } catch (error) {
       throw new AppError(
         error instanceof Error
