@@ -6,12 +6,13 @@ import { AppError } from "../../../classes";
 import { RAZORPAY_KEY_SECRET } from "../../../envs";
 import { AuthenticatedRequest } from "../../../types";
 import { razorpay } from "../../../configs";
-import { ProductModule } from "../..";
+import { CartModule, CartProductModule, ProductModule } from "../..";
 
 export const verifyPaymentController = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
+  const user = req.user;
   const {
     razorpay_order_id,
     razorpay_payment_id,
@@ -130,6 +131,18 @@ export const verifyPaymentController = async (
           );
         }
       }
+
+      const cart = await CartModule.Models.Cart.findOne({ user: user?._id });
+      if (!cart) throw new AppError("Cart not found", 404);
+
+      await CartProductModule.Models.CartProduct.deleteMany({
+        _id: { $in: cart.products.map((p) => p._id) },
+      });
+
+      await CartModule.Models.Cart.findOneAndUpdate(
+        { user: user?._id },
+        { $set: { products: [], charges: 0 } }
+      );
     } catch (error) {
       throw new AppError(
         error instanceof Error
