@@ -22,7 +22,6 @@ export interface IOrder {
     rzp_order_id: string;
     rzp_payment_id: string;
     rzp_signature: string;
-    payment_method: (typeof RAZORPAY_PAYMENT_METHODS)[number];
     rzp_payment_status: (typeof RAZORPAY_PAYMENT_STATUS)[number];
   };
   order_result: {
@@ -35,6 +34,32 @@ export interface IOrder {
     delivered_at?: Date;
     cancelled_at?: Date;
     returned_at?: Date;
+  };
+  payment_details?: {
+    method: (typeof RAZORPAY_PAYMENT_METHODS)[number];
+    refund_status?: string | null;
+    bank?: string | null;
+    wallet?: string | null;
+    email: string;
+    contact: string;
+    fee: number;
+    tax: number;
+    upi?: {
+      acquirer_data: { rrn: string; upi_transaction_id: string; vpa: string };
+    };
+    netbanking?: { acquirer_data: { bank_transaction_id: string } };
+    card?: {
+      token_id: string;
+      acquirer_data: { auth_code: string };
+      card: {
+        id?: string;
+        name?: string;
+        last4: string;
+        network: string;
+        type: string;
+        issuer: string;
+      };
+    };
   };
   createdAt: Date;
   updatedAt: Date;

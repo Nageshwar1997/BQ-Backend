@@ -12,11 +12,11 @@ export const ORDER_STATUS = [
 export const RAZORPAY_PAYMENT_METHODS = [
   "CARD",
   "UPI",
-  "NET_BANKING",
+  "NETBANKING",
   "WALLET",
-  "PAY_LATER",
-  "EMI",
-  "OTHERS",
+  // "PAYLATER", // *LINK - Not Implemented yet in FRONTEND & BACKEND
+  // "EMI", // *LINK - Not Implemented yet in FRONTEND & BACKEND
+  "OTHER",
 ];
 
 export const RAZORPAY_PAYMENT_STATUS = [
