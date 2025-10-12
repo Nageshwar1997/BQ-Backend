@@ -20,7 +20,6 @@ export const updateAddressController = async (
   const { isDefaultAddress, removedOptionalFields, ...restBody } =
     req.body ?? {};
 
-  console.log("removedOptionalFields C", removedOptionalFields);
   const updateBody = { ...restBody };
 
   if (removedOptionalFields?.length) {

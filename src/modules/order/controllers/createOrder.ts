@@ -65,10 +65,8 @@ export const createOrderController = async (
         buyer_device_user_agent: req.headers?.["user-agent"] || "",
       },
     });
-
-    console.log("razorpayOrder", razorpayOrder);
   } catch (error) {
-    console.log("Razorpay order creation failed: ", error);
+    console.error("Razorpay order creation failed:", error);
     throw new AppError("Payment gateway error, please try again later", 502);
   }
 
@@ -89,7 +87,7 @@ export const createOrderController = async (
       charges,
       discount,
       price: totalPrice,
-      order_receipt: razorpayOrder.receipt, // Todo:- Check orderId with rzp_payment_id
+      order_receipt: razorpayOrder.receipt,
     },
   };
   foundAddresses.forEach((address) => {
