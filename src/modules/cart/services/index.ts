@@ -5,7 +5,8 @@ import { IPopulatedCart } from "../types";
 
 export const getUserCart = async (req: AuthenticatedRequest) => {
   const userId = req.user?._id;
-  const cart = await Cart.findOne({ user: userId })
+  let cart = null;
+  cart = await Cart.findOne({ user: userId })
     .populate({
       path: "products", // All Products in the cart
       populate: [
@@ -27,7 +28,15 @@ export const getUserCart = async (req: AuthenticatedRequest) => {
     .lean();
 
   if (!cart) {
-    throw new AppError("Cart not found", 404);
+    cart = await Cart.findOneAndUpdate(
+      { user: userId },
+      { $setOnInsert: { user: userId, products: [], charges: 0 } },
+      { new: true, upsert: true }
+    );
+  }
+
+  if (!cart) {
+    throw new AppError("Cart not found!", 500);
   }
 
   return cart as unknown as IPopulatedCart;

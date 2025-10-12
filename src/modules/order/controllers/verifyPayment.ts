@@ -68,8 +68,8 @@ export const verifyPaymentController = async (
             ...(payment.contact && {
               "payment_details.contact": payment.contact,
             }),
-            "payment_details.fee": payment.fee,
-            "payment_details.tax": payment.tax,
+            "payment_details.fee": payment.fee ? Number(payment.fee) / 100 : 0,
+            "payment_details.tax": payment.tax ? Number(payment.tax) / 100 : 0,
             ...(payment.vpa &&
               payment.acquirer_data?.upi_transaction_id && {
                 "payment_details.upi": {
