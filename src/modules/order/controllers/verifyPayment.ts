@@ -1,6 +1,7 @@
-// controllers/verify.controller.ts
-import { Response } from "express";
+import { NextFunction, Response } from "express";
+import { ClientSession } from "mongoose";
 import crypto from "crypto";
+
 import { Order } from "../models";
 import { AppError } from "../../../classes";
 import { RAZORPAY_KEY_SECRET } from "../../../envs";
@@ -10,7 +11,9 @@ import { CartModule, CartProductModule, ProductModule } from "../..";
 
 export const verifyPaymentController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
+  _next: NextFunction,
+  session: ClientSession
 ) => {
   const user = req.user;
   const {
@@ -113,35 +116,51 @@ export const verifyPaymentController = async (
             "order_result.payment_receipt": `payment_receipt_${Date.now()}`,
           },
         },
-        { new: true }
+        { new: true, session }
       );
 
       if (!order) throw new AppError("Order not found", 404);
 
+      // Update product and shade stock
       for (const item of order.products) {
         await ProductModule.Models.Product.updateOne(
           { _id: item.product._id },
-          { $inc: { totalStock: -item.quantity } }
+          { $inc: { totalStock: -item.quantity } },
+          { session }
         );
 
         if (item.shade?._id) {
           await ProductModule.Models.Shade.updateOne(
             { _id: item.shade._id },
-            { $inc: { stock: -item.quantity } }
+            { $inc: { stock: -item.quantity } },
+            { session }
           );
         }
       }
 
-      const cart = await CartModule.Models.Cart.findOne({ user: user?._id });
+      //  Clear user cart
+      const cart = await CartModule.Models.Cart.findOne(
+        { user: user?._id },
+        null,
+        { session }
+      );
       if (!cart) throw new AppError("Cart not found", 404);
 
-      await CartProductModule.Models.CartProduct.deleteMany({
-        _id: { $in: cart.products.map((p) => p._id) },
-      });
+      await CartProductModule.Models.CartProduct.deleteMany(
+        {
+          _id: { $in: cart.products.map((p) => p._id) },
+        },
+        { session }
+      );
 
-      await CartModule.Models.Cart.findOneAndUpdate(
-        { user: user?._id },
-        { $set: { products: [], charges: 0 } }
+      await cart.updateOne(
+        {
+          $set: {
+            products: [],
+            charges: 0,
+          },
+        },
+        { session }
       );
     } catch (error) {
       throw new AppError(

@@ -19,5 +19,5 @@ orderRouter.patch(
   "/verify-payment",
   RequestMiddleware.checkEmptyRequest({ body: true }),
   AuthMiddleware.authenticated,
-  ResponseMiddleware.catchAsync(verifyPaymentController)
+  ResponseMiddleware.catchAsyncWithTransaction(verifyPaymentController)
 );
