@@ -18,6 +18,10 @@ export const createOrderController = async (
 
   const cart = await CartModule.Services.getUserCart(req);
 
+  if (cart.products.length === 0) {
+    throw new AppError("Cart is empty", 400);
+  }
+
   const addressIds: Types.ObjectId[] = [];
 
   if (addresses.shipping && !addresses.billing) {
