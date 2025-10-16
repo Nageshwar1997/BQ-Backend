@@ -6,15 +6,14 @@ import { AddressModule, CartModule } from "../..";
 import { AppError } from "../../../classes";
 import { razorpay } from "../../../configs";
 import { IOrder } from "../types";
+import { IAddress } from "../../address/types";
 
 export const createOrderController = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
   const user = req.user;
-  const { addresses } = req.body;
-
-  if (!addresses) throw new AppError("Addresses required", 400);
+  const { billing, shipping, both } = req.query;
 
   const cart = await CartModule.Services.getUserCart(req);
 
@@ -22,19 +21,19 @@ export const createOrderController = async (
     throw new AppError("Cart is empty", 400);
   }
 
-  const addressIds: Types.ObjectId[] = [];
+  const addressIds = [];
 
-  if (addresses.shipping && !addresses.billing) {
+  if (shipping && !billing) {
     throw new AppError("Billing address is required", 400);
-  } else if (addresses.billing && !addresses.shipping) {
+  } else if (billing && !shipping) {
     throw new AppError("Shipping address is required", 400);
-  } else if (addresses.billing && addresses.shipping) {
-    addressIds.push(addresses.shipping, addresses.billing);
+  } else if (billing && shipping) {
+    addressIds.push(shipping, billing);
   } else {
-    addressIds.push(addresses.both);
+    addressIds.push(both);
   }
 
-  const foundAddresses = await AddressModule.Models.Address.find({
+  const foundAddresses: IAddress[] = await AddressModule.Models.Address.find({
     user: user?._id,
     _id: { $in: addressIds },
   }).lean();
@@ -74,13 +73,10 @@ export const createOrderController = async (
     throw new AppError("Payment gateway error, please try again later", 502);
   }
 
-  const orderBody: Pick<IOrder, "user" | "products" | "addresses"> & {
-    razorpay_payment_result: Partial<IOrder["razorpay_payment_result"]>;
-    order_result: Partial<IOrder["order_result"]>;
-  } = {
+  const orderBody = {
     user: new Types.ObjectId(user?._id),
     products: cart.products || [],
-    addresses: { shipping: null, billing: null, both: null },
+    addresses: {} as IOrder["addresses"],
     razorpay_payment_result: {
       rzp_payment_status: "UNPAID",
       currency: "INR",

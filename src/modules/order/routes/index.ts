@@ -10,7 +10,7 @@ export const orderRouter = Router();
 
 orderRouter.post(
   "/create",
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  RequestMiddleware.checkEmptyRequest({ query: true }),
   AuthMiddleware.authenticated,
   ResponseMiddleware.catchAsync(createOrderController)
 );
