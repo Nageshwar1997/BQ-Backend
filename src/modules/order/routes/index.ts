@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { createOrderController, verifyPaymentController } from "../controllers";
+import {
+  cancelPaymentController,
+  createOrderController,
+  verifyPaymentController,
+} from "../controllers";
 import {
   AuthMiddleware,
   RequestMiddleware,
@@ -20,4 +24,11 @@ orderRouter.patch(
   RequestMiddleware.checkEmptyRequest({ body: true }),
   AuthMiddleware.authenticated,
   ResponseMiddleware.catchAsyncWithTransaction(verifyPaymentController)
+);
+
+orderRouter.patch(
+  "/cancel-payment/:orderId",
+  RequestMiddleware.checkEmptyRequest({ params: true }),
+  AuthMiddleware.authenticated,
+  ResponseMiddleware.catchAsync(cancelPaymentController)
 );
