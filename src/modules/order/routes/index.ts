@@ -36,7 +36,7 @@ orderRouter.patch(
 
 orderRouter.get(
   "/",
-  RequestMiddleware.checkEmptyRequest({ query: true }),
+  RequestMiddleware.checkEmptyRequest({ query: false }), //LINK - Optional
   AuthMiddleware.authenticated,
   ResponseMiddleware.catchAsync(getAllOrdersController)
 );
