@@ -57,7 +57,7 @@ export const createOrderController = async (
     razorpayOrder = await razorpay.orders.create({
       amount: (totalPrice + charges) * 100, // Price in paise
       currency: "INR", // Currency
-      receipt: `payment_receipt_${Date.now()}`,
+      receipt: `order_receipt_${Date.now()}`,
       payment_capture: true,
       notes: {
         buyer_id: `${user?._id}`,
@@ -98,9 +98,16 @@ export const createOrderController = async (
 
   const order = await new Order(orderBody).save();
 
+  if (!order) {
+    throw new AppError("Failed to create order", 400);
+  }
+
   res.success(201, "Order created successfully", {
-    message: "Order created successfully",
-    order,
-    razorpayOrder,
+    orderId: order._id,
+    razorpayOrder: {
+      id: razorpayOrder.id,
+      amount: razorpayOrder.amount,
+      currency: razorpayOrder.currency,
+    },
   });
 };
