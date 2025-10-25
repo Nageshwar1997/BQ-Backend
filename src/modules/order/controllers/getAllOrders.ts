@@ -29,7 +29,18 @@ export const getAllOrdersController = async (
     );
   }
 
-  let query = Order.find(filter).sort({ createdAt: -1 });
+  let query = Order.find(filter)
+    .sort({ createdAt: -1 })
+    .populate({
+      path: "products.product",
+      select: "title sellingPrice originalPrice commonImages category",
+      options: { slice: { commonImages: 1 } },
+    })
+    .populate({
+      path: "products.shade",
+      select: "shadeName images",
+      options: { slice: { images: 1 } },
+    });
 
   if (pageNum && limitNum) {
     query = query.skip(skip).limit(limitNum);

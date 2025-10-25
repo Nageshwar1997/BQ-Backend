@@ -90,11 +90,15 @@ export const createOrderController = async (
       order_receipt: razorpayOrder.receipt,
     },
   };
-  foundAddresses.forEach((address) => {
-    if (address.type === "shipping") orderBody.addresses.shipping = address;
-    else if (address.type === "billing") orderBody.addresses.billing = address;
-    else if (address.type === "both") orderBody.addresses.both = address;
-  });
+  if (foundAddresses.length === 1 && both) {
+    orderBody.addresses.both = foundAddresses[0];
+  } else {
+    foundAddresses.forEach((address) => {
+      if (address.type === "shipping") orderBody.addresses.shipping = address;
+      else if (address.type === "billing")
+        orderBody.addresses.billing = address;
+    });
+  }
 
   const order = await new Order(orderBody).save();
 
