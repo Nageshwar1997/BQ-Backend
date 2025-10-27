@@ -86,7 +86,7 @@ export const createOrderController = async (
       order_status: "PENDING",
       charges,
       discount,
-      price: totalPrice,
+      price: totalPrice + charges,
       order_receipt: razorpayOrder.receipt,
     },
   };
