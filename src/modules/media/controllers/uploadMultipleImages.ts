@@ -1,8 +1,5 @@
 import { Request, Response } from "express";
-
-import { AppError } from "../../../classes";
-import { allowedOptions } from "../constants";
-import { singleImageUploader } from "../utils";
+import { multipleImagesUploader } from "../utils";
 
 export const uploadMultipleImagesController = async (
   req: Request,
@@ -12,17 +9,16 @@ export const uploadMultipleImagesController = async (
 
   const files = req.files as Express.Multer.File[];
 
-  const uploadPromises = files.map(async (file) => {
-    const result = await singleImageUploader({
-      file,
-      folder: folderName,
-      cloudinaryConfigOption,
-    });
+  const result = await multipleImagesUploader({
+    files,
+    folder: folderName,
+    cloudinaryConfigOption,
+  });
 
+  const uploadedImages = result.map((result) => {
     return { cloudUrl: result.secure_url };
   });
 
-  const uploadedImages = await Promise.all(uploadPromises);
   res.success(200, "Images uploaded successfully", {
     uploadedImages,
   });
