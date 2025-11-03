@@ -186,11 +186,21 @@ export const validateZodUrl = ({ ...props }: ZodCommonConfigs) => {
 export const validateZodEnums = (
   props: ZodCommonConfigs & { enums: string[] }
 ) => {
-  return z.enum([props.enums[0], ...props.enums.slice(1)], {
+  const { field, parentField, enums, isOptional } = props;
+
+  const nestedField = parentField
+    ? `${parentField}${parentField.includes("[") ? " " : "."}${field}`
+    : field;
+
+  const baseEnum = z.enum([enums[0], ...enums.slice(1)], {
     errorMap: () => ({
-      message: `Invalid option. Must be '${props.enums.join(", ")}'.`,
+      message: `Invalid option of ${nestedField}. Must be '${enums.join(
+        ", "
+      )}'.`,
     }),
   });
+
+  return isOptional ? baseEnum.optional() : baseEnum;
 };
 
 export const validateZodNumber = ({

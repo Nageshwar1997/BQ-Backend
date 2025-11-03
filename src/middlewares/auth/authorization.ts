@@ -3,9 +3,10 @@ import { AuthModule, UserModule } from "../../modules";
 import { AuthorizedRequest } from "../../types";
 import { isValidMongoId } from "../../utils";
 import { AppError } from "../../classes";
+import { ROLES } from "../../constants";
 
 export const authorization =
-  (allowedRoles: UserModule.Types.UserRoleType[]) =>
+  (allowedRoles: (typeof ROLES)[number][]) =>
   async (req: AuthorizedRequest, _: Response, next: NextFunction) => {
     try {
       const userId = AuthModule.Services.getUserIdFromToken(req);

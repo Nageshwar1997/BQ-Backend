@@ -19,3 +19,5 @@ export const allowedOrigins = [
   FRONTEND_PRODUCTION_ADMIN_URL,
   FRONTEND_PRODUCTION_MASTER_URL,
 ];
+
+export const ROLES = ["USER", "SELLER", "ADMIN", "MASTER"] as const;

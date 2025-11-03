@@ -1,6 +1,5 @@
 import { Types } from "mongoose";
-
-export type UserRoleType = "USER" | "SELLER" | "ADMIN" | "MASTER";
+import { ROLES } from "../../../constants";
 
 export interface UserProps {
   _id: string | Types.ObjectId;
@@ -9,7 +8,7 @@ export interface UserProps {
   email: string;
   phoneNumber: string;
   password: string;
-  role: UserRoleType;
+  role: (typeof ROLES)[number];
   profilePic?: string;
   createdAt: Date;
   updatedAt: Date;

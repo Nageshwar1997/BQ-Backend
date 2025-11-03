@@ -4,6 +4,7 @@ import { Address, UserAddress } from "../models";
 import { AppError } from "../../../classes";
 import { ClientSession } from "mongoose";
 import { isValidMongoId } from "../../../utils";
+import { IAddress } from "../types";
 
 export const updateAddressController = async (
   req: AuthenticatedRequest,
@@ -16,29 +17,43 @@ export const updateAddressController = async (
 
   isValidMongoId(addressId, "Invalid Address Id provided", 404);
 
-  const { isDefaultAddress, ...restBody } = req.body ?? {};
+  const { isDefaultAddress, removedOptionalFields, ...restBody } =
+    req.body ?? {};
 
-  const [updatedAddress, updatedUserAddress] = await Promise.all([
-    Address.findOneAndUpdate(
-      { _id: addressId, user: userId },
-      { $set: { ...restBody } },
-      { new: true, session }
-    ),
-    isDefaultAddress
-      ? UserAddress.findOneAndUpdate(
-          { user: userId },
-          { $set: { defaultAddress: addressId } },
-          { new: true, session }
-        )
-      : Promise.resolve(null),
-  ]);
+  const updateBody = { ...restBody };
+
+  if (removedOptionalFields?.length) {
+    removedOptionalFields.forEach(
+      (
+        field: keyof Partial<
+          Pick<IAddress, "altPhoneNumber" | "gst" | "landmark">
+        >
+      ) => {
+        // if the optional fields removed then make them empty
+        updateBody[field] = "";
+      }
+    );
+  }
+
+  const updatedAddress = await Address.findOneAndUpdate(
+    { _id: addressId, user: userId },
+    { $set: updateBody },
+    { new: true, session }
+  );
 
   if (!updatedAddress) {
     throw new AppError("Address not found", 404);
   }
 
-  if (!updatedUserAddress && isDefaultAddress) {
-    throw new AppError("User addresses not found", 404);
+  if (isDefaultAddress) {
+    const updatedUserAddress = await UserAddress.findOneAndUpdate(
+      { user: userId },
+      { $set: { defaultAddress: addressId } },
+      { new: true, session }
+    );
+    if (!updatedUserAddress) {
+      throw new AppError("User addresses not found", 404);
+    }
   }
 
   res.success(200, "Address updated successfully");

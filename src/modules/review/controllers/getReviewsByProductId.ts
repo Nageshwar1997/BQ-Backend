@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
-import { Aggregate, Document, FilterQuery, Query, Types } from "mongoose";
+import { Aggregate, FilterQuery, Types } from "mongoose";
 
-import { AppError } from "../../../classes";
 import { isValidMongoId } from "../../../utils";
 import { Review } from "../models";
 import { isSafePopulateField } from "../../product/utils";

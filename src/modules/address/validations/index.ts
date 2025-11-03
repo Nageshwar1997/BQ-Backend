@@ -3,7 +3,7 @@ import { validateZodEnums, validateZodString } from "../../../utils";
 import { regexes } from "../../../constants";
 import { ADDRESS_TYPES, ALLOWED_COUNTRIES } from "../constants";
 
-export const addAddressSchema = z.object({
+const addressBaseSchema = z.object({
   address: validateZodString({
     field: "address",
     blockMultipleSpaces: true,
@@ -96,7 +96,7 @@ export const addAddressSchema = z.object({
           "please provide a valid email address, like example@domain.com",
       },
     ],
-  }),
+  }).transform((val) => val?.toLowerCase()),
   phoneNumber: validateZodString({
     field: "phoneNumber",
     blockSingleSpace: true,
@@ -135,4 +135,30 @@ export const addAddressSchema = z.object({
     .optional(),
 });
 
-export const updateAddressSchema = addAddressSchema.partial();
+const phoneValidation = (
+  data: Partial<z.infer<typeof addressBaseSchema>>,
+  ctx: z.RefinementCtx
+) => {
+  if (data.altPhoneNumber && data.phoneNumber === data.altPhoneNumber) {
+    ctx.addIssue({
+      code: "custom",
+      message: "Alternate phone number cannot be the same as phone number",
+      path: ["altPhoneNumber"],
+    });
+  }
+};
+
+export const addAddressSchema = addressBaseSchema.superRefine(phoneValidation);
+
+export const updateAddressSchema = addressBaseSchema
+  .extend({
+    removedOptionalFields: z.array(
+      validateZodEnums({
+        field: "[some_index]",
+        parentField: "removedOptionalFields",
+        enums: ["altPhoneNumber", "gst", "landmark"],
+      })
+    ),
+  })
+  .partial()
+  .superRefine(phoneValidation);

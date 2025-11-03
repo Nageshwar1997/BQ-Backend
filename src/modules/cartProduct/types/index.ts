@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { ProductModule } from "../..";
 
 export type TCartProduct = {
   _id: Types.ObjectId;
@@ -7,3 +8,9 @@ export type TCartProduct = {
   shade?: Types.ObjectId;
   quantity: number;
 };
+
+export interface IPopulatedCartProduct
+  extends Omit<TCartProduct, "product" | "shade"> {
+  product: ProductModule.Types.ProductProps;
+  shade?: ProductModule.Types.ShadeProps | null;
+}

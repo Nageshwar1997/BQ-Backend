@@ -32,4 +32,8 @@ export const {
 
   // P
   PORT,
+
+  // R
+  RAZORPAY_KEY_ID,
+  RAZORPAY_KEY_SECRET,
 } = process.env;
