@@ -8,6 +8,7 @@ import {
   AuthMiddleware,
   JSONParseMiddleware,
   MulterMiddleware,
+  RequestMiddleware,
   ResponseMiddleware,
   ZodMiddleware,
 } from "../../../middlewares";
@@ -17,6 +18,8 @@ import { MB } from "../../../constants";
 export const userRouter = Router();
 
 userRouter.get("/user", ResponseMiddleware.catchAsync(getUserController));
+
+// Seller Routes
 userRouter.post(
   "/seller/create",
   AuthMiddleware.authenticated,
@@ -29,6 +32,7 @@ userRouter.post(
     })),
     customLimits: { imageSize: 0.5 * MB },
   }),
+  RequestMiddleware.checkEmptyRequest({ body: true, files: true }),
   JSONParseMiddleware.JSONParse({
     fieldsToParse: ["businessAddress", "businessDetails"],
   }),
