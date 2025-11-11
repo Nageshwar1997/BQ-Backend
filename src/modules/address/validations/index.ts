@@ -28,7 +28,7 @@ const addressBaseSchema = z.object({
     max: 15,
     customRegexes: [
       {
-        regex: regexes.validGST,
+        regex: regexes.gst,
         message: "Please provide a valid GST number",
       },
     ],
@@ -42,7 +42,7 @@ const addressBaseSchema = z.object({
     blockSingleSpace: true,
     customRegexes: [
       {
-        regex: regexes.validPinCode,
+        regex: regexes.pinCode,
         message: "Please provide a valid Pin Code",
       },
     ],
@@ -67,7 +67,7 @@ const addressBaseSchema = z.object({
     max: 50,
     customRegexes: [
       {
-        regex: regexes.validName,
+        regex: regexes.name,
         message:
           "can only contain letters and only one space is allowed between words",
       },
@@ -80,7 +80,7 @@ const addressBaseSchema = z.object({
     max: 50,
     customRegexes: [
       {
-        regex: regexes.validName,
+        regex: regexes.name,
         message:
           "can only contain letters and only one space is allowed between words",
       },
@@ -91,7 +91,7 @@ const addressBaseSchema = z.object({
     blockSingleSpace: true,
     customRegexes: [
       {
-        regex: regexes.validEmail,
+        regex: regexes.email,
         message:
           "please provide a valid email address, like example@domain.com",
       },
@@ -104,7 +104,7 @@ const addressBaseSchema = z.object({
     max: 10,
     customRegexes: [
       {
-        regex: regexes.validPhone,
+        regex: regexes.phoneNumber,
         message:
           "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
       },
@@ -119,7 +119,7 @@ const addressBaseSchema = z.object({
     max: 10,
     customRegexes: [
       {
-        regex: regexes.validPhone,
+        regex: regexes.phoneNumber,
         message:
           "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
       },
