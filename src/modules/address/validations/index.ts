@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { validateZodEnums, validateZodString } from "../../../utils";
-import { regexes } from "../../../constants";
-import { ADDRESS_TYPES, ALLOWED_COUNTRIES } from "../constants";
+import { ALLOWED_COUNTRIES, regexes } from "../../../constants";
+import { ADDRESS_TYPES } from "../constants";
 
 const addressBaseSchema = z.object({
   address: validateZodString({
