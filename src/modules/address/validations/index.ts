@@ -26,12 +26,7 @@ const addressBaseSchema = z.object({
     blockSingleSpace: true,
     min: 15,
     max: 15,
-    customRegexes: [
-      {
-        regex: regexes.gst,
-        message: "Please provide a valid GST number",
-      },
-    ],
+    customRegexes: [{ regex: regexes.gst, message: "must be valid" }],
     isOptional: true,
     nonEmpty: false,
   }),
@@ -40,12 +35,7 @@ const addressBaseSchema = z.object({
     min: 6,
     max: 6,
     blockSingleSpace: true,
-    customRegexes: [
-      {
-        regex: regexes.pinCode,
-        message: "Please provide a valid Pin Code",
-      },
-    ],
+    customRegexes: [{ regex: regexes.pinCode, message: "must be valid" }],
   }),
   state: validateZodString({
     field: "state",
