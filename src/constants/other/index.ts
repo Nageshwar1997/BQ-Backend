@@ -63,3 +63,13 @@ export const STATES_AND_UNION_TERRITORIES = [
 ];
 
 export const ALLOWED_COUNTRIES = ["India"];
+
+export const ALLOWED_BUSINESSES = [
+  "Individual",
+  "Freelance Seller",
+  "Small Business",
+  "Home-based Seller",
+  "Retail Store",
+  "Salon",
+  "Wholesale Distributor",
+];
