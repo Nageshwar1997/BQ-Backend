@@ -1,6 +1,11 @@
 import { Schema } from "mongoose";
-import { UserProps } from "../types";
-import { ROLES } from "../../../constants";
+import { SellerProps, UserProps } from "../types";
+import {
+  ALLOWED_BUSINESSES,
+  ALLOWED_COUNTRIES,
+  ROLES,
+  STATES_AND_UNION_TERRITORIES,
+} from "../../../constants";
 
 export const userSchema = new Schema<UserProps>(
   {
@@ -25,3 +30,79 @@ export const userSchema = new Schema<UserProps>(
 userSchema.index({ email: 1 }, { unique: true });
 userSchema.index({ phoneNumber: 1 }, { unique: true });
 userSchema.index({ role: 1 });
+
+const businessAddressSchema = new Schema<SellerProps["businessAddress"]>(
+  {
+    address: { type: String, required: true, minlength: 3 },
+    landmark: { type: String, default: "" },
+    city: { type: String, required: true, minlength: 2 },
+    state: { type: String, required: true, enum: STATES_AND_UNION_TERRITORIES },
+    pinCode: { type: String, required: true, minlength: 6, maxlength: 6 },
+    country: {
+      type: String,
+      required: true,
+      enum: ALLOWED_COUNTRIES,
+      default: "India",
+    },
+    pan: {
+      type: String,
+      required: true,
+      minlength: 10,
+      maxlength: 10,
+      uppercase: true,
+    },
+    gst: {
+      type: String,
+      required: true,
+      minlength: 15,
+      maxlength: 15,
+      uppercase: true,
+    },
+  },
+  { versionKey: false, _id: false }
+);
+
+const personalDetailsSchema = new Schema<SellerProps["personalDetails"]>(
+  {
+    name: { type: String, required: true, minlength: 2, maxlength: 50 },
+    email: { type: String, required: true },
+    phoneNumber: { type: String, required: true, minlength: 10, maxlength: 10 },
+  },
+  { versionKey: false, _id: false }
+);
+
+const businessDetailsSchema = new Schema<SellerProps["businessDetails"]>(
+  {
+    name: { type: String, required: true, minlength: 2 },
+    email: { type: String, required: true },
+    phoneNumber: { type: String, required: true, minlength: 10, maxlength: 10 },
+    category: { type: String, required: true, enum: ALLOWED_BUSINESSES },
+  },
+  { versionKey: false, _id: false }
+);
+
+const requiredDocumentsSchema = new Schema<SellerProps["requiredDocuments"]>(
+  {
+    gst: { type: String, required: true },
+    itr: { type: String, required: true },
+    geoTagging: { type: String, required: true },
+    addressProof: { type: String, required: true },
+  },
+  { versionKey: false, _id: false }
+);
+
+export const sellerSchema = new Schema<SellerProps>(
+  {
+    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    businessAddress: businessAddressSchema,
+    personalDetails: personalDetailsSchema,
+    businessDetails: businessDetailsSchema,
+    requiredDocuments: requiredDocumentsSchema,
+    approvalStatus: {
+      type: String,
+      enum: ["PENDING", "APPROVED", "REJECTED"],
+      default: "PENDING",
+    },
+  },
+  { versionKey: false, timestamps: true }
+);

@@ -1,0 +1,129 @@
+import z from "zod";
+import { validateZodEnums, validateZodString } from "../../../utils";
+import {
+  ALLOWED_BUSINESSES,
+  ALLOWED_COUNTRIES,
+  regexes,
+  STATES_AND_UNION_TERRITORIES,
+} from "../../../constants";
+
+export const sellerRequestZodSchema = z.object({
+  businessAddress: z.object(
+    {
+      address: validateZodString({
+        field: "address",
+        parentField: "businessAddress",
+        blockMultipleSpaces: true,
+        min: 3,
+      }),
+      landmark: validateZodString({
+        field: "landmark",
+        parentField: "businessAddress",
+        blockMultipleSpaces: true,
+        min: 2,
+        isOptional: true,
+        nonEmpty: false,
+      }),
+      city: validateZodString({
+        field: "city",
+        parentField: "businessAddress",
+        blockMultipleSpaces: true,
+        min: 2,
+      }),
+      state: validateZodEnums({
+        field: "state",
+        parentField: "businessAddress",
+        enums: STATES_AND_UNION_TERRITORIES,
+      }),
+      country: validateZodEnums({
+        field: "country",
+        parentField: "businessAddress",
+        enums: ALLOWED_COUNTRIES,
+      }).default("India"),
+      pinCode: validateZodString({
+        field: "pinCode",
+        parentField: "businessAddress",
+        min: 6,
+        max: 6,
+        blockSingleSpace: true,
+        customRegexes: [{ regex: regexes.pinCode, message: "must be valid" }],
+      }),
+      pan: validateZodString({
+        field: "pan",
+        parentField: "businessAddress",
+        min: 10,
+        max: 10,
+        blockSingleSpace: true,
+        customRegexes: [{ regex: regexes.pan, message: "must be valid" }],
+      }),
+      gst: validateZodString({
+        field: "gst",
+        parentField: "businessAddress",
+        min: 15,
+        max: 16,
+        blockSingleSpace: true,
+        customRegexes: [{ regex: regexes.gst, message: "must be valid" }],
+      }),
+    },
+    {
+      required_error: "businessAddress is required",
+      invalid_type_error: "businessAddress must be object",
+    }
+  ),
+  businessDetails: z.object(
+    {
+      name: validateZodString({
+        field: "name",
+        parentField: "businessDetails",
+        blockMultipleSpaces: true,
+        min: 2,
+        customRegexes: [
+          {
+            regex: regexes.name,
+            message:
+              "can only contain letters and only one space is allowed between words",
+          },
+        ],
+      }),
+      email: validateZodString({
+        field: "email",
+        parentField: "businessDetails",
+        blockSingleSpace: true,
+        customRegexes: [
+          {
+            regex: regexes.email,
+            message:
+              "please provide a valid email address, like example@domain.com",
+          },
+        ],
+      }).transform((val) => val?.toLowerCase()),
+      phoneNumber: validateZodString({
+        field: "phoneNumber",
+        parentField: "businessDetails",
+        blockSingleSpace: true,
+        min: 10,
+        max: 10,
+        customRegexes: [
+          {
+            regex: regexes.phoneNumber,
+            message:
+              "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
+          },
+        ],
+      }),
+      category: validateZodEnums({
+        field: "category",
+        parentField: "businessDetails",
+        enums: ALLOWED_BUSINESSES,
+      }),
+    },
+    {
+      required_error: "businessDetails is required",
+      invalid_type_error: "businessDetails must be object",
+    }
+  ),
+  agreeTerms: z.coerce.boolean({
+    required_error: "agreeTerms is required",
+    invalid_type_error: "agreeTerms must be boolean",
+  }),
+});

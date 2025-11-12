@@ -177,9 +177,7 @@ export const validateZodUrl = ({ ...props }: ZodCommonConfigs) => {
   return validateZodString({
     ...props,
     blockSingleSpace: true,
-    customRegexes: [
-      { regex: regexes.validUrl, message: "must be a valid URL" },
-    ],
+    customRegexes: [{ regex: regexes.url, message: "must be a valid URL" }],
   });
 };
 
@@ -275,7 +273,7 @@ export const validateZodDate = ({
       required_error: messages.required,
       invalid_type_error: messages.invalid_format,
     })
-    .refine((val) => regexes.validDate.test(val), {
+    .refine((val) => regexes.date.test(val), {
       message: messages.invalid_format,
     })
     .transform((val) => {

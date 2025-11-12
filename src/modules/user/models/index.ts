@@ -1,5 +1,7 @@
 import { model } from "mongoose";
-import { userSchema } from "../schemas";
-import { UserProps } from "../types";
+import { sellerSchema, userSchema } from "../schemas";
+import { SellerProps, UserProps } from "../types";
 
 export const User = model<UserProps>("User", userSchema);
+
+export const Seller = model<SellerProps>("Seller", sellerSchema);

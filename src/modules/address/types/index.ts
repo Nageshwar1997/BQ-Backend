@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { UserModule } from "../..";
-import { ADDRESS_TYPES, ALLOWED_COUNTRIES } from "../constants";
+import { ADDRESS_TYPES } from "../constants";
+import { ALLOWED_COUNTRIES } from "../../../constants";
 
 export interface IAddress
   extends Pick<

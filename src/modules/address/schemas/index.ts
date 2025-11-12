@@ -1,12 +1,16 @@
 import { Schema } from "mongoose";
 import { IAddress, IUserAddresses } from "../types";
-import { ADDRESS_TYPES, ALLOWED_COUNTRIES } from "../constants";
+import { ADDRESS_TYPES } from "../constants";
+import {
+  ALLOWED_COUNTRIES,
+  STATES_AND_UNION_TERRITORIES,
+} from "../../../constants";
 
 export const addressBaseFields = {
   address: { type: String, required: true },
   landmark: { type: String },
   city: { type: String, required: true },
-  state: { type: String, required: true },
+  state: { type: String, required: true, enum: STATES_AND_UNION_TERRITORIES },
   pinCode: { type: String, required: true, minlength: 6, maxlength: 6 },
   country: {
     type: String,

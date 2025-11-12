@@ -36,7 +36,7 @@ export const addShadesZodSchema = ({
         isOptional: true,
         customRegexes: [
           {
-            regex: regexes.validHexColorCode,
+            regex: regexes.hexCode,
             message: "Color code must be a valid hex color code.",
           },
         ],

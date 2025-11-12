@@ -3,3 +3,4 @@ export * as Models from "./models";
 export * as Routes from "./routes";
 export * as Services from "./services";
 export * as Types from "./types";
+export * as Validations from "./validations";

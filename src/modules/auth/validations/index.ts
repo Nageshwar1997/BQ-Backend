@@ -9,21 +9,21 @@ import { validateAuthField } from "../utils";
 
 const customRegexes = {
   email: {
-    regex: regexes.validEmail,
+    regex: regexes.email,
     message: "please provide a valid email address, like example@domain.com",
   },
   name: {
-    regex: regexes.validName,
+    regex: regexes.name,
     message:
       "can only contain letters and only one space is allowed between words",
   },
   phoneNumber: {
-    regex: regexes.validPhone,
+    regex: regexes.phoneNumber,
     message:
       "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
   },
   password: {
-    regex: regexes.validPassword,
+    regex: regexes.password,
     message:
       "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
   },
