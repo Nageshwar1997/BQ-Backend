@@ -3,6 +3,7 @@ import {
   cancelPaymentController,
   createOrderController,
   getAllOrdersController,
+  getOrderByIdController,
   verifyPaymentController,
 } from "../controllers";
 import {
@@ -39,4 +40,10 @@ orderRouter.get(
   RequestMiddleware.checkEmptyRequest({ query: false }), //LINK - Optional
   AuthMiddleware.authenticated,
   ResponseMiddleware.catchAsync(getAllOrdersController)
+);
+orderRouter.get(
+  "/:orderId",
+  RequestMiddleware.checkEmptyRequest({ params: false }),
+  AuthMiddleware.authenticated,
+  ResponseMiddleware.catchAsync(getOrderByIdController)
 );

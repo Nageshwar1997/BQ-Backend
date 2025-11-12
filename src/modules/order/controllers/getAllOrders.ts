@@ -33,7 +33,7 @@ export const getAllOrdersController = async (
     .sort({ createdAt: -1 })
     .populate({
       path: "products.product",
-      select: "title sellingPrice originalPrice commonImages category",
+      select: "title sellingPrice originalPrice commonImages",
       options: { slice: { commonImages: 1 } },
     })
     .populate({
