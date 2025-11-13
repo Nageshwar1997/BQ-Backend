@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import { ROLES } from "../../../constants";
-import { AddressModule } from "../..";
+import { AddressModule, ProductModule } from "../..";
 
 export interface UserProps {
   _id: string | Types.ObjectId;
@@ -35,4 +35,14 @@ export interface SellerProps {
     addressProof: string;
     geoTagging: string;
   };
+}
+
+export interface IWishlist {
+  _id: string | Types.ObjectId;
+  products: Types.ObjectId[];
+}
+
+export interface IPopulatedWishlist {
+  _id: string | Types.ObjectId | UserProps;
+  products: ProductModule.Types.PopulatedProduct[];
 }

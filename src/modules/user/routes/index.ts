@@ -1,8 +1,11 @@
 import { Router } from "express";
 
 import {
+  addProductToWishlistController,
   createSellerRequestController,
   getUserController,
+  getWishlistController,
+  removeProductFromWishlistController,
 } from "../controllers";
 import {
   AuthMiddleware,
@@ -38,4 +41,27 @@ userRouter.post(
   }),
   ZodMiddleware.validateZodSchema(sellerRequestZodSchema),
   ResponseMiddleware.catchAsync(createSellerRequestController)
+);
+
+// Wishlist Routes
+userRouter.get(
+  "/wishlist",
+  AuthMiddleware.authenticated,
+  ResponseMiddleware.catchAsync(getWishlistController)
+);
+
+userRouter.post(
+  "/wishlist/add/:productId",
+  RequestMiddleware.checkEmptyRequest({ params: true }),
+  AuthMiddleware.authenticated,
+  ResponseMiddleware.catchAsync(addProductToWishlistController)
+);
+
+userRouter.delete(
+  "/wishlist/remove/:productId",
+  RequestMiddleware.checkEmptyRequest({ params: true }),
+  AuthMiddleware.authenticated,
+  ResponseMiddleware.catchAsyncWithTransaction(
+    removeProductFromWishlistController
+  )
 );
