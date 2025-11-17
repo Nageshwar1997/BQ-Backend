@@ -11,6 +11,7 @@ import {
   ReviewModule,
   UserModule,
 } from "../modules";
+import { chatRouter } from "../modules/chatbot/routes";
 
 const router = Router();
 
@@ -43,5 +44,6 @@ router.use("/addresses", AddressModule.Routes.addressRouter);
 
 // Order routes
 router.use("/orders", OrderModule.Routes.orderRouter);
+router.use("/chatbot", chatRouter);
 
 export default router;

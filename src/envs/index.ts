@@ -36,4 +36,5 @@ export const {
   // R
   RAZORPAY_KEY_ID,
   RAZORPAY_KEY_SECRET,
+  MISTRAL_API_KEY,
 } = process.env;

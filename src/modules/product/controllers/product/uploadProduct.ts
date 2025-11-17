@@ -6,6 +6,9 @@ import { AppError } from "../../../../classes";
 import { Product, Shade } from "../../models";
 import { findOrCreateCategory } from "../../services";
 import { removeImages, uploadImages } from "../../utils";
+import { ProductEmbedding } from "../../../chatbot/models";
+import { embeddings } from "../../../../configs/chatbot";
+import { ShadeProps } from "../../types";
 
 export const uploadProductController = async (
   req: AuthorizedRequest,
@@ -31,7 +34,7 @@ export const uploadProductController = async (
 
   const files = req.files as Express.Multer.File[];
 
-  // Find or Create Level-Two Category (Parent must be null)
+  // Find or Create Level-One Category (Parent must be null)
   const category_1 = await findOrCreateCategory(
     categoryLevelOne.name,
     categoryLevelOne.category,
@@ -62,11 +65,8 @@ export const uploadProductController = async (
     );
   }
 
+  // Separate files for common images and shade images
   const commonImageFiles: Express.Multer.File[] = [];
-  let uploadedCommonImages: string[] = [];
-  let uploadedAllShadesImages: string[] = [];
-  let newShadeIds: Types.ObjectId[] = [];
-
   const shadeImagesMap: Record<number, Express.Multer.File[]> = {};
   files?.forEach((file) => {
     if (file.fieldname.startsWith("commonImages")) {
@@ -88,16 +88,20 @@ export const uploadProductController = async (
     throw new AppError("Common images are required", 400);
   }
 
-  // Upload common images
-  uploadedCommonImages = await uploadImages(
-    commonImageFiles,
-    `Products/${title}/Common_Images`
-  );
+  let uploadedCommonImages: string[] = [];
+  let uploadedAllShadesImages: string[] = [];
+  let newShadeIds: Types.ObjectId[] = [];
 
   try {
+    // Upload common images
+    uploadedCommonImages = await uploadImages(
+      commonImageFiles,
+      `Products/${title}/Common_Images`
+    );
+
+    // Handle shades
     if (shades?.length) {
       const shadesData = Array.isArray(shades) ? shades : [shades];
-
       const missingShadeErrors: string[] = [];
       let shadesTotalStock = 0;
 
@@ -127,7 +131,7 @@ export const uploadProductController = async (
         shadesData.map(async (shade, idx) => {
           const shadeFiles = shadeImagesMap[idx] || [];
 
-          shadesTotalStock += shade.stock;
+          shadesTotalStock += shade.stock || 0;
 
           const images = await uploadImages(
             shadeFiles,
@@ -151,37 +155,67 @@ export const uploadProductController = async (
 
       newShadeIds = insertedShades.map((shade) => shade._id);
     }
-  } catch (error) {
-    removeImages([...uploadedCommonImages, ...uploadedAllShadesImages]);
-    throw error;
-  }
 
-  const finalData = {
-    title,
-    brand,
-    description,
-    howToUse,
-    ingredients,
-    additionalDetails,
-    category: category_3._id,
-    discount: ((originalPrice - sellingPrice) / originalPrice) * 100,
-    seller: user?._id,
-    originalPrice,
-    sellingPrice,
-    commonImages: uploadedCommonImages,
-    shades: newShadeIds.length > 0 ? newShadeIds : [],
-    totalStock,
-  };
-  try {
-    const product = await Product.create(finalData);
+    // ===== 5️⃣ Create product =====
+    const product = await Product.create({
+      title,
+      brand,
+      description,
+      howToUse,
+      ingredients,
+      additionalDetails,
+      category: category_3._id,
+      discount: ((originalPrice - sellingPrice) / originalPrice) * 100,
+      seller: user?._id,
+      originalPrice,
+      sellingPrice,
+      commonImages: uploadedCommonImages,
+      shades: newShadeIds,
+      totalStock,
+    });
+
+    const productText = [
+      title,
+      brand,
+      description,
+      howToUse,
+      ingredients,
+      additionalDetails,
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    const otherText = [
+      ...(shades?.map((s: ShadeProps) => s.shadeName) ?? []),
+      categoryLevelOne.name,
+      categoryLevelTwo.name,
+      categoryLevelThree.name,
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    const docs = [productText, otherText];
+    // ===== 7️⃣ Generate embedding =====
+    const embeddingsVectors = await embeddings.embedDocuments(docs);
+
+    // ===== 8️⃣ Save embedding in ProductEmbedding collection =====
+    const embeddingsData = docs.map((doc, idx) => ({
+      productId: product._id,
+      embedding: embeddingsVectors[idx],
+      metadata: { searchText: doc },
+    }));
+
+    // 3️⃣ Save all embeddings in one go
+    await ProductEmbedding.insertMany(embeddingsData);
 
     res.success(200, "Product uploaded successfully", { product });
   } catch (error) {
-    // Rollback: Remove uploaded images
+    // Rollback uploaded images
     removeImages([...uploadedCommonImages, ...uploadedAllShadesImages]);
-    // Rollback: Remove uploaded shades
+
+    // Rollback inserted shades
     if (newShadeIds.length) {
-      await Shade.deleteMany({ _id: { $in: newShadeIds } }); // To remove all shades
+      await Shade.deleteMany({ _id: { $in: newShadeIds } });
     }
 
     throw error;
