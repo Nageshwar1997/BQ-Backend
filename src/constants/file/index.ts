@@ -7,6 +7,7 @@ export const ALLOWED_IMAGE_TYPES = [
   "image/png",
   "image/webp",
   "image/jpg",
+  "image/svg+xml",
 ];
 
 export const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm"];
