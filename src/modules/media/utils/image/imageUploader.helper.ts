@@ -12,6 +12,8 @@ import { getCloudinaryOptimizedUrl } from "../../../../utils";
 
 const mainFolder = CLOUDINARY_MAIN_FOLDER;
 
+const sanitize = (str: string) => str.replace(/[&|\/\\#?%]/g, "_");
+
 // ========== COMMON UPLOADER FUNCTION ==========
 const uploadToCloudinary = async (
   file: Express.Multer.File,
@@ -35,15 +37,16 @@ const uploadToCloudinary = async (
     cloudinary.uploader
       .upload_stream(
         {
-          folder: `${mainFolder}/${subFolder}`,
+          folder: sanitize(`${mainFolder}/${subFolder}`),
           public_id: publicId,
           resource_type: "image",
-          allowed_formats: ["jpg", "jpeg", "png", "webp"],
+          allowed_formats: ["jpg", "jpeg", "png", "webp", "svg"],
           format: "webp", // convert to webp
           transformation: [{ fetch_format: "webp", quality: "auto" }],
         },
         (error, result) => {
           if (error) {
+            console.log("ERROR CLD", error);
             return reject(
               new AppError(
                 error.message || "Failed to upload image on Cloudinary",
