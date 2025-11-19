@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 
-import { allowedOptions } from "../constants";
-import { AppError } from "../../../classes";
 import { singleImageUploader } from "../utils";
 
 export const uploadSingleImageController = async (

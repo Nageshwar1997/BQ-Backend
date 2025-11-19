@@ -2,7 +2,6 @@ import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { Order } from "../models";
 import { AppError } from "../../../classes";
-import { ORDER_STATUS, RAZORPAY_PAYMENT_STATUS } from "../constants";
 import { IOrder } from "../types";
 import { FilterQuery } from "mongoose";
 

@@ -1,14 +1,8 @@
 import { Response } from "express";
 
 import { AuthorizedRequest } from "../../../types";
-import { allowedOptions } from "../constants";
 import { AppError } from "../../../classes";
-import {
-  ALLOWED_IMAGE_TYPES,
-  ALLOWED_VIDEO_TYPES,
-  MAX_IMAGE_FILE_SIZE,
-  MAX_VIDEO_FILE_SIZE,
-} from "../../../constants";
+import { ALLOWED_IMAGE_TYPES, ALLOWED_VIDEO_TYPES } from "../../../constants";
 import {
   singleImageRemover,
   singleImageUploader,
