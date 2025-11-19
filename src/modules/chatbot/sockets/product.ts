@@ -21,7 +21,6 @@ export const initProductSocket = (nsp: Namespace) => {
   nsp.on("connection", (socket) => {
     console.log("Client connected to /products namespace:", socket.id);
 
-    // Handle product chat messages
     socket.on("send_message", async ({ message, userId }) => {
       try {
         if (!message || !userId) {
@@ -47,7 +46,7 @@ export const initProductSocket = (nsp: Namespace) => {
           chatHistory.set(userId, session);
         }
 
-        // Decide whether to perform vector search
+        // Vector search if needed
         let matchedProducts = session.lastMatchedProducts || [];
         const shouldSearch =
           !session.lastQuery ||
@@ -55,17 +54,6 @@ export const initProductSocket = (nsp: Namespace) => {
 
         if (shouldSearch) {
           const queryVector = await getEmbeddings.embedQuery(message);
-          //   matchedProducts = await EmbeddedProduct.aggregate([
-          //     {
-          //       $vectorSearch: {
-          //         index: "product_search_index",
-          //         queryVector,
-          //         path: "embeddings",
-          //         numCandidates: 100,
-          //         limit: 5,
-          //       },
-          //     },
-          //   ]);
           matchedProducts = await EmbeddedProduct.aggregate([
             {
               $vectorSearch: {
@@ -98,76 +86,91 @@ export const initProductSocket = (nsp: Namespace) => {
           session.lastQuery = message;
         }
 
-        // console.log("matchedProducts", matchedProducts);
-        // Format matched products
-        let productInfo = "No matching products found.";
-        if (matchedProducts.length > 0) {
-          productInfo = matchedProducts
-            .map(
-              (p, idx) => `
-Product #${idx + 1}
--------------------------
-Name: ${p.product.title}
-Price: ₹${p.product.sellingPrice}
-Description: ${p.product.description}
-How To Use: ${p.product.howToUse}
-Ingredients: ${p.product.ingredients}
-Additional Details: ${p.product.additionalDetails}
-Brand: ${p.product.brand}
-Discount: ${p.product.discount}
-`
-            )
-            .join("\n");
-        }
+        console.log("MATCHED_PRODUCTS", matchedProducts);
 
-        // Push user query + matched products
+        // Prepare minimal product info for AI context
+        const minimalProducts = matchedProducts?.map((p, i) => ({
+          Product: i + 1,
+          Name: p.product.title,
+          Brand: p.product.brand,
+          Price: p.product.sellingPrice,
+          Description: p.product.description,
+          ...(p.product.howToUse && { "How To Use": p.product.howToUse }),
+          ...(p.product.ingredients && { Ingredients: p.product.ingredients }),
+          ...(p.product.additionalDetails && {
+            "Additional Details": p.product.additionalDetails,
+          }),
+          ...(p.product.shades?.length > 0 && {
+            Shades: p.product.shades.map((s) => s.shadeName).join(", "),
+          }),
+          Discount: p.product.discount,
+        }));
+
+        // Push user message with product context
         session.history.push(
-          new HumanMessage(`
-User Query: ${message}
-
-Matched Products:
-${productInfo}
-`)
+          new HumanMessage(
+            `User Query: ${message}\nMatched Products: ${JSON.stringify(
+              minimalProducts
+            )}`
+          )
         );
 
-        // Initialize LLM
-        // const model = await initChatModel("mistral-small-latest", {
-        //   modelProvider: "mistralai",
-        //   modelName: "mistral-small-latest",
-        //   configPrefix: "mistral",
-        //   configurableFields: ["model", "modelName", "configPrefix"],
-        // });
-
-        // // Get AI reply
-        // const response = await model.invoke(session.history);
-
-        console.log("Initializing model...");
+        // Initialize streaming AI model
         const model = await initChatModel("mistral-small-latest", {
           modelProvider: "mistralai",
           modelName: "mistral-small-latest",
           configPrefix: "mistral",
           configurableFields: ["model", "modelName", "configPrefix"],
+          disableStreaming: false, // enable streaming
         });
-        console.log("Model initialized", model);
 
-        console.log("session.history", session.history);
+        // Stream response chunk by chunk
+        const stream = await model.stream(session.history);
 
-        const response = await model.invoke(session.history);
-        console.log("AI response received", response.content);
+        let accumulatedResponse = "";
 
-        // Save AI reply
-        session.history.push(new AIMessage(response.content));
+        for await (const chunk of stream) {
+          const chunkText = chunk.content || "";
+          accumulatedResponse += chunkText;
 
-        // Send response to client
-        socket.emit("receive_message", {
+          // Emit chunk to frontend immediately
+          socket.emit("receive_message_chunk", {
+            success: true,
+            chunk: chunkText,
+          });
+        }
+
+        // Save full AI response in session
+        session.history.push(new AIMessage(accumulatedResponse));
+
+        // Emit final complete response event (optional)
+        socket.emit("receive_message_complete", {
           success: true,
-          reply: response.content,
+          fullResponse: accumulatedResponse,
         });
       } catch (err: any) {
         console.error("Product Chat Error:", err);
+
+        // Handle rate-limit / capacity errors
+        const isMistral429 =
+          err?.statusCode === 429 ||
+          err?.code === "3505" ||
+          err?.body?.includes?.("service_tier_capacity_exceeded") ||
+          err?.message?.includes?.("Service tier capacity exceeded");
+
+        let friendlyMessage =
+          err?.message ||
+          "Something went wrong, please try again after a while.";
+
+        if (isMistral429) {
+          friendlyMessage =
+            "The AI shopping assistant is currently under heavy load. " +
+            "Please try again in a few moments, or send a shorter/simple message.";
+        }
+
         socket.emit("receive_message", {
           success: false,
-          reply: err.message || "Internal error",
+          reply: friendlyMessage,
         });
       }
     });
