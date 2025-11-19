@@ -19,8 +19,6 @@ const chatHistory = new Map<string, ChatSession>();
 
 export const initProductSocket = (nsp: Namespace) => {
   nsp.on("connection", (socket) => {
-    console.log("Client connected to /products namespace:", socket.id);
-
     socket.on("send_message", async ({ message, userId }) => {
       try {
         if (!message || !userId) {
@@ -54,7 +52,9 @@ export const initProductSocket = (nsp: Namespace) => {
 
         if (shouldSearch) {
           const queryVector = await getEmbeddings.embedQuery(message);
+
           matchedProducts = await EmbeddedProduct.aggregate([
+            // 1️⃣ Vector search
             {
               $vectorSearch: {
                 index: "vector_product_index",
@@ -64,20 +64,128 @@ export const initProductSocket = (nsp: Namespace) => {
                 limit: 5,
               },
             },
+
+            // 2️⃣ Lookup product
             {
               $lookup: {
-                from: "products", // MongoDB collection name for Product
-                localField: "product", // field in EmbeddedProduct
-                foreignField: "_id", // field in Product
-                as: "productData", // name of the populated field
+                from: "products",
+                localField: "product",
+                foreignField: "_id",
+                as: "productData",
               },
             },
-            { $unwind: "$productData" }, // flatten the array
+            { $unwind: "$productData" },
+
+            // 3️⃣ Lookup shades
+            {
+              $lookup: {
+                from: "shades",
+                localField: "productData.shades",
+                foreignField: "_id",
+                as: "shadesData",
+              },
+            },
+
+            // 4️⃣ Lookup category
+            {
+              $lookup: {
+                from: "categories",
+                localField: "productData.category",
+                foreignField: "_id",
+                as: "categoryData",
+              },
+            },
+            { $unwind: "$categoryData" },
+
+            // 5️⃣ Parent category
+            {
+              $lookup: {
+                from: "categories",
+                localField: "categoryData.parentCategory",
+                foreignField: "_id",
+                as: "parentCategoryData",
+              },
+            },
+            {
+              $unwind: {
+                path: "$parentCategoryData",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+
+            // 6️⃣ Grandparent category
+            {
+              $lookup: {
+                from: "categories",
+                localField: "parentCategoryData.parentCategory",
+                foreignField: "_id",
+                as: "grandParentCategoryData",
+              },
+            },
+            {
+              $unwind: {
+                path: "$grandParentCategoryData",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+
+            // 7️⃣ Final projection with category inside product
             {
               $project: {
                 _id: 0,
-                similarityScore: 1, // optional: include similarity if needed
-                product: "$productData", // use populated product
+                similarityScore: 1,
+
+                product: {
+                  title: "$productData.title",
+                  brand: "$productData.brand",
+                  sellingPrice: "$productData.sellingPrice",
+                  originalPrice: "$productData.originalPrice",
+                  discount: "$productData.discount",
+                  howToUse: "$productData.howToUse",
+                  ingredients: "$productData.ingredients",
+                  additionalDetails: "$productData.additionalDetails",
+                  commonImages: "$productData.commonImages",
+
+                  // ✅ Populate shades as full objects
+                  shades: {
+                    $map: {
+                      input: "$productData.shades",
+                      as: "s",
+                      in: {
+                        $arrayElemAt: [
+                          {
+                            $filter: {
+                              input: "$shadesData",
+                              as: "sd",
+                              cond: { $eq: ["$$sd._id", "$$s"] },
+                            },
+                          },
+                          0,
+                        ],
+                      },
+                    },
+                  },
+
+                  // ✅ Move category inside product
+                  category: {
+                    _id: "$categoryData._id",
+                    name: "$categoryData.name",
+                    category: "$categoryData.category",
+                    level: "$categoryData.level",
+                    parentCategory: {
+                      _id: "$parentCategoryData._id",
+                      name: "$parentCategoryData.name",
+                      category: "$parentCategoryData.category",
+                      level: "$parentCategoryData.level",
+                      parentCategory: {
+                        _id: "$grandParentCategoryData._id",
+                        name: "$grandParentCategoryData.name",
+                        category: "$grandParentCategoryData.category",
+                        level: "$grandParentCategoryData.level",
+                      },
+                    },
+                  },
+                },
               },
             },
           ]);
@@ -86,7 +194,7 @@ export const initProductSocket = (nsp: Namespace) => {
           session.lastQuery = message;
         }
 
-        console.log("MATCHED_PRODUCTS", matchedProducts);
+        console.log("MATCHED_PRODUCTS", matchedProducts[0].product.category);
 
         // Prepare minimal product info for AI context
         const minimalProducts = matchedProducts?.map((p, i) => ({
