@@ -7,11 +7,11 @@ import {
 } from "langchain";
 import { getEmbeddings } from "../../../configs";
 import { EmbeddedProduct } from "../models";
-import { IPopulatedEmbeddedProduct } from "../types";
+import { IAggregatedEmbeddedProduct } from "../types";
 
 interface ChatSession {
   history: (SystemMessage | HumanMessage | AIMessage)[];
-  lastMatchedProducts?: IPopulatedEmbeddedProduct[];
+  lastMatchedProducts?: IAggregatedEmbeddedProduct[];
   lastQuery?: string;
 }
 
@@ -54,7 +54,7 @@ export const initProductSocket = (nsp: Namespace) => {
           const queryVector = await getEmbeddings.embedQuery(message);
 
           matchedProducts = await EmbeddedProduct.aggregate([
-            // 1️⃣ Vector search
+            // Vector search
             {
               $vectorSearch: {
                 index: "vector_product_index",
@@ -65,7 +65,7 @@ export const initProductSocket = (nsp: Namespace) => {
               },
             },
 
-            // 2️⃣ Lookup product
+            // Lookup product
             {
               $lookup: {
                 from: "products",
@@ -76,7 +76,7 @@ export const initProductSocket = (nsp: Namespace) => {
             },
             { $unwind: "$productData" },
 
-            // 3️⃣ Lookup shades
+            // Lookup shades
             {
               $lookup: {
                 from: "shades",
@@ -86,7 +86,7 @@ export const initProductSocket = (nsp: Namespace) => {
               },
             },
 
-            // 4️⃣ Lookup category
+            // Lookup category
             {
               $lookup: {
                 from: "categories",
@@ -97,7 +97,7 @@ export const initProductSocket = (nsp: Namespace) => {
             },
             { $unwind: "$categoryData" },
 
-            // 5️⃣ Parent category
+            // Parent category
             {
               $lookup: {
                 from: "categories",
@@ -113,7 +113,7 @@ export const initProductSocket = (nsp: Namespace) => {
               },
             },
 
-            // 6️⃣ Grandparent category
+            // Grandparent category
             {
               $lookup: {
                 from: "categories",
@@ -129,7 +129,7 @@ export const initProductSocket = (nsp: Namespace) => {
               },
             },
 
-            // 7️⃣ Final projection with category inside product
+            // Project required fields
             {
               $project: {
                 _id: 0,
@@ -144,9 +144,8 @@ export const initProductSocket = (nsp: Namespace) => {
                   howToUse: "$productData.howToUse",
                   ingredients: "$productData.ingredients",
                   additionalDetails: "$productData.additionalDetails",
-                  commonImages: "$productData.commonImages",
 
-                  // ✅ Populate shades as full objects
+                  // Shade Names Only (Array of Shade Names)
                   shades: {
                     $map: {
                       input: "$productData.shades",
@@ -154,10 +153,16 @@ export const initProductSocket = (nsp: Namespace) => {
                       in: {
                         $arrayElemAt: [
                           {
-                            $filter: {
-                              input: "$shadesData",
-                              as: "sd",
-                              cond: { $eq: ["$$sd._id", "$$s"] },
+                            $map: {
+                              input: {
+                                $filter: {
+                                  input: "$shadesData",
+                                  as: "sd",
+                                  cond: { $eq: ["$$sd._id", "$$s"] },
+                                },
+                              },
+                              as: "matchedShade",
+                              in: "$$matchedShade.shadeName",
                             },
                           },
                           0,
@@ -165,25 +170,11 @@ export const initProductSocket = (nsp: Namespace) => {
                       },
                     },
                   },
-
-                  // ✅ Move category inside product
+                  // Category Names Only
                   category: {
-                    _id: "$categoryData._id",
-                    name: "$categoryData.name",
-                    category: "$categoryData.category",
-                    level: "$categoryData.level",
-                    parentCategory: {
-                      _id: "$parentCategoryData._id",
-                      name: "$parentCategoryData.name",
-                      category: "$parentCategoryData.category",
-                      level: "$parentCategoryData.level",
-                      parentCategory: {
-                        _id: "$grandParentCategoryData._id",
-                        name: "$grandParentCategoryData.name",
-                        category: "$grandParentCategoryData.category",
-                        level: "$grandParentCategoryData.level",
-                      },
-                    },
+                    grandParent: "$grandParentCategoryData.name",
+                    parent: "$parentCategoryData.name",
+                    child: "$categoryData.name",
                   },
                 },
               },
@@ -194,24 +185,30 @@ export const initProductSocket = (nsp: Namespace) => {
           session.lastQuery = message;
         }
 
-        console.log("MATCHED_PRODUCTS", matchedProducts[0].product.category);
+        console.log("MATCHED_PRODUCTS", matchedProducts[0].product);
 
         // Prepare minimal product info for AI context
         const minimalProducts = matchedProducts?.map((p, i) => ({
-          Product: i + 1,
+          "Product No.": i + 1,
           Name: p.product.title,
           Brand: p.product.brand,
-          Price: p.product.sellingPrice,
+          "Selling Price": p.product.sellingPrice,
+          "Original Price": p.product.sellingPrice,
           Description: p.product.description,
+          Discount: p.product.discount,
+          Category: {
+            "Grand Parent": p.product.category.grandParent,
+            Parent: p.product.category.parent,
+            Child: p.product.category.child,
+          },
           ...(p.product.howToUse && { "How To Use": p.product.howToUse }),
           ...(p.product.ingredients && { Ingredients: p.product.ingredients }),
           ...(p.product.additionalDetails && {
             "Additional Details": p.product.additionalDetails,
           }),
-          ...(p.product.shades?.length > 0 && {
-            Shades: p.product.shades.map((s) => s.shadeName).join(", "),
+          ...(p.product.shades.length > 0 && {
+            Shades: p.product.shades.map((shadeName) => shadeName).join(", "),
           }),
-          Discount: p.product.discount,
         }));
 
         // Push user message with product context
@@ -256,25 +253,11 @@ export const initProductSocket = (nsp: Namespace) => {
           success: true,
           fullResponse: accumulatedResponse,
         });
-      } catch (err: any) {
-        console.error("Product Chat Error:", err);
-
-        // Handle rate-limit / capacity errors
-        const isMistral429 =
-          err?.statusCode === 429 ||
-          err?.code === "3505" ||
-          err?.body?.includes?.("service_tier_capacity_exceeded") ||
-          err?.message?.includes?.("Service tier capacity exceeded");
-
+      } catch (err) {
         let friendlyMessage =
-          err?.message ||
-          "Something went wrong, please try again after a while.";
-
-        if (isMistral429) {
-          friendlyMessage =
-            "The AI shopping assistant is currently under heavy load. " +
-            "Please try again in a few moments, or send a shorter/simple message.";
-        }
+          (err as { body: { message: string } }).body.message ||
+          (err as { message: string })?.message ||
+          "The AI shopping assistant is currently under heavy load. Please try again in a few moments.";
 
         socket.emit("receive_message", {
           success: false,

@@ -12,7 +12,8 @@ import {
   DatabaseMiddleware,
 } from "./middlewares";
 import { NODE_ENV, PORT } from "./envs";
-import { initSocket } from "./configs/socket";
+import { getNamespace, initSocket } from "./configs/socket";
+import { initProductSocket } from "./modules/chatbot/sockets/product";
 
 const app = express();
 const port = PORT || 5454;
@@ -42,9 +43,14 @@ app.use(ResponseMiddleware.error);
 // Create HTTP server
 const server = http.createServer(app);
 
-// Only initialize Socket.IO if someone connects
-// Frontend will trigger this automatically on first connect
+// Initialize Socket.IO
 initSocket(server);
+
+// Create products namespace
+const productsNsp = getNamespace("products");
+
+// Initialize product-specific socket logic
+initProductSocket(productsNsp);
 
 // Start server
 if (NODE_ENV === "development") {
