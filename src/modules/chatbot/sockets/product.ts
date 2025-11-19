@@ -5,16 +5,19 @@ import {
   AIMessage,
   initChatModel,
 } from "langchain";
-import { getEmbeddedProducts } from "../services/product";
+import {
+  getEmbeddedProducts,
+  getMinimalProductsForAiPrompt,
+} from "../services/product";
 import { IAggregatedEmbeddedProduct } from "../types";
 
-interface ChatSession {
+interface ProductChatSession {
   history: (SystemMessage | HumanMessage | AIMessage)[];
   lastMatchedProducts?: IAggregatedEmbeddedProduct[];
   lastQuery?: string;
 }
 
-const chatHistory = new Map<string, ChatSession>();
+const productChatHistory = new Map<string, ProductChatSession>();
 
 export const initProductSocket = (nsp: Namespace) => {
   nsp.on("connection", (socket) => {
@@ -29,7 +32,7 @@ export const initProductSocket = (nsp: Namespace) => {
         }
 
         // Initialize session if not exists
-        let session = chatHistory.get(userId);
+        let session = productChatHistory.get(userId);
         if (!session) {
           session = {
             history: [
@@ -40,7 +43,7 @@ export const initProductSocket = (nsp: Namespace) => {
             lastMatchedProducts: [],
             lastQuery: "",
           };
-          chatHistory.set(userId, session);
+          productChatHistory.set(userId, session);
         }
 
         // Vector search if needed
@@ -56,31 +59,8 @@ export const initProductSocket = (nsp: Namespace) => {
           session.lastQuery = message;
         }
 
-        console.log("MATCHED_PRODUCTS", matchedProducts[0].product);
-
         // Prepare minimal product info for AI context
-        const minimalProducts = matchedProducts?.map((p, i) => ({
-          "Product No.": i + 1,
-          Name: p.product.title,
-          Brand: p.product.brand,
-          "Selling Price": p.product.sellingPrice,
-          "Original Price": p.product.sellingPrice,
-          Description: p.product.description,
-          Discount: p.product.discount,
-          Category: {
-            "Grand Parent": p.product.category.grandParent,
-            Parent: p.product.category.parent,
-            Child: p.product.category.child,
-          },
-          ...(p.product.howToUse && { "How To Use": p.product.howToUse }),
-          ...(p.product.ingredients && { Ingredients: p.product.ingredients }),
-          ...(p.product.additionalDetails && {
-            "Additional Details": p.product.additionalDetails,
-          }),
-          ...(p.product.shades.length > 0 && {
-            Shades: p.product.shades.map((shadeName) => shadeName).join(", "),
-          }),
-        }));
+        const minimalProducts = getMinimalProductsForAiPrompt(matchedProducts);
 
         // Push user message with product context
         session.history.push(

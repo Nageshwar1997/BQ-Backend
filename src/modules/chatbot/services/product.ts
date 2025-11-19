@@ -1,7 +1,17 @@
 import { getEmbeddings } from "../../../configs";
 import { EmbeddedProduct } from "../models";
+import { IAggregatedEmbeddedProduct } from "../types";
 
-export const getEmbeddedProducts = async (message: string) => {
+export const removeHTMLTags = (text: string): string => {
+  return text
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+export const getEmbeddedProducts = async (
+  message: string
+): Promise<IAggregatedEmbeddedProduct[]> => {
   const queryVector = await getEmbeddings.embedQuery(message);
 
   const products = await EmbeddedProduct.aggregate([
@@ -132,5 +142,49 @@ export const getEmbeddedProducts = async (message: string) => {
     },
   ]);
 
-  return products;
+  const cleanedProducts = products.map((item) => {
+    return {
+      ...item,
+      product: {
+        ...item.product,
+        description: removeHTMLTags(item.product.description),
+        howToUse: removeHTMLTags(item.product.howToUse),
+        ingredients: removeHTMLTags(item.product.ingredients),
+        additionalDetails: removeHTMLTags(item.product.additionalDetails),
+      },
+    };
+  });
+
+  return cleanedProducts;
+};
+
+export const getMinimalProductsForAiPrompt = (
+  products: IAggregatedEmbeddedProduct[]
+) => {
+  const minimalProducts = products?.map(({ product }, i) => ({
+    "Product No.": i + 1,
+    Name: product.title,
+    Brand: product.brand,
+    "Selling Price": product.sellingPrice,
+    "Original Price": product.sellingPrice,
+    Description: product.description,
+    Discount: product.discount,
+    Category: {
+      "Grand Parent": product.category.grandParent,
+      Parent: product.category.parent,
+      Child: product.category.child,
+    },
+    ...(product.howToUse && { "How To Use": product.howToUse }),
+    ...(product.ingredients && {
+      Ingredients: product.ingredients,
+    }),
+    ...(product.additionalDetails && {
+      "Additional Details": product.additionalDetails,
+    }),
+    ...(product.shades.length > 0 && {
+      Shades: product.shades.map((shadeName) => shadeName).join(", "),
+    }),
+  }));
+
+  return minimalProducts;
 };
