@@ -26,3 +26,10 @@ export interface IAggregatedEmbeddedProduct
     category: Record<"grandParent" | "parent" | "child", string>;
   };
 }
+
+export interface TCreateOrUpdateEmbeddedProduct {
+  productId: IAggregatedEmbeddedProduct["product"]["_id"];
+  title: IAggregatedEmbeddedProduct["product"]["title"];
+  brand: IAggregatedEmbeddedProduct["product"]["brand"];
+  category: IAggregatedEmbeddedProduct["product"]["category"];
+}

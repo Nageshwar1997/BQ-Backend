@@ -1,8 +1,11 @@
-import { getEmbeddings } from "../../../configs";
+import { getEmbeddings, postEmbeddings } from "../../../configs";
 import { EmbeddedProduct } from "../models";
-import { IAggregatedEmbeddedProduct } from "../types";
+import {
+  IAggregatedEmbeddedProduct,
+  TCreateOrUpdateEmbeddedProduct,
+} from "../types";
 
-export const removeHTMLTags = (text: string): string => {
+const removeHTMLTags = (text: string): string => {
   return text
     ?.replace(/<[^>]*>/g, " ")
     ?.replace(/\s+/g, " ")
@@ -187,4 +190,26 @@ export const getMinimalProductsForAiPrompt = (
   }));
 
   return minimalProducts;
+};
+
+export const createOrUpdateEmbeddedProduct = async ({
+  title,
+  brand,
+  productId,
+  category,
+}: TCreateOrUpdateEmbeddedProduct) => {
+  try {
+    const searchText = `${title} ${brand} ${category.grandParent} ${category.parent} ${category.child}`;
+    const embeddings = await postEmbeddings.embedQuery(searchText);
+
+    await EmbeddedProduct.findOneAndUpdate(
+      { product: productId },
+      { $set: { embeddings, searchText } },
+      { new: true, upsert: true }
+    );
+
+    console.log("Background product embedding done");
+  } catch (err) {
+    console.error("Background product embedding failed:", err);
+  }
 };

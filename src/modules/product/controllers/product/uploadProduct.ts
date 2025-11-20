@@ -6,7 +6,6 @@ import { AppError } from "../../../../classes";
 import { Product, Shade } from "../../models";
 import { findOrCreateCategory } from "../../services";
 import { removeImages, uploadImages } from "../../utils";
-import { postEmbeddings } from "../../../../configs";
 import { ChatbotModule } from "../../..";
 
 export const uploadProductController = async (
@@ -181,20 +180,16 @@ export const uploadProductController = async (
 
     // Background embedding
     (async () => {
-      try {
-        const searchText = `${product.title} ${product.brand} ${category_1.name} ${category_2.name} ${category_3.name}`;
-        const embeddings = await postEmbeddings.embedQuery(searchText);
-
-        await ChatbotModule.Models.EmbeddedProduct.create({
-          embeddings,
-          product: product._id,
-          searchText,
-        });
-
-        console.log("Background embedding done");
-      } catch (err) {
-        console.error("Embedding failed:", err);
-      }
+      await ChatbotModule.Services.createOrUpdateEmbeddedProduct({
+        title: product.title,
+        brand: product.brand,
+        category: {
+          child: category_3.name,
+          parent: category_2.name,
+          grandParent: category_1.name,
+        },
+        productId: product._id,
+      });
     })();
   } catch (error) {
     console.log("ERROR", error);
