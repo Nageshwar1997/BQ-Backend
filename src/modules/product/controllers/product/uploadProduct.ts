@@ -6,8 +6,8 @@ import { AppError } from "../../../../classes";
 import { Product, Shade } from "../../models";
 import { findOrCreateCategory } from "../../services";
 import { removeImages, uploadImages } from "../../utils";
-import { EmbeddedProduct } from "../../../chatbot/models";
 import { postEmbeddings } from "../../../../configs";
+import { ChatbotModule } from "../../..";
 
 export const uploadProductController = async (
   req: AuthorizedRequest,
@@ -185,7 +185,7 @@ export const uploadProductController = async (
         const searchText = `${product.title} ${product.brand} ${category_1.name} ${category_2.name} ${category_3.name}`;
         const embeddings = await postEmbeddings.embedQuery(searchText);
 
-        await EmbeddedProduct.create({
+        await ChatbotModule.Models.EmbeddedProduct.create({
           embeddings,
           product: product._id,
           searchText,

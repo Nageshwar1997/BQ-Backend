@@ -8,6 +8,8 @@ import { findOrCreateCategory } from "../../services";
 import { checkUserPermission, isValidMongoId } from "../../../../utils";
 import { POSSIBLE_UPDATE_PRODUCT_FIELDS } from "../../constants";
 import { removeImages, uploadImages } from "../../utils";
+import { postEmbeddings } from "../../../../configs";
+import { ChatbotModule } from "../../..";
 
 export const updateProductController = async (
   req: AuthorizedRequest,
@@ -455,6 +457,35 @@ export const updateProductController = async (
       updateBody,
       { new: true }
     ).lean();
+
+    if (!product) {
+      throw new AppError("Failed to update product", 400);
+    }
+
+    if (
+      updateBody?.title ||
+      updateBody?.brand ||
+      categoryLevelOne ||
+      categoryLevelTwo ||
+      categoryLevelThree
+    ) {
+      (async () => {
+        try {
+          const searchText = `${product.title} ${product.brand} ${category_1.name} ${category_2.name} ${category_3.name}`;
+          const embeddings = await postEmbeddings.embedQuery(searchText);
+
+          await ChatbotModule.Models.EmbeddedProduct.findOneAndUpdate(
+            { product: product._id },
+            { $set: { embeddings, searchText } },
+            { new: true, upsert: true }
+          );
+
+          console.log("Background embedding done");
+        } catch (err) {
+          console.error("Embedding failed:", err);
+        }
+      })();
+    }
 
     if (removingCommonImageURLs?.length) {
       await removeImages(removingCommonImageURLs);
