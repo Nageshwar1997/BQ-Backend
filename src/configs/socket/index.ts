@@ -37,7 +37,7 @@ export const initSocket = (
 };
 
 // Get or create a namespace
-export const getNamespace = (name: string) => {
+export const getNamespace = (name: "products" | "orders") => {
   if (!io) throw new Error("Socket.IO not initialized");
 
   if (!namespaces[name]) {

@@ -13,7 +13,7 @@ import {
 } from "./middlewares";
 import { NODE_ENV, PORT } from "./envs";
 import { getNamespace, initSocket } from "./configs/socket";
-import { initProductSocket } from "./modules/chatbot/sockets/product";
+import { ChatbotModule } from "./modules";
 
 const app = express();
 const port = PORT || 5454;
@@ -48,9 +48,11 @@ initSocket(server);
 
 // Create products namespace
 const productsNsp = getNamespace("products");
+const ordersNsp = getNamespace("products");
 
 // Initialize product-specific socket logic
-initProductSocket(productsNsp);
+ChatbotModule.Sockets.initProductSocket(productsNsp);
+ChatbotModule.Sockets.initProductSocket(ordersNsp);
 
 // Start server
 if (NODE_ENV === "development") {
