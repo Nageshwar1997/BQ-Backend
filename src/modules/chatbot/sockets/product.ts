@@ -11,6 +11,7 @@ import {
 } from "../services/product";
 import { IAggregatedEmbeddedProduct } from "../types";
 import { NODE_ENV } from "../../../envs";
+import { ConnectionError } from "@mistralai/mistralai/models/errors/httpclienterrors";
 
 interface ProductChatSession {
   history: (SystemMessage | HumanMessage | AIMessage)[];
@@ -106,23 +107,24 @@ export const initProductSocket = (nsp: Namespace) => {
           fullResponse: accumulatedResponse,
         });
       } catch (err: any) {
-        let friendlyMessage =
+        let errMsg =
           "The AI shopping assistant is currently under heavy load. Please try again in a few moments.";
 
-        if (err?.body && NODE_ENV === "development") {
-          try {
-            const parsed = JSON.parse(err.body);
+        if (NODE_ENV === "development") {
+          if (err?.body) {
+            try {
+              const parsed = JSON.parse(err.body);
 
-            friendlyMessage = parsed.message || friendlyMessage;
-          } catch (parseError) {
-            console.log("Failed to parse error body", parseError);
+              errMsg = parsed.message || errMsg;
+            } catch {
+              console.log("Failed to parse error body");
+            }
+          } else if (err instanceof ConnectionError || err instanceof Error) {
+            errMsg = err.message;
           }
         }
 
-        socket.emit("receive_message", {
-          success: false,
-          error: friendlyMessage,
-        });
+        socket.emit("receive_message", { success: false, error: errMsg });
       }
     });
 
