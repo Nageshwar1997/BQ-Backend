@@ -6,12 +6,12 @@ import {
   initChatModel,
 } from "langchain";
 import {
-  getAiGeneratedSuggestedQuestion,
   getEmbeddedProducts,
   getMinimalProductsForAiPrompt,
 } from "../services/product";
 import { IProductChatSession } from "../types";
 import { NODE_ENV } from "../../../envs";
+import { getAiGeneratedSuggestedQuestion } from "../utils";
 
 const productChatHistory = new Map<string, IProductChatSession>();
 
@@ -98,6 +98,7 @@ export const initProductSocket = (nsp: Namespace) => {
         const suggestedQuestions: string[] =
           await getAiGeneratedSuggestedQuestion(
             accumulatedResponse,
+            "product",
             session.history
           );
 
