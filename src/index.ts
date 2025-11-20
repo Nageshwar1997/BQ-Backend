@@ -48,11 +48,11 @@ initSocket(server);
 
 // Create products namespace
 const productsNsp = getNamespace("products");
-const ordersNsp = getNamespace("products");
+// const ordersNsp = getNamespace("products");
 
 // Initialize product-specific socket logic
 ChatbotModule.Sockets.initProductSocket(productsNsp);
-ChatbotModule.Sockets.initProductSocket(ordersNsp);
+// ChatbotModule.Sockets.initOrderSocket(ordersNsp);
 
 // Start server
 if (NODE_ENV === "development") {

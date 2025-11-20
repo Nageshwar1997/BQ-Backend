@@ -3,7 +3,7 @@ import { getEmbeddings, postEmbeddings } from "../../../configs";
 import { EmbeddedProduct } from "../models";
 import {
   IAggregatedEmbeddedProduct,
-  TProductChatSession,
+  IProductChatSession,
   TCreateOrUpdateEmbeddedProduct,
 } from "../types";
 
@@ -218,7 +218,7 @@ export const createOrUpdateEmbeddedProduct = async ({
 
 export const getAiGeneratedSuggestedQuestion = async (
   lastResponse: string,
-  history: TProductChatSession["history"][]
+  history: IProductChatSession["history"][]
 ): Promise<string[]> => {
   try {
     const model = await initChatModel("mistral-small-latest", {

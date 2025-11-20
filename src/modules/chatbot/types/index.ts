@@ -1,11 +1,17 @@
 import { Types } from "mongoose";
-import { ProductModule } from "../..";
+import { OrderModule, ProductModule } from "../..";
 import { SystemMessage, HumanMessage, AIMessage } from "langchain";
 
-export interface IEmbeddedProduct {
+export type TBaseEmbedded = {
   embeddings: number[];
   searchText: string;
+};
+export interface IEmbeddedProduct extends TBaseEmbedded {
   product: Types.ObjectId;
+}
+
+export interface IEmbeddedOrder extends TBaseEmbedded {
+  order: Types.ObjectId;
 }
 
 export interface IAggregatedEmbeddedProduct
@@ -28,6 +34,11 @@ export interface IAggregatedEmbeddedProduct
   };
 }
 
+export interface IAggregatedEmbeddedOrder
+  extends Omit<IEmbeddedOrder, "order"> {
+  order: OrderModule.Types.IOrder;
+}
+
 export interface TCreateOrUpdateEmbeddedProduct {
   productId: IAggregatedEmbeddedProduct["product"]["_id"];
   title: IAggregatedEmbeddedProduct["product"]["title"];
@@ -35,8 +46,15 @@ export interface TCreateOrUpdateEmbeddedProduct {
   category: IAggregatedEmbeddedProduct["product"]["category"];
 }
 
-export interface TProductChatSession {
+type TBaseChatSession = {
   history: (SystemMessage | HumanMessage | AIMessage)[];
-  lastMatchedProducts?: IAggregatedEmbeddedProduct[];
   lastQuery?: string;
+};
+
+export interface IProductChatSession extends TBaseChatSession {
+  lastMatchedProducts?: IAggregatedEmbeddedProduct[];
+}
+
+export interface IOrderChatSession extends TBaseChatSession {
+  lastMatchedOrders?: IAggregatedEmbeddedOrder[];
 }

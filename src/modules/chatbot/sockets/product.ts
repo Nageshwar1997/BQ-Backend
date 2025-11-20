@@ -10,10 +10,10 @@ import {
   getEmbeddedProducts,
   getMinimalProductsForAiPrompt,
 } from "../services/product";
-import { TProductChatSession } from "../types";
+import { IProductChatSession } from "../types";
 import { NODE_ENV } from "../../../envs";
 
-const productChatHistory = new Map<string, TProductChatSession>();
+const productChatHistory = new Map<string, IProductChatSession>();
 
 export const initProductSocket = (nsp: Namespace) => {
   nsp.on("connection", (socket) => {
