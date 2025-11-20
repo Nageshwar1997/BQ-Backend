@@ -22,12 +22,12 @@ const productChatHistory = new Map<string, ProductChatSession>();
 
 export const initProductSocket = (nsp: Namespace) => {
   nsp.on("connection", (socket) => {
-    socket.on("send_message", async ({ message, userId }) => {
+    socket.on("send_message", async ({ message, userId = "User_123" }) => {
       try {
-        if (!message || !userId) {
+        if (!message) {
           socket.emit("receive_message", {
             success: false,
-            reply: "Message and userId are required",
+            error: "Please ask me products related questions only.",
           });
           return;
         }
@@ -121,7 +121,7 @@ export const initProductSocket = (nsp: Namespace) => {
 
         socket.emit("receive_message", {
           success: false,
-          reply: friendlyMessage,
+          error: friendlyMessage,
         });
       }
     });
