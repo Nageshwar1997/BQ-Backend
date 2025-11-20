@@ -25,6 +25,9 @@ export const {
   JWT_SECRET,
 
   // M
+  MISTRAL_API_KEY, // Mistral automatically read it with this name only don't change it
+  MISTRAL_API_KEY_POST,
+  MISTRAL_API_KEY_GET,
   MONGODB_URI,
 
   // N
@@ -36,7 +39,4 @@ export const {
   // R
   RAZORPAY_KEY_ID,
   RAZORPAY_KEY_SECRET,
-  MISTRAL_API_KEY, // Mistral automatically read it with this name only don't change it
-  MISTRAL_API_KEY_POST,
-  MISTRAL_API_KEY_GET,
 } = process.env;
