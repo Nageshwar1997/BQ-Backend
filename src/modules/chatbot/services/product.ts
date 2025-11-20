@@ -247,7 +247,7 @@ export const getAiGeneratedSuggestedQuestion = async (
     // Try to parse JSON array
     try {
       const parsed = JSON.parse(content);
-      console.log("parsed", parsed);
+
       if (Array.isArray(parsed)) return parsed;
     } catch {
       // fallback: split by newlines and remove empty lines
