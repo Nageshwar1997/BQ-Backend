@@ -10,6 +10,7 @@ import {
   getMinimalProductsForAiPrompt,
 } from "../services/product";
 import { IAggregatedEmbeddedProduct } from "../types";
+import { NODE_ENV } from "../../../envs";
 
 interface ProductChatSession {
   history: (SystemMessage | HumanMessage | AIMessage)[];
@@ -81,7 +82,7 @@ export const initProductSocket = (nsp: Namespace) => {
         });
 
         // Stream response chunk by chunk
-        const stream = await model.stream(session.history);
+        const stream = await model?.stream(session.history);
 
         let accumulatedResponse = "";
 
@@ -104,11 +105,19 @@ export const initProductSocket = (nsp: Namespace) => {
           success: true,
           fullResponse: accumulatedResponse,
         });
-      } catch (err) {
+      } catch (err: any) {
         let friendlyMessage =
-          (err as { body: { message: string } })?.body?.message ||
-          (err as { message: string })?.message ||
           "The AI shopping assistant is currently under heavy load. Please try again in a few moments.";
+
+        if (err?.body && NODE_ENV === "development") {
+          try {
+            const parsed = JSON.parse(err.body);
+
+            friendlyMessage = parsed.message || friendlyMessage;
+          } catch (parseError) {
+            console.log("Failed to parse error body", parseError);
+          }
+        }
 
         socket.emit("receive_message", {
           success: false,
