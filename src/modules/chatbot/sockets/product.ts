@@ -5,7 +5,6 @@ import {
   AIMessage,
   initChatModel,
 } from "langchain";
-import { ConnectionError } from "@mistralai/mistralai/models/errors/httpclienterrors";
 import {
   getAiGeneratedSuggestedQuestion,
   getEmbeddedProducts,
@@ -121,7 +120,7 @@ export const initProductSocket = (nsp: Namespace) => {
             } catch {
               console.log("Failed to parse error body");
             }
-          } else if (err instanceof ConnectionError || err instanceof Error) {
+          } else if (err instanceof Error) {
             errMsg = err.message;
           }
         }
