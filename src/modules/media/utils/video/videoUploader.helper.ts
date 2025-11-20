@@ -22,13 +22,13 @@ const uploadVideoToCloudinary = async (
   const subFolder = folder?.split(" ").join("_") || "Common_Folder";
 
   const publicId = `${new Date()
-    .toLocaleDateString()
-    .replace(/\//g, "-")}_${Date.now()}_${file?.originalname
-    .split(" ")
-    .join("_")
-    .split(".")
-    .slice(0, -1)
-    .join("")}`;
+    ?.toLocaleDateString()
+    ?.replace(/\//g, "-")}_${Date.now()}_${file?.originalname
+    ?.split(" ")
+    ?.join("_")
+    ?.split(".")
+    ?.slice(0, -1)
+    ?.join("")}`;
 
   const cloudinary = myCloudinary(cloudinaryConfigOption);
 

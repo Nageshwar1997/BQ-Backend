@@ -12,7 +12,7 @@ import { getCloudinaryOptimizedUrl } from "../../../../utils";
 
 const mainFolder = CLOUDINARY_MAIN_FOLDER;
 
-const sanitize = (str: string) => str.replace(/[&|\/\\#?%]/g, "_");
+const sanitize = (str: string) => str?.replace(/[&|\/\\#?%]/g, "_");
 
 // ========== COMMON UPLOADER FUNCTION ==========
 const uploadToCloudinary = async (
@@ -24,12 +24,12 @@ const uploadToCloudinary = async (
 
   const publicId = `${new Date()
     .toLocaleDateString()
-    .replace(/\//g, "-")}_${Date.now()}_${file?.originalname
-    .split(" ")
-    .join("_")
-    .split(".")
-    .slice(0, -1)
-    .join("")}`;
+    ?.replace(/\//g, "-")}_${Date.now()}_${file?.originalname
+    ?.split(" ")
+    ?.join("_")
+    ?.split(".")
+    ?.slice(0, -1)
+    ?.join("")}`;
 
   const cloudinary = myCloudinary(cloudinaryConfigOption);
 

@@ -4,9 +4,9 @@ import { IAggregatedEmbeddedProduct } from "../types";
 
 export const removeHTMLTags = (text: string): string => {
   return text
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+    ?.replace(/<[^>]*>/g, " ")
+    ?.replace(/\s+/g, " ")
+    ?.trim();
 };
 
 export const getEmbeddedProducts = async (

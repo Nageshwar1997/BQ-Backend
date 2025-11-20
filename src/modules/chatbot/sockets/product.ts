@@ -106,7 +106,7 @@ export const initProductSocket = (nsp: Namespace) => {
         });
       } catch (err) {
         let friendlyMessage =
-          (err as { body: { message: string } }).body.message ||
+          (err as { body: { message: string } })?.body?.message ||
           (err as { message: string })?.message ||
           "The AI shopping assistant is currently under heavy load. Please try again in a few moments.";
 
