@@ -5,21 +5,16 @@ import {
   AIMessage,
   initChatModel,
 } from "langchain";
+import { ConnectionError } from "@mistralai/mistralai/models/errors/httpclienterrors";
 import {
+  getAiGeneratedSuggestedQuestion,
   getEmbeddedProducts,
   getMinimalProductsForAiPrompt,
 } from "../services/product";
-import { IAggregatedEmbeddedProduct } from "../types";
+import { TProductChatSession } from "../types";
 import { NODE_ENV } from "../../../envs";
-import { ConnectionError } from "@mistralai/mistralai/models/errors/httpclienterrors";
 
-interface ProductChatSession {
-  history: (SystemMessage | HumanMessage | AIMessage)[];
-  lastMatchedProducts?: IAggregatedEmbeddedProduct[];
-  lastQuery?: string;
-}
-
-const productChatHistory = new Map<string, ProductChatSession>();
+const productChatHistory = new Map<string, TProductChatSession>();
 
 export const initProductSocket = (nsp: Namespace) => {
   nsp.on("connection", (socket) => {
@@ -69,7 +64,7 @@ export const initProductSocket = (nsp: Namespace) => {
           new HumanMessage(
             `User Query: ${message}\nMatched Products: ${JSON.stringify(
               minimalProducts
-            )}`
+            )}\nGive a clear, helpful answer.`
           )
         );
 
@@ -101,10 +96,17 @@ export const initProductSocket = (nsp: Namespace) => {
         // Save full AI response in session
         session.history.push(new AIMessage(accumulatedResponse));
 
-        // Emit final complete response event (optional)
+        const suggestedQuestions: string[] =
+          await getAiGeneratedSuggestedQuestion(
+            accumulatedResponse,
+            session.history
+          );
+
+        // Emit final complete response with suggested questions
         socket.emit("receive_message_complete", {
           success: true,
           fullResponse: accumulatedResponse,
+          suggestedQuestions,
         });
       } catch (err: any) {
         let errMsg =

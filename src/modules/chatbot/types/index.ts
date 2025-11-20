@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 import { ProductModule } from "../..";
+import { SystemMessage, HumanMessage, AIMessage } from "langchain";
 
 export interface IEmbeddedProduct {
   embeddings: number[];
@@ -32,4 +33,10 @@ export interface TCreateOrUpdateEmbeddedProduct {
   title: IAggregatedEmbeddedProduct["product"]["title"];
   brand: IAggregatedEmbeddedProduct["product"]["brand"];
   category: IAggregatedEmbeddedProduct["product"]["category"];
+}
+
+export interface TProductChatSession {
+  history: (SystemMessage | HumanMessage | AIMessage)[];
+  lastMatchedProducts?: IAggregatedEmbeddedProduct[];
+  lastQuery?: string;
 }
