@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { SellerProps, UserProps } from "../types";
+import { IWishlist, SellerProps, UserProps } from "../types";
 import {
   ALLOWED_BUSINESSES,
   ALLOWED_COUNTRIES,
@@ -103,6 +103,14 @@ export const sellerSchema = new Schema<SellerProps>(
       enum: ["PENDING", "APPROVED", "REJECTED"],
       default: "PENDING",
     },
+  },
+  { versionKey: false, timestamps: true }
+);
+
+export const wishlistSchema = new Schema<IWishlist>(
+  {
+    _id: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    products: [{ type: Schema.Types.ObjectId, ref: "Product" }],
   },
   { versionKey: false, timestamps: true }
 );
