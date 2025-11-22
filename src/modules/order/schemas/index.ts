@@ -1,4 +1,4 @@
-import { Schema, Types } from "mongoose";
+import { Schema } from "mongoose";
 import { IOrder } from "../types";
 import { AddressModule, CartProductModule } from "../..";
 import { TCartProduct } from "../../cartProduct/types";

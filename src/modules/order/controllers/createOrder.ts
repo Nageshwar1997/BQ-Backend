@@ -2,7 +2,7 @@ import { Response } from "express";
 import { Types } from "mongoose";
 import { AuthenticatedRequest } from "../../../types";
 import { Order } from "../models";
-import { AddressModule, CartModule } from "../..";
+import { AddressModule, CartModule, ChatbotModule } from "../..";
 import { AppError } from "../../../classes";
 import { razorpay } from "../../../configs";
 import { IOrder } from "../types";
@@ -114,4 +114,9 @@ export const createOrderController = async (
       currency: razorpayOrder.currency,
     },
   });
+
+  // Create embedded order in chatbot (Background task)
+  (async () => {
+    await ChatbotModule.Services.createOrUpdateEmbeddedOrder({ order });
+  })();
 };

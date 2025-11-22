@@ -12,6 +12,8 @@ import { getCloudinaryOptimizedUrl } from "../../../../utils";
 
 const mainFolder = CLOUDINARY_MAIN_FOLDER;
 
+const sanitize = (str: string) => str?.replace(/[&|\/\\#?%]/g, "_");
+
 // ========== COMMON UPLOADER FUNCTION ==========
 const uploadToCloudinary = async (
   file: Express.Multer.File,
@@ -22,12 +24,12 @@ const uploadToCloudinary = async (
 
   const publicId = `${new Date()
     .toLocaleDateString()
-    .replace(/\//g, "-")}_${Date.now()}_${file?.originalname
-    .split(" ")
-    .join("_")
-    .split(".")
-    .slice(0, -1)
-    .join("")}`;
+    ?.replace(/\//g, "-")}_${Date.now()}_${file?.originalname
+    ?.split(" ")
+    ?.join("_")
+    ?.split(".")
+    ?.slice(0, -1)
+    ?.join("")}`;
 
   const cloudinary = myCloudinary(cloudinaryConfigOption);
 
@@ -35,10 +37,10 @@ const uploadToCloudinary = async (
     cloudinary.uploader
       .upload_stream(
         {
-          folder: `${mainFolder}/${subFolder}`,
+          folder: sanitize(`${mainFolder}/${subFolder}`),
           public_id: publicId,
           resource_type: "image",
-          allowed_formats: ["jpg", "jpeg", "png", "webp"],
+          allowed_formats: ["jpg", "jpeg", "png", "webp", "svg"],
           format: "webp", // convert to webp
           transformation: [{ fetch_format: "webp", quality: "auto" }],
         },

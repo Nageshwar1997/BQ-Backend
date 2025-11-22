@@ -8,6 +8,7 @@ import { findOrCreateCategory } from "../../services";
 import { checkUserPermission, isValidMongoId } from "../../../../utils";
 import { POSSIBLE_UPDATE_PRODUCT_FIELDS } from "../../constants";
 import { removeImages, uploadImages } from "../../utils";
+import { ChatbotModule } from "../../..";
 
 export const updateProductController = async (
   req: AuthorizedRequest,
@@ -455,6 +456,31 @@ export const updateProductController = async (
       updateBody,
       { new: true }
     ).lean();
+
+    if (!product) {
+      throw new AppError("Failed to update product", 400);
+    }
+
+    if (
+      updateBody?.title ||
+      updateBody?.brand ||
+      categoryLevelOne ||
+      categoryLevelTwo ||
+      categoryLevelThree
+    ) {
+      (async () => {
+        await ChatbotModule.Services.createOrUpdateEmbeddedProduct({
+          title: product.title,
+          brand: product.brand,
+          category: {
+            child: category_3.name,
+            parent: category_2.name,
+            grandParent: category_1.name,
+          },
+          productId: product._id,
+        });
+      })();
+    }
 
     if (removingCommonImageURLs?.length) {
       await removeImages(removingCommonImageURLs);

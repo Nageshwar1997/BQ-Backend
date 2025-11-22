@@ -9,6 +9,7 @@ import {
 } from "../constants";
 
 export interface IOrder {
+  _id: Types.ObjectId | string;
   user: Types.ObjectId;
   products: CartProductModule.Types.IPopulatedCartProduct[];
   addresses: {

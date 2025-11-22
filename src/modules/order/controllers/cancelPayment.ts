@@ -3,6 +3,7 @@ import { Order } from "../models";
 import { AppError } from "../../../classes";
 import { AuthenticatedRequest } from "../../../types";
 import { isValidMongoId } from "../../../utils";
+import { ChatbotModule } from "../..";
 
 export const cancelPaymentController = async (
   req: AuthenticatedRequest,
@@ -29,4 +30,8 @@ export const cancelPaymentController = async (
   });
 
   res.success(200, "Payment cancelled successfully");
+
+  (async () => {
+    await ChatbotModule.Services.createOrUpdateEmbeddedOrder({ order });
+  })();
 };

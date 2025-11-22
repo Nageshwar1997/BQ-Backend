@@ -6,6 +6,7 @@ import { AppError } from "../../../../classes";
 import { Product, Shade } from "../../models";
 import { findOrCreateCategory } from "../../services";
 import { removeImages, uploadImages } from "../../utils";
+import { ChatbotModule } from "../../..";
 
 export const uploadProductController = async (
   req: AuthorizedRequest,
@@ -176,6 +177,20 @@ export const uploadProductController = async (
     const product = await Product.create(finalData);
 
     res.success(200, "Product uploaded successfully", { product });
+
+    // Background embedding
+    (async () => {
+      await ChatbotModule.Services.createOrUpdateEmbeddedProduct({
+        title: product.title,
+        brand: product.brand,
+        category: {
+          child: category_3.name,
+          parent: category_2.name,
+          grandParent: category_1.name,
+        },
+        productId: product._id,
+      });
+    })();
   } catch (error) {
     // Rollback: Remove uploaded images
     removeImages([...uploadedCommonImages, ...uploadedAllShadesImages]);
