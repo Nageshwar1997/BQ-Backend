@@ -1,8 +1,8 @@
-import http from "http";
-import express from "express";
-import path from "path";
-import QueryString from "qs";
 import "dotenv/config";
+import path from "path";
+import express from "express";
+import QueryString from "qs";
+import http from "http";
 
 import router from "./routes";
 import { connectDB, handleNamespace, initSocket } from "./configs";
