@@ -5,7 +5,7 @@ import QueryString from "qs";
 import http from "http";
 
 import router from "./routes";
-import { connectDB, handleNamespace, initSocket } from "./configs";
+import { handleNamespace, initSocket } from "./configs";
 import {
   ResponseMiddleware,
   CorsMiddleware,
@@ -49,14 +49,8 @@ handleNamespace("orders");
 
 // Start server
 
-server.listen(port, async () => {
-  try {
-    await connectDB();
-    console.log(`Server running on http://localhost:${port}`);
-  } catch (error) {
-    console.error("Server startup failed:", error);
-    process.exit(1);
-  }
+server.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
 });
 
 export { app, server };
