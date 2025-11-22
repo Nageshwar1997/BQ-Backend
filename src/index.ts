@@ -48,16 +48,15 @@ handleNamespace("products");
 handleNamespace("orders");
 
 // Start server
-if (NODE_ENV === "development") {
-  server.listen(port, async () => {
-    try {
-      await connectDB();
-      console.log(`Server running on http://localhost:${port}`);
-    } catch (error) {
-      console.error("Server startup failed:", error);
-      process.exit(1);
-    }
-  });
-}
+
+server.listen(port, async () => {
+  try {
+    await connectDB();
+    console.log(`Server running on http://localhost:${port}`);
+  } catch (error) {
+    console.error("Server startup failed:", error);
+    process.exit(1);
+  }
+});
 
 export { app, server };
