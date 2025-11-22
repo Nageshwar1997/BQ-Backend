@@ -11,7 +11,7 @@ import {
   CorsMiddleware,
   DatabaseMiddleware,
 } from "./middlewares";
-import { NODE_ENV, PORT } from "./envs";
+import { PORT } from "./envs";
 
 const app = express();
 const port = PORT || 5454;
