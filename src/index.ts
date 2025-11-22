@@ -5,15 +5,13 @@ import QueryString from "qs";
 import "dotenv/config";
 
 import router from "./routes";
-import { connectDB } from "./configs";
+import { connectDB, handleNamespace, initSocket } from "./configs";
 import {
   ResponseMiddleware,
   CorsMiddleware,
   DatabaseMiddleware,
 } from "./middlewares";
 import { NODE_ENV, PORT } from "./envs";
-import { handleNamespace, initSocket } from "./configs/socket";
-import { ChatbotModule } from "./modules";
 
 const app = express();
 const port = PORT || 5454;

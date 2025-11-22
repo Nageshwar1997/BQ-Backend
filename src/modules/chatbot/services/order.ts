@@ -114,43 +114,46 @@ export const getEmbeddedOrders = async (
 export const getMinimalOrdersForAiPrompt = (
   orders: IAggregatedEmbeddedOrder[]
 ) => {
-  const minimalOrders = orders?.map(({ order }, i) => ({
-    "Order Id": order._id,
-    "Shipping Address":
-      "City:- " +
-      (order.addresses.both?.city ?? order.addresses.shipping?.city) +
-      ", " +
-      "State:- " +
-      (order.addresses.both?.state ?? order.addresses.shipping?.state),
-    "Created At": order.createdAt,
-    ...(order.order_result.cancelled_at && {
-      "Cancelled  At": order.order_result.cancelled_at,
-    }),
-    ...(order.razorpay_payment_result?.rzp_payment_status === "PAID" &&
-      order.order_result?.order_status === "CONFIRMED" && {
-        "Expected Delivery": new Date(
-          (order.order_result.paid_at?.getTime() || Date.now()) +
-            7 * 24 * 60 * 60 * 1000
-        ),
+  const minimalOrders = orders?.map(({ order }) => {
+    if (!order) "No Orders Found";
+    return {
+      "Order Id": order._id,
+      "Shipping Address":
+        "City:- " +
+        (order.addresses.both?.city ?? order.addresses.shipping?.city) +
+        ", " +
+        "State:- " +
+        (order.addresses.both?.state ?? order.addresses.shipping?.state),
+      "Created At": order.createdAt,
+      ...(order.order_result.cancelled_at && {
+        "Cancelled  At": order.order_result.cancelled_at,
       }),
-    "Order  At": order.order_result.cancelled_at,
-    "Payment Status": order.razorpay_payment_result.rzp_payment_status,
-    "Payment Mode": order.razorpay_payment_result.payment_mode,
-    "Total Amount": order.order_result.price,
-    Discount: order.order_result.discount,
-    Charges: order.order_result.charges,
-    "Customer Email": order.payment_details?.email,
-    "Customer Contact": order.payment_details?.contact,
-    Products: order.products.forEach((product) => {
-      return {
-        "Product Title": product.product.title,
-        ...(product.shade?.shadeName && {
-          "Shade Name": product.shade?.shadeName,
+      ...(order.razorpay_payment_result?.rzp_payment_status === "PAID" &&
+        order.order_result?.order_status === "CONFIRMED" && {
+          "Expected Delivery": new Date(
+            (order.order_result.paid_at?.getTime() || Date.now()) +
+              7 * 24 * 60 * 60 * 1000
+          ),
         }),
-        Quantity: product.quantity,
-      };
-    }),
-  }));
+      "Order  At": order.order_result.cancelled_at,
+      "Payment Status": order.razorpay_payment_result.rzp_payment_status,
+      "Payment Mode": order.razorpay_payment_result.payment_mode,
+      "Total Amount": order.order_result.price,
+      Discount: order.order_result.discount,
+      Charges: order.order_result.charges,
+      "Customer Email": order.payment_details?.email,
+      "Customer Contact": order.payment_details?.contact,
+      Products: order.products.forEach((product) => {
+        return {
+          "Product Title": product.product.title,
+          ...(product.shade?.shadeName && {
+            "Shade Name": product.shade?.shadeName,
+          }),
+          Quantity: product.quantity,
+        };
+      }),
+    };
+  });
 
   return minimalOrders;
 };
