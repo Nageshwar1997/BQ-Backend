@@ -46,7 +46,6 @@ const uploadToCloudinary = async (
         },
         (error, result) => {
           if (error) {
-            console.log("ERROR CLD", error);
             return reject(
               new AppError(
                 error.message || "Failed to upload image on Cloudinary",

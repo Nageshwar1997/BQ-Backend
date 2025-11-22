@@ -7,7 +7,13 @@ import { AppError } from "../../../classes";
 import { RAZORPAY_KEY_SECRET } from "../../../envs";
 import { AuthenticatedRequest } from "../../../types";
 import { razorpay } from "../../../configs";
-import { CartModule, CartProductModule, ProductModule } from "../..";
+import {
+  CartModule,
+  CartProductModule,
+  ChatbotModule,
+  ProductModule,
+} from "../..";
+import { IOrder } from "../types";
 
 export const verifyPaymentController = async (
   req: AuthenticatedRequest,
@@ -45,9 +51,10 @@ export const verifyPaymentController = async (
   if (!payment || payment.status !== "captured") {
     throw new AppError("Payment not captured", 400);
   }
+  let order: IOrder | null = null;
 
   try {
-    const order = await Order.findByIdAndUpdate(
+    order = await Order.findByIdAndUpdate(
       orderDBId,
       {
         $set: {
@@ -169,4 +176,8 @@ export const verifyPaymentController = async (
   }
 
   res.success(200, "Payment verified successfully");
+  // Create embedded order in chatbot (Background task)
+  (async () => {
+    await ChatbotModule.Services.createOrUpdateEmbeddedOrder({ order });
+  })();
 };

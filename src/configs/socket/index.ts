@@ -1,16 +1,14 @@
-import { IncomingMessage, Server, ServerResponse } from "http";
-import { Server as SocketIOServer, Namespace } from "socket.io";
-import { AppError } from "../../classes";
+import { Server as HttpServer } from "http";
+import { Server as SocketIOServer, Socket, Namespace } from "socket.io";
+
 import { allowedOrigins } from "../../constants";
+import { AppError } from "../../classes";
+import { ChatbotModule } from "../../modules";
 
-export let io: SocketIOServer | null = null;
-const namespaces: Record<string, Namespace> = {}; // store created namespaces
+let io: SocketIOServer | null = null;
 
-// Initialize Socket.IO
-export const initSocket = (
-  server: Server<typeof IncomingMessage, typeof ServerResponse>
-) => {
-  if (io) return io; // Prevent re-initialization
+export const initSocket = (server: HttpServer) => {
+  if (io) return io;
 
   io = new SocketIOServer(server, {
     cors: {
@@ -25,40 +23,26 @@ export const initSocket = (
     },
   });
 
-  io.on("connection", (socket) => {
-    console.log("Client connected:", socket.id);
-
-    socket.on("disconnect", () => {
-      console.log("Client disconnected:", socket.id);
-    });
-  });
-
   return io;
 };
 
-// Get or create a namespace
-export const getNamespace = (name: "products" | "orders") => {
+export const handleNamespace = (name: "products" | "orders") => {
   if (!io) throw new Error("Socket.IO not initialized");
 
-  if (!namespaces[name]) {
-    const nsp = io.of(`/${name}`);
+  const nsp: Namespace = io.of(`/${name}`); // namespace created only when first client connects
 
-    nsp.on("connection", (socket) => {
-      console.log(`Client connected to /${name} namespace:`, socket.id);
+  nsp.on("connection", (socket: Socket) => {
+    console.log(`Client connected on /${name} namespace:`, socket.id);
+    if (name === "products") {
+      ChatbotModule.Sockets.initProductSocket(socket);
+    } else if (name === "orders") {
+      ChatbotModule.Sockets.initOrderSocket(socket);
+    }
 
-      socket.on("disconnect", () => {
-        console.log(`Client disconnected from /${name}:`, socket.id);
-      });
-
-      // Handle custom events
-      socket.on(`${name}_event`, (data) => {
-        console.log(`[${name}] Event received:`, data);
-        nsp.emit(`${name}_event`, data); // broadcast within namespace
-      });
+    socket.on("disconnect", () => {
+      console.log(`Client disconnected from /${name} namespace:`, socket.id);
     });
+  });
 
-    namespaces[name] = nsp;
-  }
-
-  return namespaces[name];
+  return nsp;
 };

@@ -12,7 +12,7 @@ import {
   DatabaseMiddleware,
 } from "./middlewares";
 import { NODE_ENV, PORT } from "./envs";
-import { getNamespace, initSocket } from "./configs/socket";
+import { handleNamespace, initSocket } from "./configs/socket";
 import { ChatbotModule } from "./modules";
 
 const app = express();
@@ -33,10 +33,10 @@ app.get("/", (_, res) =>
   res.success(200, "Welcome to the MERN Beautinique API")
 );
 
-// Routes
+// API Routes
 app.use("/api", router);
 
-// Error Handling Routes
+// Error Handling
 app.use(ResponseMiddleware.notFound);
 app.use(ResponseMiddleware.error);
 
@@ -46,15 +46,8 @@ const server = http.createServer(app);
 // Initialize Socket.IO
 initSocket(server);
 
-// Create products namespace
-const productsNsp = getNamespace("products");
-// Create orders namespace
-const ordersNsp = getNamespace("products");
-
-// Initialize product-specific socket logic
-ChatbotModule.Sockets.initProductSocket(productsNsp);
-// Initialize order-specific socket logic
-ChatbotModule.Sockets.initOrderSocket(ordersNsp);
+handleNamespace("products");
+handleNamespace("orders");
 
 // Start server
 if (NODE_ENV === "development") {

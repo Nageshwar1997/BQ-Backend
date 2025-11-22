@@ -192,7 +192,6 @@ export const uploadProductController = async (
       });
     })();
   } catch (error) {
-    console.log("ERROR", error);
     // Rollback: Remove uploaded images
     removeImages([...uploadedCommonImages, ...uploadedAllShadesImages]);
     // Rollback: Remove uploaded shades

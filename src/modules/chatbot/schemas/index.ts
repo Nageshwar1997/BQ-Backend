@@ -12,9 +12,12 @@ export const embeddedProductSchema = new Schema<IEmbeddedProduct>(
 
 export const embeddedOrderSchema = new Schema<IEmbeddedOrder>(
   {
+    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     embeddings: { type: [Number], required: true },
     searchText: { type: String, required: true },
     order: { type: Schema.Types.ObjectId, ref: "Order", required: true },
   },
   { versionKey: false }
 );
+
+embeddedOrderSchema.index({ user: 1 });

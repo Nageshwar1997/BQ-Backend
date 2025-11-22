@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { OrderModule, ProductModule } from "../..";
+import { OrderModule, ProductModule, UserModule } from "../..";
 import { SystemMessage, HumanMessage, AIMessage } from "langchain";
 
 export type TBaseEmbedded = {
@@ -11,6 +11,7 @@ export interface IEmbeddedProduct extends TBaseEmbedded {
 }
 
 export interface IEmbeddedOrder extends TBaseEmbedded {
+  user: Types.ObjectId;
   order: Types.ObjectId;
 }
 
@@ -35,7 +36,8 @@ export interface IAggregatedEmbeddedProduct
 }
 
 export interface IAggregatedEmbeddedOrder
-  extends Omit<IEmbeddedOrder, "order"> {
+  extends Omit<IEmbeddedOrder, "order" | "user"> {
+  user: UserModule.Types.UserProps;
   order: OrderModule.Types.IOrder;
 }
 
