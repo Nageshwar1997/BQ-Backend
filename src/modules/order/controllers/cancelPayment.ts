@@ -25,7 +25,7 @@ export const cancelPaymentController = async (
   await order.updateOne({
     $set: {
       "razorpay_payment_result.rzp_payment_status": "CANCELLED",
-      "order_result.order_status": "CANCELLED",
+      "order_result.order_status": "PENDING",
     },
   });
 

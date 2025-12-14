@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  cancelOrderController,
   cancelPaymentController,
   createOrderController,
   getAllOrdersController,
@@ -41,9 +42,16 @@ orderRouter.get(
   AuthMiddleware.authenticated,
   ResponseMiddleware.catchAsync(getAllOrdersController)
 );
+
 orderRouter.get(
   "/:orderId",
-  RequestMiddleware.checkEmptyRequest({ params: false }),
+  RequestMiddleware.checkEmptyRequest({ params: true }),
   AuthMiddleware.authenticated,
   ResponseMiddleware.catchAsync(getOrderByIdController)
+);
+orderRouter.patch(
+  "/cancel/:orderId",
+  RequestMiddleware.checkEmptyRequest({ params: true }),
+  AuthMiddleware.authenticated,
+  ResponseMiddleware.catchAsyncWithTransaction(cancelOrderController)
 );
