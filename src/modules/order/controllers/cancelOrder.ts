@@ -14,7 +14,7 @@ export const cancelOrderController = async (
   session: ClientSession
 ) => {
   const { orderId } = req.params;
-  const { reason } = req.body;
+  const { reason } = req.body ?? {};
   const userId = req.user?._id;
 
   isValidMongoId(orderId, "Invalid Order Id provided", 404);
@@ -52,11 +52,7 @@ export const cancelOrderController = async (
       if (isPaid) {
         const paymentId = order.razorpay_payment_result.rzp_payment_id;
         if (paymentId) {
-          const refundAmount =
-            (order.order_result.price -
-              order.order_result.discount +
-              (order.order_result.charges || 0)) *
-            100; // paise
+          const refundAmount = order.order_result.price * 100; // paise
 
           const refund = await razorpay.payments.refund(paymentId, {
             amount: refundAmount,
