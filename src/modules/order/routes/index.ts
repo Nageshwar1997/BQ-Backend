@@ -51,7 +51,7 @@ orderRouter.get(
 );
 orderRouter.patch(
   "/cancel/:orderId",
-  RequestMiddleware.checkEmptyRequest({ params: true }),
+  RequestMiddleware.checkEmptyRequest({ params: true, body: false }),
   AuthMiddleware.authenticated,
   ResponseMiddleware.catchAsyncWithTransaction(cancelOrderController)
 );
