@@ -51,7 +51,7 @@ export const razorpayWebhooksController = async (
         "payment.details.tax": Number(payment.tax) / 100,
       }),
       ...((payment.vpa || payment.upi) && {
-        "payment_details.upi": {
+        "payment.details.upi": {
           ...(payment.acquirer_data && {
             rrn: payment.acquirer_data.rrn,
             upi_transaction_id: payment.acquirer_data.upi_transaction_id,
@@ -69,7 +69,7 @@ export const razorpayWebhooksController = async (
         },
       }),
       ...((payment.token_id || payment.card) && {
-        "payment_details.card": {
+        "payment.details.card": {
           ...((payment.token_id || payment.card?.token_iin) && {
             token_id: payment.token_id || payment.card?.token_iin,
           }),
@@ -125,7 +125,6 @@ export const razorpayWebhooksController = async (
 
       // *NOTE - Working Fine
       case "order.paid":
-        // Todo:- mesg dlt
         // Only confirm if order is not already cancelled or refunded
         if (["PENDING", "FAILED", "PROCESSING"].includes(order.status)) {
           updatePayload = {
@@ -143,16 +142,16 @@ export const razorpayWebhooksController = async (
       case "refund.created":
         // Skip if already refunded
         if (order.payment.status !== "REFUNDED") {
-          updatePayload = { "payment_details.refund_status": "APPROVED" };
+          updatePayload = { "payment.refund.status": "APPROVED" };
         }
         break;
 
       case "refund.processed":
-        updatePayload = { "payment_details.refund_status": "REFUNDED" };
+        updatePayload = { "payment.refund.status": "REFUNDED" };
         break;
 
       case "refund.failed":
-        updatePayload = { "payment_details.refund_status": "FAILED" };
+        updatePayload = { "payment.refund.status": "FAILED" };
         break;
 
       default:
