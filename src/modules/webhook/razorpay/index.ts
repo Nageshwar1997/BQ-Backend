@@ -110,7 +110,7 @@ export const razorpayWebhooksController = async (
             ...paymentCommonBody,
             "payment.status": "PAID",
             status: "PROCESSING",
-            "order_result.payment_receipt": `payment_receipt_${Date.now()}`,
+            "payment.receipt": `payment_receipt_${Date.now()}`,
           };
         }
         break;
@@ -141,8 +141,8 @@ export const razorpayWebhooksController = async (
             "payment.paid_at": new Date(payment.created_at * 1000),
             // NEw
             "payment.status": "PAID",
-            ...(!!order.order_result.payment_receipt && {
-              "order_result.payment_receipt": `payment_receipt_${Date.now()}`,
+            ...(!!order.payment.receipt && {
+              "payment.receipt": `payment_receipt_${Date.now()}`,
             }),
           };
         }

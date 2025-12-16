@@ -28,13 +28,13 @@ export interface IOrder {
     };
     amount: number;
     paid_at?: Date;
+    receipt?: string;
   };
   discount: number;
   charges: number;
   status: (typeof ORDER_STATUS)[number];
   order_result: {
     order_receipt: string;
-    payment_receipt?: string;
     delivered_at?: Date;
     cancelled_at?: Date;
     returned_at?: Date;
