@@ -25,7 +25,7 @@ export const cancelOrderController = async (
 
   if (!order) throw new AppError("Order not found", 404);
 
-  const status = order.order_result.order_status;
+  const status = order.status;
 
   if (["DELIVERED", "RETURNED"].includes(status)) {
     throw new AppError("Order cannot be cancelled", 400);
@@ -36,7 +36,7 @@ export const cancelOrderController = async (
   }
 
   // ✅ Cancel order
-  order.order_result.order_status = "CANCELLED";
+  order.status = "CANCELLED";
   order.order_result.cancelled_at = new Date();
 
   await order.save({ session });

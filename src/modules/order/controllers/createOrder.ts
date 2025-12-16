@@ -56,8 +56,8 @@ export const createOrderController = async (
     products: cart.products || [],
     addresses: {} as IOrder["addresses"],
     payment: { mode: "ONLINE", currency: "INR", status: "PENDING" },
+    status: "PENDING",
     order_result: {
-      order_status: "PENDING",
       charges,
       discount,
       price: totalPrice + charges,

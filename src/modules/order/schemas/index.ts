@@ -87,8 +87,8 @@ export const orderSchema = new Schema<IOrder>(
         signature: { type: String },
       },
     },
+    status: { type: String, enum: ORDER_STATUS, default: "PENDING" },
     order_result: {
-      order_status: { type: String, enum: ORDER_STATUS, default: "PENDING" },
       price: { type: Number, required: true, default: 0 },
       discount: { type: Number, required: true, default: 0 },
       charges: { type: Number, default: 0 },

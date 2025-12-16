@@ -109,7 +109,7 @@ export const razorpayWebhooksController = async (
           updatePayload = {
             ...paymentCommonBody,
             "payment.status": "PAID",
-            "order_result.order_status": "PROCESSING",
+            status: "PROCESSING",
             "order_result.payment_receipt": `payment_receipt_${Date.now()}`,
           };
         }
@@ -118,13 +118,13 @@ export const razorpayWebhooksController = async (
       case "payment.failed":
         if (
           ["UNPAID"].includes(order.payment.status) &&
-          ["PENDING"].includes(order.order_result.order_status)
+          ["PENDING"].includes(order.status)
         ) {
           console.log("HELLO TRIGGERED");
           updatePayload = {
             ...paymentCommonBody,
             "payment.status": "FAILED",
-            "order_result.order_status": "FAILED",
+            status: "FAILED",
             message: payment.error_description,
           };
         }
@@ -134,14 +134,10 @@ export const razorpayWebhooksController = async (
       case "order.paid":
         // Todo:- mesg dlt
         // Only confirm if order is not already cancelled or refunded
-        if (
-          ["PENDING", "FAILED", "PROCESSING"].includes(
-            order.order_result?.order_status
-          )
-        ) {
+        if (["PENDING", "FAILED", "PROCESSING"].includes(order.status)) {
           updatePayload = {
             ...paymentCommonBody,
-            "order_result.order_status": "CONFIRMED",
+            status: "CONFIRMED",
             "order_result.paid_at": new Date(payment.created_at * 1000),
             // NEw
             "payment.status": "PAID",

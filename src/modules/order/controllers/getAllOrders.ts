@@ -23,7 +23,7 @@ export const getAllOrdersController = async (
   const filter: FilterQuery<IOrder> = { user: userId };
 
   if (orderStatuses.length) {
-    filter["order_result.order_status"] = {
+    filter["status"] = {
       $in: orderStatuses.map((s) => new RegExp(`^${s}$`, "i")),
     };
   }

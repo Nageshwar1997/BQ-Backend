@@ -129,7 +129,7 @@ export const getMinimalOrdersForAiPrompt = (
         "Cancelled  At": order.order_result.cancelled_at,
       }),
       ...(order.payment.status === "PAID" &&
-        order.order_result?.order_status === "CONFIRMED" && {
+        order.status === "CONFIRMED" && {
           "Expected Delivery": new Date(
             (order.order_result.paid_at?.getTime() || Date.now()) +
               7 * 24 * 60 * 60 * 1000
@@ -169,9 +169,9 @@ export const createOrUpdateEmbeddedOrder = async ({
     "Order No.": 1,
     "Order ID": order._id,
     "User Id": order.user?._id || order.user,
-    "Order Status": order.order_result.order_status,
+    "Order Status": order.status,
     ...(order.payment.status === "PAID" &&
-      order.order_result?.order_status === "CONFIRMED" && {
+      order.status === "CONFIRMED" && {
         "Expected Delivery": new Date(
           (order.order_result.paid_at?.getTime() || Date.now()) +
             7 * 24 * 60 * 60 * 1000

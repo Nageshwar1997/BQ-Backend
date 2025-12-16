@@ -27,8 +27,8 @@ export interface IOrder {
       signature: string;
     };
   };
+  status: (typeof ORDER_STATUS)[number];
   order_result: {
-    order_status: (typeof ORDER_STATUS)[number];
     price: number;
     discount: number;
     charges: number;

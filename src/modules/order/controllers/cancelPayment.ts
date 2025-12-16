@@ -26,7 +26,7 @@ export const cancelPaymentController = async (
   await order.updateOne({
     $set: {
       "payment.status": "FAILED",
-      "order_result.order_status": "FAILED",
+      status: "FAILED",
       message: `${
         flag === "tab_closed"
           ? "Tab closed"
