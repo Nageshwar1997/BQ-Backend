@@ -29,9 +29,9 @@ export interface IOrder {
     amount: number;
   };
   discount: number;
+  charges: number;
   status: (typeof ORDER_STATUS)[number];
   order_result: {
-    charges: number;
     order_receipt: string;
     payment_receipt?: string;
     paid_at?: Date;

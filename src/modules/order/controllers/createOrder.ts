@@ -62,10 +62,9 @@ export const createOrderController = async (
       amount: totalPrice + charges,
     },
     discount,
+    charges,
     status: "PENDING",
-    order_result: {
-      charges,
-    },
+    order_result: {},
   };
   if (foundAddresses.length === 1 && both) {
     orderBody.addresses.both = foundAddresses[0];

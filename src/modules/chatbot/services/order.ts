@@ -140,7 +140,7 @@ export const getMinimalOrdersForAiPrompt = (
       "Payment Mode": order.payment.mode,
       "Total Amount": order.payment.amount,
       Discount: order.discount,
-      Charges: order.order_result.charges,
+      Charges: order.charges,
       "Customer Email": order.payment_details?.email,
       "Customer Contact": order.payment_details?.contact,
       Products: order.products.forEach((product) => {
@@ -181,7 +181,7 @@ export const createOrUpdateEmbeddedOrder = async ({
     "Payment Mode": order.payment.mode,
     "Total Amount": order.payment.amount,
     Discount: order.discount,
-    Charges: order.order_result.charges,
+    Charges: order.charges,
     "Customer Email": order.payment_details?.email,
     "Customer Contact": order.payment_details?.contact,
     "Shipping Address":
