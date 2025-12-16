@@ -83,7 +83,6 @@ export const orderSchema = new Schema<IOrder>(
       },
     },
     razorpay_payment_result: {
-      rzp_signature: { type: String },
       rzp_payment_status: {
         type: String,
         enum: RAZORPAY_PAYMENT_STATUS,

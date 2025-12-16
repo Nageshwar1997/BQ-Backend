@@ -48,7 +48,7 @@ export const razorpayWebhooksController = async (
     // Build common payment details
     const paymentCommonBody = {
       "payment.razorpay.payment_id": payment.id,
-      "razorpay_payment_result.rzp_signature": rzp_signature,
+      "payment.razorpay.signature": rzp_signature,
       "payment_details.method": payment.method?.toUpperCase() || "OTHER",
       ...(payment.bank && { "payment_details.bank": payment.bank }),
       ...(payment.wallet && { "payment_details.wallet": payment.wallet }),

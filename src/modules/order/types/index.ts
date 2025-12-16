@@ -27,7 +27,6 @@ export interface IOrder {
     };
   };
   razorpay_payment_result: {
-    rzp_signature: string;
     rzp_payment_status: (typeof RAZORPAY_PAYMENT_STATUS)[number];
   };
   order_result: {
