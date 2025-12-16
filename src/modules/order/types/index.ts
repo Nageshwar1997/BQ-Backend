@@ -36,6 +36,12 @@ export interface IOrder {
       method: (typeof RAZORPAY_PAYMENT_METHODS)[number];
       fee: number;
       tax: number;
+      upi?: {
+        rrn: string;
+        upi_transaction_id: string;
+        vpa: string;
+        flow: string;
+      };
     };
   };
   discount: number;
@@ -44,18 +50,12 @@ export interface IOrder {
   delivered_at?: Date;
   cancelled_at?: Date;
   returned_at?: Date;
+
   payment_details?: {
     refund_status?: string | null;
     bank?: string | null;
     wallet?: string | null;
-    upi?: {
-      acquirer_data: {
-        rrn: string;
-        upi_transaction_id: string;
-        vpa: string;
-        flow: string;
-      };
-    };
+
     netbanking?: { acquirer_data: { bank_transaction_id: string } };
     card?: {
       token_id: string;

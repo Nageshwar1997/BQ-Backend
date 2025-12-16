@@ -62,14 +62,12 @@ export const razorpayWebhooksController = async (
       }),
       ...((payment.vpa || payment.upi) && {
         "payment_details.upi": {
-          acquirer_data: {
-            ...(payment.acquirer_data && {
-              rrn: payment.acquirer_data.rrn,
-              upi_transaction_id: payment.acquirer_data.upi_transaction_id,
-            }),
-            vpa: payment.vpa || payment.upi?.vpa,
-            flow: payment.upi?.flow,
-          },
+          ...(payment.acquirer_data && {
+            rrn: payment.acquirer_data.rrn,
+            upi_transaction_id: payment.acquirer_data.upi_transaction_id,
+          }),
+          vpa: payment.vpa || payment.upi?.vpa,
+          flow: payment.upi?.flow,
         },
       }),
       ...(payment.acquirer_data?.bank_transaction_id && {

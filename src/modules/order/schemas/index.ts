@@ -24,12 +24,10 @@ export const orderProductSchema = new Schema<Omit<TCartProduct, "cart">>(
 // Nested schemas for payment_details
 const upiSchema = new Schema(
   {
-    acquirer_data: {
-      rrn: { type: String },
-      upi_transaction_id: { type: String },
-      vpa: { type: String },
-      flow: { type: String },
-    },
+    rrn: { type: String },
+    upi_transaction_id: { type: String },
+    vpa: { type: String },
+    flow: { type: String },
   },
   { _id: false }
 );
@@ -96,6 +94,7 @@ export const orderSchema = new Schema<IOrder>(
         method: { type: String, enum: RAZORPAY_PAYMENT_METHODS },
         fee: { type: Number },
         tax: { type: Number },
+        upi: upiSchema,
       },
     },
     discount: { type: Number, required: true, default: 0 },
@@ -110,7 +109,6 @@ export const orderSchema = new Schema<IOrder>(
       bank: { type: String },
       wallet: { type: String },
 
-      upi: upiSchema,
       netbanking: netbankingSchema,
       card: cardDetailSchema,
     },
