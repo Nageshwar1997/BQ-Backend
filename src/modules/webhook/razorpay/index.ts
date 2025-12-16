@@ -29,7 +29,13 @@ export const razorpayWebhooksController = async (
 
   try {
     const event = body.event;
-    if (["payment.captured", "payment.failed"].includes(event)) {
+    if (
+      [
+        "payment.captured",
+        "payment.failed",
+        // "order.paid" // NOTE - I'm capturing whole payment in one time, so I don't need to use this
+      ].includes(event)
+    ) {
       const payment = req.body.payload.payment.entity;
 
       const orderDBId = payment?.notes?.db_order_id;
@@ -44,6 +50,11 @@ export const razorpayWebhooksController = async (
           : payment.status === "failed"
           ? "FAILED"
           : "UNPAID";
+
+      const orderStatus = paymentStatus === "PAID" ? "CONFIRMED" : "FAILED";
+
+      const paidAt =
+        paymentStatus === "PAID" ? new Date(payment.created_at * 1000) : null;
 
       const order = await OrderModule.Models.Order.findByIdAndUpdate(
         orderDBId,
@@ -113,9 +124,11 @@ export const razorpayWebhooksController = async (
                 }),
               },
             }),
-            "order_result.paid_at": new Date(payment.created_at * 1000),
-            "order_result.order_status": "CONFIRMED",
-            "order_result.payment_receipt": `payment_receipt_${Date.now()}`,
+            "order_result.order_status": orderStatus,
+            ...(paidAt && {
+              "order_result.paid_at": paidAt,
+              "order_result.payment_receipt": `payment_receipt_${Date.now()}`,
+            }),
           },
         },
         { new: true, session }
