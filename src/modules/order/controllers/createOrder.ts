@@ -64,7 +64,6 @@ export const createOrderController = async (
     discount,
     charges,
     status: "PENDING",
-    order_result: {},
   };
   if (foundAddresses.length === 1 && both) {
     orderBody.addresses.both = foundAddresses[0];
@@ -88,11 +87,9 @@ export const createOrderController = async (
     order._id.toString()
   );
 
-  if (order.order_result) {
+  if (order.payment) {
     order.payment.razorpay.receipt = razorpayOrder.receipt || "";
     order.payment.razorpay.order_id = razorpayOrder.id;
-    await order.save();
-
     await order.save();
   }
 

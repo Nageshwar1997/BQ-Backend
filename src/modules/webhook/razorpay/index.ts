@@ -52,8 +52,8 @@ export const razorpayWebhooksController = async (
       "payment_details.method": payment.method?.toUpperCase() || "OTHER",
       ...(payment.bank && { "payment_details.bank": payment.bank }),
       ...(payment.wallet && { "payment_details.wallet": payment.wallet }),
-      ...(payment.email && { "payment_details.email": payment.email }),
-      ...(payment.contact && { "payment_details.contact": payment.contact }),
+      ...(payment.email && { "payment.details.email": payment.email }),
+      ...(payment.contact && { "payment.details.contact": payment.contact }),
       ...(payment.fee && { "payment_details.fee": Number(payment.fee) / 100 }),
       ...(payment.tax && { "payment_details.tax": Number(payment.tax) / 100 }),
       ...((payment.vpa || payment.upi) && {

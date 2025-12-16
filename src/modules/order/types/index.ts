@@ -30,22 +30,22 @@ export interface IOrder {
     amount: number;
     paid_at?: Date;
     receipt?: string;
+    details?: {
+      email: string;
+      contact: string;
+    };
   };
   discount: number;
   charges: number;
   status: (typeof ORDER_STATUS)[number];
   delivered_at?: Date;
   cancelled_at?: Date;
-  order_result: {
-    returned_at?: Date;
-  };
+  returned_at?: Date;
   payment_details?: {
     method: (typeof RAZORPAY_PAYMENT_METHODS)[number];
     refund_status?: string | null;
     bank?: string | null;
     wallet?: string | null;
-    email: string;
-    contact: string;
     fee: number;
     tax: number;
     upi?: {
