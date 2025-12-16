@@ -55,10 +55,12 @@ export const createOrderController = async (
     user: new Types.ObjectId(user?._id),
     products: cart.products || [],
     addresses: {} as IOrder["addresses"],
-    payment_mode: "ONLINE",
+    payment: {
+      mode: "ONLINE",
+      currency: "INR",
+    },
     razorpay_payment_result: {
       rzp_payment_status: "UNPAID",
-      currency: "INR",
     },
     order_result: {
       order_status: "PENDING",
@@ -91,7 +93,7 @@ export const createOrderController = async (
 
   if (order.order_result) {
     order.order_result.order_receipt = razorpayOrder.receipt || "";
-    order.razorpay_payment_result.rzp_order_id = razorpayOrder.id;
+    order.payment.razorpay.order_id = razorpayOrder.id;
     await order.save();
 
     await order.save();

@@ -73,21 +73,22 @@ export const orderSchema = new Schema<IOrder>(
       billing: orderAddressSchema,
       both: orderAddressSchema,
     },
-    payment_mode: {
-      type: String,
-      enum: ALLOWED_PAYMENT_MODE,
-      default: "ONLINE",
+    payment: {
+      mode: { type: String, enum: ALLOWED_PAYMENT_MODE, default: "ONLINE" },
+      currency: { type: String, enum: ALLOWED_CURRENCIES, default: "INR" },
+      razorpay: {
+        order_id: { type: String },
+        payment_id: { type: String },
+        signature: { type: String },
+      },
     },
     razorpay_payment_result: {
-      rzp_order_id: { type: String },
-      rzp_payment_id: { type: String },
       rzp_signature: { type: String },
       rzp_payment_status: {
         type: String,
         enum: RAZORPAY_PAYMENT_STATUS,
         default: "UNPAID",
       },
-      currency: { type: String, enum: ALLOWED_CURRENCIES, default: "INR" },
     },
     order_result: {
       order_status: { type: String, enum: ORDER_STATUS, default: "PENDING" },

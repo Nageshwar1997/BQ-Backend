@@ -17,11 +17,16 @@ export interface IOrder {
     billing: Omit<AddressModule.Types.IAddress, "user"> | null;
     both: Omit<AddressModule.Types.IAddress, "user"> | null;
   };
-  payment_mode: (typeof ALLOWED_PAYMENT_MODE)[number];
-  razorpay_payment_result: {
+  payment: {
+    mode: (typeof ALLOWED_PAYMENT_MODE)[number];
     currency: (typeof ALLOWED_CURRENCIES)[number];
-    rzp_order_id: string;
-    rzp_payment_id: string;
+    razorpay: {
+      order_id: string;
+      payment_id?: string;
+      signature: string;
+    };
+  };
+  razorpay_payment_result: {
     rzp_signature: string;
     rzp_payment_status: (typeof RAZORPAY_PAYMENT_STATUS)[number];
   };
