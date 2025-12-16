@@ -89,7 +89,7 @@ export const createOrderController = async (
   );
 
   if (order.order_result) {
-    order.order_result.order_receipt = razorpayOrder.receipt || "";
+    order.payment.razorpay.receipt = razorpayOrder.receipt || "";
     order.payment.razorpay.order_id = razorpayOrder.id;
     await order.save();
 
