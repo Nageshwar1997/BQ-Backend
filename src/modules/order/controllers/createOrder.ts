@@ -55,12 +55,16 @@ export const createOrderController = async (
     user: new Types.ObjectId(user?._id),
     products: cart.products || [],
     addresses: {} as IOrder["addresses"],
-    payment: { mode: "ONLINE", currency: "INR", status: "PENDING" },
+    payment: {
+      mode: "ONLINE",
+      currency: "INR",
+      status: "PENDING",
+      price: totalPrice + charges,
+    },
     status: "PENDING",
     order_result: {
       charges,
       discount,
-      price: totalPrice + charges,
     },
   };
   if (foundAddresses.length === 1 && both) {
