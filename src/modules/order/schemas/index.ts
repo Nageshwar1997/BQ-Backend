@@ -90,7 +90,11 @@ export const orderSchema = new Schema<IOrder>(
       amount: { type: Number, required: true, default: 0 },
       paid_at: { type: Date },
       receipt: { type: String, unique: true },
-      details: { email: { type: String }, contact: { type: String } },
+      details: {
+        email: { type: String },
+        contact: { type: String },
+        method: { type: String, enum: RAZORPAY_PAYMENT_METHODS },
+      },
     },
     discount: { type: Number, required: true, default: 0 },
     charges: { type: Number, default: 0 },
@@ -100,7 +104,6 @@ export const orderSchema = new Schema<IOrder>(
     returned_at: { type: Date },
 
     payment_details: {
-      method: { type: String, enum: RAZORPAY_PAYMENT_METHODS },
       refund_status: { type: String },
       bank: { type: String },
       wallet: { type: String },

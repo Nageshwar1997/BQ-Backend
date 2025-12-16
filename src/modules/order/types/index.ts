@@ -33,6 +33,7 @@ export interface IOrder {
     details?: {
       email: string;
       contact: string;
+      method: (typeof RAZORPAY_PAYMENT_METHODS)[number];
     };
   };
   discount: number;
@@ -42,7 +43,6 @@ export interface IOrder {
   cancelled_at?: Date;
   returned_at?: Date;
   payment_details?: {
-    method: (typeof RAZORPAY_PAYMENT_METHODS)[number];
     refund_status?: string | null;
     bank?: string | null;
     wallet?: string | null;
