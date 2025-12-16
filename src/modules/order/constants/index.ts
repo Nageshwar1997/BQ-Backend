@@ -3,6 +3,7 @@ export const ALLOWED_CURRENCIES = ["INR"];
 
 export const ORDER_STATUS = [
   "PENDING",
+  "FAILED",
   "CONFIRMED",
   "DELIVERED",
   "CANCELLED",
