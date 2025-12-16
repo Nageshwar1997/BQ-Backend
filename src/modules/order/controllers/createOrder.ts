@@ -55,10 +55,10 @@ export const createOrderController = async (
     user: new Types.ObjectId(user?._id),
     products: cart.products || [],
     addresses: {} as IOrder["addresses"],
+    payment_mode: "ONLINE",
     razorpay_payment_result: {
       rzp_payment_status: "UNPAID",
       currency: "INR",
-      payment_mode: "ONLINE",
     },
     order_result: {
       order_status: "PENDING",
