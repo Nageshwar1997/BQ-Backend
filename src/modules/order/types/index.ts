@@ -34,6 +34,8 @@ export interface IOrder {
       email: string;
       contact: string;
       method: (typeof RAZORPAY_PAYMENT_METHODS)[number];
+      fee: number;
+      tax: number;
     };
   };
   discount: number;
@@ -46,8 +48,6 @@ export interface IOrder {
     refund_status?: string | null;
     bank?: string | null;
     wallet?: string | null;
-    fee: number;
-    tax: number;
     upi?: {
       acquirer_data: {
         rrn: string;

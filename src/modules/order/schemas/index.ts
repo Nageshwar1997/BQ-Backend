@@ -94,6 +94,8 @@ export const orderSchema = new Schema<IOrder>(
         email: { type: String },
         contact: { type: String },
         method: { type: String, enum: RAZORPAY_PAYMENT_METHODS },
+        fee: { type: Number },
+        tax: { type: Number },
       },
     },
     discount: { type: Number, required: true, default: 0 },
@@ -107,8 +109,7 @@ export const orderSchema = new Schema<IOrder>(
       refund_status: { type: String },
       bank: { type: String },
       wallet: { type: String },
-      fee: { type: Number },
-      tax: { type: Number },
+
       upi: upiSchema,
       netbanking: netbankingSchema,
       card: cardDetailSchema,
