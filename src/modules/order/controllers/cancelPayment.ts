@@ -11,6 +11,7 @@ export const cancelPaymentController = async (
 ) => {
   const user = req.user;
   const { orderId } = req.params;
+  const { flag } = req.body ?? {};
 
   isValidMongoId(orderId, "Invalid Order Id provided", 404);
 
@@ -24,8 +25,15 @@ export const cancelPaymentController = async (
 
   await order.updateOne({
     $set: {
-      "razorpay_payment_result.rzp_payment_status": "CANCELLED",
-      "order_result.order_status": "PENDING",
+      "razorpay_payment_result.rzp_payment_status": "FAILED",
+      "order_result.order_status": "FAILED",
+      message: `${
+        flag === "tab_closed"
+          ? "Tab closed"
+          : flag === "modal_closed"
+          ? "Payment modal closed"
+          : "Payment cancelled by user"
+      }, we have cancelled the payment`,
     },
   });
 

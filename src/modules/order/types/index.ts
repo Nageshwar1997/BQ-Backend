@@ -31,6 +31,7 @@ export interface IOrder {
     discount: number;
     charges: number;
     order_receipt: string;
+    payment_receipt?: string;
     paid_at?: Date;
     delivered_at?: Date;
     cancelled_at?: Date;
@@ -67,6 +68,7 @@ export interface IOrder {
       };
     };
   };
+  message?: string;
   createdAt: Date;
   updatedAt: Date;
 }

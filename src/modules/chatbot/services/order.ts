@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { ClientSession, Types } from "mongoose";
 import { getEmbeddings, postEmbeddings } from "../../../configs";
 import { EmbeddedOrder } from "../models";
 import { IAggregatedEmbeddedOrder } from "../types";
@@ -160,8 +160,10 @@ export const getMinimalOrdersForAiPrompt = (
 
 export const createOrUpdateEmbeddedOrder = async ({
   order,
+  session,
 }: {
   order: IAggregatedEmbeddedOrder["order"];
+  session?: ClientSession;
 }) => {
   const searchText = JSON.stringify({
     "Order No.": 1,
@@ -196,7 +198,7 @@ export const createOrUpdateEmbeddedOrder = async ({
     await EmbeddedOrder.findOneAndUpdate(
       { order: order._id, user: order.user?._id || order.user },
       { $set: { embeddings, searchText } },
-      { new: true, upsert: true }
+      { new: true, upsert: true, ...(session ? { session } : {}) } // only include session if defined
     );
 
     console.log("Background order embedding done");

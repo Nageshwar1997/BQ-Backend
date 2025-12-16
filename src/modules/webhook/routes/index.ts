@@ -7,5 +7,5 @@ export const webhookRouter = Router();
 webhookRouter.use(
   "/razorpay",
   raw({ type: "application/json" }), //NOTE - To parse the raw json
-  ResponseMiddleware.catchAsyncWithTransaction(razorpayWebhooksController)
+  ResponseMiddleware.catchAsync(razorpayWebhooksController)
 );

@@ -43,16 +43,21 @@ const netbankingSchema = new Schema(
 
 const cardSchema = new Schema(
   {
+    id: { type: String },
+    name: { type: String },
+    last4: { type: String },
+    network: { type: String },
+    type: { type: String },
+    issuer: { type: String },
+  },
+  { _id: false }
+);
+
+const cardDetailSchema = new Schema(
+  {
     token_id: { type: String },
     acquirer_data: { auth_code: { type: String } },
-    card: {
-      id: { type: String },
-      name: { type: String },
-      last4: { type: String },
-      network: { type: String },
-      type: { type: String },
-      issuer: { type: String },
-    },
+    card: cardSchema,
   },
   { _id: false }
 );
@@ -62,6 +67,7 @@ export const orderSchema = new Schema<IOrder>(
   {
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     products: [orderProductSchema],
+    message: { type: String },
     addresses: {
       shipping: orderAddressSchema,
       billing: orderAddressSchema,
@@ -93,6 +99,7 @@ export const orderSchema = new Schema<IOrder>(
       cancelled_at: { type: Date },
       returned_at: { type: Date },
       order_receipt: { type: String, unique: true },
+      payment_receipt: { type: String, unique: true },
     },
     payment_details: {
       method: { type: String, enum: RAZORPAY_PAYMENT_METHODS },
@@ -105,7 +112,7 @@ export const orderSchema = new Schema<IOrder>(
       tax: { type: Number },
       upi: upiSchema,
       netbanking: netbankingSchema,
-      card: cardSchema,
+      card: cardDetailSchema,
     },
   },
   { timestamps: true, versionKey: false }
