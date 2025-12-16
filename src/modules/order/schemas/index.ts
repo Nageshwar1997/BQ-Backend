@@ -39,7 +39,7 @@ const netbankingSchema = new Schema(
   { _id: false }
 );
 
-const cardSchema = new Schema(
+const cardDetailSchema = new Schema(
   {
     id: { type: String },
     name: { type: String },
@@ -47,15 +47,8 @@ const cardSchema = new Schema(
     network: { type: String },
     type: { type: String },
     issuer: { type: String },
-  },
-  { _id: false }
-);
-
-const cardDetailSchema = new Schema(
-  {
     token_id: { type: String },
-    acquirer_data: { auth_code: { type: String } },
-    card: cardSchema,
+    auth_code: { type: String },
   },
   { _id: false }
 );
@@ -95,6 +88,7 @@ export const orderSchema = new Schema<IOrder>(
         fee: { type: Number },
         tax: { type: Number },
         upi: upiSchema,
+        card: cardDetailSchema,
       },
     },
     discount: { type: Number, required: true, default: 0 },
@@ -110,7 +104,6 @@ export const orderSchema = new Schema<IOrder>(
       wallet: { type: String },
 
       netbanking: netbankingSchema,
-      card: cardDetailSchema,
     },
   },
   { timestamps: true, versionKey: false }

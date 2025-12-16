@@ -36,15 +36,6 @@ export const razorpayWebhooksController = async (
     isValidMongoId(orderDBId, "Invalid order id in notes", 400);
     isValidMongoId(userId, "Invalid user id in notes", 400);
 
-    console.log(
-      "Object.values(payment.card)",
-      Object.values(payment.card ?? {})
-    );
-    console.log(
-      "Object.entries(payment.card)",
-      Object.entries(payment.card ?? {})
-    );
-
     // Build common payment details
     const paymentCommonBody = {
       "payment.razorpay.payment_id": payment.id,
@@ -77,22 +68,22 @@ export const razorpayWebhooksController = async (
           },
         },
       }),
-      ...((payment.token_id || (payment.card && payment.acquirer_data)) && {
+      ...((payment.token_id || payment.card) && {
         "payment_details.card": {
           ...((payment.token_id || payment.card?.token_iin) && {
             token_id: payment.token_id || payment.card?.token_iin,
           }),
           ...(payment.acquirer_data?.auth_code && {
-            acquirer_data: {
-              auth_code: payment.acquirer_data.auth_code,
-            },
+            auth_code: payment.acquirer_data.auth_code,
           }),
-          ...(payment.card &&
-            Object.values(payment.card).length > 0 && {
-              card: Object.fromEntries(
-                Object.entries(payment.card).filter(([_, value]) => !!value)
-              ),
-            }),
+          ...(payment.card && {
+            id: payment.card.id,
+            name: payment.card.name,
+            last4: payment.card.last4,
+            network: payment.card.network,
+            type: payment.card.type,
+            issuer: payment.card.issuer,
+          }),
         },
       }),
     };

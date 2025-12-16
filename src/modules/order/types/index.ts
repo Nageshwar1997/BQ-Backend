@@ -42,6 +42,16 @@ export interface IOrder {
         vpa: string;
         flow: string;
       };
+      card?: {
+        token_id: string;
+        auth_code: string;
+        id?: string;
+        name?: string;
+        last4: string;
+        network: string;
+        type: string;
+        issuer: string;
+      };
     };
   };
   discount: number;
@@ -57,18 +67,6 @@ export interface IOrder {
     wallet?: string | null;
 
     netbanking?: { acquirer_data: { bank_transaction_id: string } };
-    card?: {
-      token_id: string;
-      acquirer_data: { auth_code: string };
-      card: {
-        id?: string;
-        name?: string;
-        last4: string;
-        network: string;
-        type: string;
-        issuer: string;
-      };
-    };
   };
   message?: string;
   createdAt: Date;
