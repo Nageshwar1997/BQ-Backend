@@ -53,7 +53,7 @@ export const cancelOrderController = async (
       // Refund initiate only if payment captured
       if (isPaid && paymentId) {
         await razorpay.payments.refund(paymentId, {
-          amount: order.payment.price * 100, // INR → paise
+          amount: order.payment.amount * 100, // INR → paise
           notes: {
             db_order_id: order._id.toString(),
             reason: reason || "Order cancelled",

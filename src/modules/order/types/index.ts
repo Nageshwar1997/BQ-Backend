@@ -26,11 +26,11 @@ export interface IOrder {
       payment_id?: string;
       signature: string;
     };
-    price: number;
+    amount: number;
   };
+  discount: number;
   status: (typeof ORDER_STATUS)[number];
   order_result: {
-    discount: number;
     charges: number;
     order_receipt: string;
     payment_receipt?: string;

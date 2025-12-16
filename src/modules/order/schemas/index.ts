@@ -86,11 +86,11 @@ export const orderSchema = new Schema<IOrder>(
         payment_id: { type: String },
         signature: { type: String },
       },
-      price: { type: Number, required: true, default: 0 },
+      amount: { type: Number, required: true, default: 0 },
     },
+    discount: { type: Number, required: true, default: 0 },
     status: { type: String, enum: ORDER_STATUS, default: "PENDING" },
     order_result: {
-      discount: { type: Number, required: true, default: 0 },
       charges: { type: Number, default: 0 },
       paid_at: { type: Date },
       delivered_at: { type: Date },

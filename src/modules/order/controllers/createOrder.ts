@@ -59,12 +59,12 @@ export const createOrderController = async (
       mode: "ONLINE",
       currency: "INR",
       status: "PENDING",
-      price: totalPrice + charges,
+      amount: totalPrice + charges,
     },
+    discount,
     status: "PENDING",
     order_result: {
       charges,
-      discount,
     },
   };
   if (foundAddresses.length === 1 && both) {
