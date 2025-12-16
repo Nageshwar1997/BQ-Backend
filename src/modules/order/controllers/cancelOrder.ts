@@ -65,7 +65,7 @@ export const cancelOrderController = async (
           { _id: order._id },
           {
             $set: {
-              "payment_details.refund_status": "REQUESTED",
+              "payment.refund.status": "REQUESTED",
             },
           }
         );
