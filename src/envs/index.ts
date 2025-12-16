@@ -39,4 +39,5 @@ export const {
   // R
   RAZORPAY_KEY_ID,
   RAZORPAY_KEY_SECRET,
+  RAZORPAY_WEBHOOK_SECRET,
 } = process.env;

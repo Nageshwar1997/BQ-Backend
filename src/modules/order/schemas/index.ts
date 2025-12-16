@@ -28,6 +28,7 @@ const upiSchema = new Schema(
       rrn: { type: String },
       upi_transaction_id: { type: String },
       vpa: { type: String },
+      flow: { type: String },
     },
   },
   { _id: false }

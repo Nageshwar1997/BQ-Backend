@@ -46,7 +46,12 @@ export interface IOrder {
     fee: number;
     tax: number;
     upi?: {
-      acquirer_data: { rrn: string; upi_transaction_id: string; vpa: string };
+      acquirer_data: {
+        rrn: string;
+        upi_transaction_id: string;
+        vpa: string;
+        flow: string;
+      };
     };
     netbanking?: { acquirer_data: { bank_transaction_id: string } };
     card?: {

@@ -25,6 +25,7 @@ export const catchAsyncWithTransaction = (
       await fn(req, res, next, session);
       await session.commitTransaction();
     } catch (err) {
+      console.error(err);
       await session.abortTransaction();
       next(err);
     } finally {

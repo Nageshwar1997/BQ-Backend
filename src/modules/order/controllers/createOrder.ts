@@ -2,9 +2,13 @@ import { Response } from "express";
 import { Types } from "mongoose";
 import { AuthenticatedRequest } from "../../../types";
 import { Order } from "../models";
-import { AddressModule, CartModule, ChatbotModule } from "../..";
+import {
+  AddressModule,
+  CartModule,
+  ChatbotModule,
+  RazorpayModule,
+} from "../..";
 import { AppError } from "../../../classes";
-import { razorpay } from "../../../configs";
 import { IOrder } from "../types";
 import { IAddress } from "../../address/types";
 
@@ -51,28 +55,6 @@ export const createOrderController = async (
   );
   const charges = totalPrice < 499 ? 40 : 0;
 
-  let razorpayOrder;
-
-  try {
-    razorpayOrder = await razorpay.orders.create({
-      amount: (totalPrice + charges) * 100, // Price in paise
-      currency: "INR", // Currency
-      receipt: `order_receipt_${Date.now()}`,
-      payment_capture: true,
-      notes: {
-        buyer_id: `${user?._id}`,
-        buyer_name: `${user?.firstName} ${user?.lastName}`,
-        buyer_email: `${user?.email}`,
-        buyer_contact: `${user?.phoneNumber}`,
-        buyer_device_ip: req.ip || "",
-        buyer_device_user_agent: req.headers?.["user-agent"] || "",
-      },
-    });
-  } catch (error) {
-    console.error("Razorpay order creation failed:", error);
-    throw new AppError("Payment gateway error, please try again later", 502);
-  }
-
   const orderBody = {
     user: new Types.ObjectId(user?._id),
     products: cart.products || [],
@@ -87,7 +69,6 @@ export const createOrderController = async (
       charges,
       discount,
       price: totalPrice + charges,
-      order_receipt: razorpayOrder.receipt,
     },
   };
   if (foundAddresses.length === 1 && both) {
@@ -104,6 +85,20 @@ export const createOrderController = async (
 
   if (!order) {
     throw new AppError("Failed to create order", 400);
+  }
+
+  const razorpayOrder = await RazorpayModule.Services.rzp_create_order(
+    user!,
+    totalPrice + charges,
+    order._id.toString()
+  );
+
+  if (order.order_result) {
+    order.order_result.order_receipt = razorpayOrder.receipt || "";
+    order.razorpay_payment_result.rzp_order_id = razorpayOrder.id;
+    await order.save();
+
+    await order.save();
   }
 
   res.success(201, "Order created successfully", {
