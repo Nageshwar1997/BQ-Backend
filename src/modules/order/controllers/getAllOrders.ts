@@ -4,6 +4,7 @@ import { Order } from "../models";
 import { AppError } from "../../../classes";
 import { IOrder } from "../types";
 import { FilterQuery } from "mongoose";
+import { toArray } from "../../../utils";
 
 export const getAllOrdersController = async (
   req: AuthenticatedRequest,
@@ -11,21 +12,26 @@ export const getAllOrdersController = async (
 ) => {
   const userId = req.user?._id;
   let { order_status, payment_status, page, limit } = req.query;
+
+  const orderStatuses = toArray(order_status);
+  const paymentStatuses = toArray(payment_status);
+
   const pageNum = page ? Number(page) : 0;
   const limitNum = limit ? Number(limit) : 0;
   const skip = pageNum && limitNum ? (pageNum - 1) * limitNum : 0;
 
   const filter: FilterQuery<IOrder> = { user: userId };
 
-  if (order_status) {
-    filter["order_result.order_status"] = new RegExp(`^${order_status}$`, "i");
+  if (orderStatuses.length) {
+    filter["order_result.order_status"] = {
+      $in: orderStatuses.map((s) => new RegExp(`^${s}$`, "i")),
+    };
   }
 
-  if (payment_status) {
-    filter["razorpay_payment_result.rzp_payment_status"] = new RegExp(
-      `^${payment_status}$`,
-      "i"
-    );
+  if (paymentStatuses.length) {
+    filter["razorpay_payment_result.rzp_payment_status"] = {
+      $in: paymentStatuses.map((s) => new RegExp(`^${s}$`, "i")),
+    };
   }
 
   let query = Order.find(filter)
