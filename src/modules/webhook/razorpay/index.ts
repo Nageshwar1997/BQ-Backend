@@ -138,7 +138,7 @@ export const razorpayWebhooksController = async (
           updatePayload = {
             ...paymentCommonBody,
             status: "CONFIRMED",
-            "order_result.paid_at": new Date(payment.created_at * 1000),
+            "payment.paid_at": new Date(payment.created_at * 1000),
             // NEw
             "payment.status": "PAID",
             ...(!!order.order_result.payment_receipt && {

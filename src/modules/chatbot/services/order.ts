@@ -131,7 +131,7 @@ export const getMinimalOrdersForAiPrompt = (
       ...(order.payment.status === "PAID" &&
         order.status === "CONFIRMED" && {
           "Expected Delivery": new Date(
-            (order.order_result.paid_at?.getTime() || Date.now()) +
+            (order.payment.paid_at?.getTime() || Date.now()) +
               7 * 24 * 60 * 60 * 1000
           ),
         }),
@@ -173,7 +173,7 @@ export const createOrUpdateEmbeddedOrder = async ({
     ...(order.payment.status === "PAID" &&
       order.status === "CONFIRMED" && {
         "Expected Delivery": new Date(
-          (order.order_result.paid_at?.getTime() || Date.now()) +
+          (order.payment.paid_at?.getTime() || Date.now()) +
             7 * 24 * 60 * 60 * 1000
         ),
       }),

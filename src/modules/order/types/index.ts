@@ -27,6 +27,7 @@ export interface IOrder {
       signature: string;
     };
     amount: number;
+    paid_at?: Date;
   };
   discount: number;
   charges: number;
@@ -34,7 +35,6 @@ export interface IOrder {
   order_result: {
     order_receipt: string;
     payment_receipt?: string;
-    paid_at?: Date;
     delivered_at?: Date;
     cancelled_at?: Date;
     returned_at?: Date;
