@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 import { z, ZodType } from "zod";
+import { ParsedQs } from "qs";
 
 import {
   ValidateRequiredFileFieldsParams,
@@ -11,7 +12,6 @@ import {
 } from "../types";
 import { AppError } from "../classes";
 import { regexes } from "../constants";
-import { error } from "console";
 
 export const isValidMongoId = (
   id: string,
@@ -320,4 +320,11 @@ export const validateZodDate = ({
 
 export const escapeRegexSpecialChars = (value: string): string => {
   return value.replace(regexes.escapeSpecialChars, "\\$&");
+};
+
+export const toArray = (value?: string | ParsedQs | (string | ParsedQs)[]) => {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") return value.split(",").map((v) => v.trim());
+  return [];
 };
