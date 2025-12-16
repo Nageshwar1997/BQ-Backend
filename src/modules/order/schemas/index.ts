@@ -34,7 +34,8 @@ const upiSchema = new Schema(
 
 const netbankingSchema = new Schema(
   {
-    acquirer_data: { bank_transaction_id: { type: String } },
+    bank: { type: String },
+    bank_transaction_id: { type: String },
   },
   { _id: false }
 );
@@ -89,6 +90,8 @@ export const orderSchema = new Schema<IOrder>(
         tax: { type: Number },
         upi: upiSchema,
         card: cardDetailSchema,
+        wallet: { type: String },
+        netbanking: netbankingSchema,
       },
     },
     discount: { type: Number, required: true, default: 0 },
@@ -100,10 +103,6 @@ export const orderSchema = new Schema<IOrder>(
 
     payment_details: {
       refund_status: { type: String },
-      bank: { type: String },
-      wallet: { type: String },
-
-      netbanking: netbankingSchema,
     },
   },
   { timestamps: true, versionKey: false }

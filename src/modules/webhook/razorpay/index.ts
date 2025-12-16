@@ -41,8 +41,7 @@ export const razorpayWebhooksController = async (
       "payment.razorpay.payment_id": payment.id,
       "payment.razorpay.signature": rzp_signature,
       "payment.details.method": payment.method?.toUpperCase() || "OTHER",
-      ...(payment.bank && { "payment_details.bank": payment.bank }),
-      ...(payment.wallet && { "payment_details.wallet": payment.wallet }),
+      ...(payment.wallet && { "payment.details.wallet": payment.wallet }),
       ...(payment.email && { "payment.details.email": payment.email }),
       ...(payment.contact && { "payment.details.contact": payment.contact }),
       ...(payment.fee > 0 && {
@@ -61,11 +60,12 @@ export const razorpayWebhooksController = async (
           flow: payment.upi?.flow,
         },
       }),
-      ...(payment.acquirer_data?.bank_transaction_id && {
-        "payment_details.netbanking": {
-          acquirer_data: {
+      ...((payment.acquirer_data?.bank_transaction_id || payment.bank) && {
+        "payment.details.netbanking": {
+          ...(payment.acquirer_data?.bank_transaction_id && {
             bank_transaction_id: payment.acquirer_data.bank_transaction_id,
-          },
+          }),
+          ...(payment.bank && { bank: payment.bank }),
         },
       }),
       ...((payment.token_id || payment.card) && {

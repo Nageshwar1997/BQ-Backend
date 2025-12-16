@@ -52,6 +52,8 @@ export interface IOrder {
         type: string;
         issuer: string;
       };
+      wallet?: string;
+      netbanking?: { bank_transaction_id: string; bank: string };
     };
   };
   discount: number;
@@ -63,10 +65,6 @@ export interface IOrder {
 
   payment_details?: {
     refund_status?: string | null;
-    bank?: string | null;
-    wallet?: string | null;
-
-    netbanking?: { acquirer_data: { bank_transaction_id: string } };
   };
   message?: string;
   createdAt: Date;
