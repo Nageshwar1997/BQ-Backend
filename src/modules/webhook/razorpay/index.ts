@@ -105,12 +105,10 @@ export const razorpayWebhooksController = async (
     switch (event) {
       // *NOTE - Working Fine
       case "payment.captured":
-        if (
-          ["UNPAID"].includes(order.razorpay_payment_result.rzp_payment_status)
-        ) {
+        if (["UNPAID"].includes(order.payment.status)) {
           updatePayload = {
             ...paymentCommonBody,
-            "razorpay_payment_result.rzp_payment_status": "PAID",
+            "payment.status": "PAID",
             "order_result.order_status": "PROCESSING",
             "order_result.payment_receipt": `payment_receipt_${Date.now()}`,
           };
@@ -119,15 +117,13 @@ export const razorpayWebhooksController = async (
       // *NOTE - Working Fine
       case "payment.failed":
         if (
-          ["UNPAID"].includes(
-            order.razorpay_payment_result.rzp_payment_status
-          ) &&
+          ["UNPAID"].includes(order.payment.status) &&
           ["PENDING"].includes(order.order_result.order_status)
         ) {
           console.log("HELLO TRIGGERED");
           updatePayload = {
             ...paymentCommonBody,
-            "razorpay_payment_result.rzp_payment_status": "FAILED",
+            "payment.status": "FAILED",
             "order_result.order_status": "FAILED",
             message: payment.error_description,
           };
@@ -148,7 +144,7 @@ export const razorpayWebhooksController = async (
             "order_result.order_status": "CONFIRMED",
             "order_result.paid_at": new Date(payment.created_at * 1000),
             // NEw
-            "razorpay_payment_result.rzp_payment_status": "PAID",
+            "payment.status": "PAID",
             ...(!!order.order_result.payment_receipt && {
               "order_result.payment_receipt": `payment_receipt_${Date.now()}`,
             }),
@@ -157,7 +153,7 @@ export const razorpayWebhooksController = async (
         break;
       case "refund.created":
         // Skip if already refunded
-        if (order.razorpay_payment_result.rzp_payment_status !== "REFUNDED") {
+        if (order.payment.status !== "REFUNDED") {
           updatePayload = { "payment_details.refund_status": "APPROVED" };
         }
         break;

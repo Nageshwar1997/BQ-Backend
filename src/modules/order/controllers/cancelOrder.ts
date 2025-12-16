@@ -46,8 +46,7 @@ export const cancelOrderController = async (
   // 🔁 Async tasks (gated, safe)
   setImmediate(async () => {
     try {
-      const isPaid =
-        order.razorpay_payment_result?.rzp_payment_status === "PAID";
+      const isPaid = order.payment.status === "PAID";
 
       const paymentId = order.payment.razorpay.payment_id;
 

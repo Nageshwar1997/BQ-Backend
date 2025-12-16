@@ -29,7 +29,7 @@ export const getAllOrdersController = async (
   }
 
   if (paymentStatuses.length) {
-    filter["razorpay_payment_result.rzp_payment_status"] = {
+    filter["payment.status"] = {
       $in: paymentStatuses.map((s) => new RegExp(`^${s}$`, "i")),
     };
   }

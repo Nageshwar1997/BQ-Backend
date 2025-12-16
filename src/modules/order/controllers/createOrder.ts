@@ -58,10 +58,9 @@ export const createOrderController = async (
     payment: {
       mode: "ONLINE",
       currency: "INR",
+      status: "PENDING",
     },
-    razorpay_payment_result: {
-      rzp_payment_status: "UNPAID",
-    },
+    razorpay_payment_result: {},
     order_result: {
       order_status: "PENDING",
       charges,

@@ -19,6 +19,7 @@ export interface IOrder {
   };
   payment: {
     mode: (typeof ALLOWED_PAYMENT_MODE)[number];
+    status: (typeof RAZORPAY_PAYMENT_STATUS)[number];
     currency: (typeof ALLOWED_CURRENCIES)[number];
     razorpay: {
       order_id: string;
@@ -26,9 +27,7 @@ export interface IOrder {
       signature: string;
     };
   };
-  razorpay_payment_result: {
-    rzp_payment_status: (typeof RAZORPAY_PAYMENT_STATUS)[number];
-  };
+  razorpay_payment_result: {};
   order_result: {
     order_status: (typeof ORDER_STATUS)[number];
     price: number;

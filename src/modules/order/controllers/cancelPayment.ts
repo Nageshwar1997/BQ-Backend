@@ -25,7 +25,7 @@ export const cancelPaymentController = async (
 
   await order.updateOne({
     $set: {
-      "razorpay_payment_result.rzp_payment_status": "FAILED",
+      "payment.status": "FAILED",
       "order_result.order_status": "FAILED",
       message: `${
         flag === "tab_closed"

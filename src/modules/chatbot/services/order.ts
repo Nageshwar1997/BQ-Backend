@@ -128,7 +128,7 @@ export const getMinimalOrdersForAiPrompt = (
       ...(order.order_result.cancelled_at && {
         "Cancelled  At": order.order_result.cancelled_at,
       }),
-      ...(order.razorpay_payment_result?.rzp_payment_status === "PAID" &&
+      ...(order.payment.status === "PAID" &&
         order.order_result?.order_status === "CONFIRMED" && {
           "Expected Delivery": new Date(
             (order.order_result.paid_at?.getTime() || Date.now()) +
@@ -136,7 +136,7 @@ export const getMinimalOrdersForAiPrompt = (
           ),
         }),
       "Order  At": order.order_result.cancelled_at,
-      "Payment Status": order.razorpay_payment_result.rzp_payment_status,
+      "Payment Status": order.payment.status,
       "Payment Mode": order.payment.mode,
       "Total Amount": order.order_result.price,
       Discount: order.order_result.discount,
@@ -170,14 +170,14 @@ export const createOrUpdateEmbeddedOrder = async ({
     "Order ID": order._id,
     "User Id": order.user?._id || order.user,
     "Order Status": order.order_result.order_status,
-    ...(order.razorpay_payment_result?.rzp_payment_status === "PAID" &&
+    ...(order.payment.status === "PAID" &&
       order.order_result?.order_status === "CONFIRMED" && {
         "Expected Delivery": new Date(
           (order.order_result.paid_at?.getTime() || Date.now()) +
             7 * 24 * 60 * 60 * 1000
         ),
       }),
-    "Payment Status": order.razorpay_payment_result.rzp_payment_status,
+    "Payment Status": order.payment.status,
     "Payment Mode": order.payment.mode,
     "Total Amount": order.order_result.price,
     Discount: order.order_result.discount,
