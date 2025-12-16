@@ -27,7 +27,6 @@ export interface IOrder {
       signature: string;
     };
   };
-  razorpay_payment_result: {};
   order_result: {
     order_status: (typeof ORDER_STATUS)[number];
     price: number;
