@@ -125,8 +125,8 @@ export const getMinimalOrdersForAiPrompt = (
         "State:- " +
         (order.addresses.both?.state ?? order.addresses.shipping?.state),
       "Created At": order.createdAt,
-      ...(order.order_result.cancelled_at && {
-        "Cancelled  At": order.order_result.cancelled_at,
+      ...(order.cancelled_at && {
+        "Cancelled  At": order.cancelled_at,
       }),
       ...(order.payment.status === "PAID" &&
         order.status === "CONFIRMED" && {
@@ -135,7 +135,7 @@ export const getMinimalOrdersForAiPrompt = (
               7 * 24 * 60 * 60 * 1000
           ),
         }),
-      "Order  At": order.order_result.cancelled_at,
+      "Order  At": order.cancelled_at,
       "Payment Status": order.payment.status,
       "Payment Mode": order.payment.mode,
       "Total Amount": order.payment.amount,

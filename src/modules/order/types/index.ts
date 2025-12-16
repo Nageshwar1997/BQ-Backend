@@ -34,9 +34,9 @@ export interface IOrder {
   discount: number;
   charges: number;
   status: (typeof ORDER_STATUS)[number];
+  delivered_at?: Date;
+  cancelled_at?: Date;
   order_result: {
-    delivered_at?: Date;
-    cancelled_at?: Date;
     returned_at?: Date;
   };
   payment_details?: {

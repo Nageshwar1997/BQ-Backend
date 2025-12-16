@@ -37,7 +37,7 @@ export const cancelOrderController = async (
 
   // ✅ Cancel order
   order.status = "CANCELLED";
-  order.order_result.cancelled_at = new Date();
+  order.cancelled_at = new Date();
 
   await order.save({ session });
 

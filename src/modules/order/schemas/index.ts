@@ -94,9 +94,9 @@ export const orderSchema = new Schema<IOrder>(
     discount: { type: Number, required: true, default: 0 },
     charges: { type: Number, default: 0 },
     status: { type: String, enum: ORDER_STATUS, default: "PENDING" },
+    delivered_at: { type: Date },
+    cancelled_at: { type: Date },
     order_result: {
-      delivered_at: { type: Date },
-      cancelled_at: { type: Date },
       returned_at: { type: Date },
     },
     payment_details: {
