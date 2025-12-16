@@ -9,5 +9,4 @@ export * as CartProductModule from "./cartProduct";
 export * as AddressModule from "./address";
 export * as OrderModule from "./order";
 export * as ChatbotModule from "./chatbot";
-export * as RazorpayModule from "./razorpay";
 export * as WebhookModule from "./webhook";

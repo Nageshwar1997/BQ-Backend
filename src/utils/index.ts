@@ -11,6 +11,7 @@ import {
 } from "../types";
 import { AppError } from "../classes";
 import { regexes } from "../constants";
+import { error } from "console";
 
 export const isValidMongoId = (
   id: string,
@@ -19,7 +20,10 @@ export const isValidMongoId = (
 ): boolean => {
   const isValid = Types.ObjectId.isValid(id);
 
-  if (!isValid) throw new AppError(message, statusCode || 400);
+  if (!isValid) {
+    console.error(`Invalid ObjectId, ${message} : `, id);
+    throw new AppError(message, statusCode || 400);
+  }
 
   return true;
 };

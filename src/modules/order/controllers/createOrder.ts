@@ -2,15 +2,11 @@ import { Response } from "express";
 import { Types } from "mongoose";
 import { AuthenticatedRequest } from "../../../types";
 import { Order } from "../models";
-import {
-  AddressModule,
-  CartModule,
-  ChatbotModule,
-  RazorpayModule,
-} from "../..";
+import { AddressModule, CartModule, ChatbotModule } from "../..";
 import { AppError } from "../../../classes";
 import { IOrder } from "../types";
 import { IAddress } from "../../address/types";
+import { rzp_create_order } from "../services";
 
 export const createOrderController = async (
   req: AuthenticatedRequest,
@@ -87,7 +83,7 @@ export const createOrderController = async (
     throw new AppError("Failed to create order", 400);
   }
 
-  const razorpayOrder = await RazorpayModule.Services.rzp_create_order(
+  const razorpayOrder = await rzp_create_order(
     user!,
     totalPrice + charges,
     order._id.toString()

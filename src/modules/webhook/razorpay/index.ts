@@ -6,7 +6,7 @@ import { AppError } from "../../../classes";
 import { ChatbotModule, OrderModule } from "../..";
 import { isValidMongoId } from "../../../utils";
 
-export const verifyPaymentController = async (
+export const razorpayWebhooksController = async (
   req: Request,
   res: Response,
   _next: NextFunction,
@@ -29,7 +29,7 @@ export const verifyPaymentController = async (
 
   try {
     const event = body.event;
-    if (event === "payment.captured") {
+    if (["payment.captured", "payment.failed"].includes(event)) {
       const payment = req.body.payload.payment.entity;
 
       const orderDBId = payment?.notes?.db_order_id;
@@ -38,6 +38,13 @@ export const verifyPaymentController = async (
       isValidMongoId(orderDBId, "Invalid order id get from notes", 400);
       isValidMongoId(userId, "Invalid user id get from notes", 400);
 
+      const paymentStatus =
+        payment.status === "captured"
+          ? "PAID"
+          : payment.status === "failed"
+          ? "FAILED"
+          : "UNPAID";
+
       const order = await OrderModule.Models.Order.findByIdAndUpdate(
         orderDBId,
         {
@@ -45,7 +52,7 @@ export const verifyPaymentController = async (
             "razorpay_payment_result.rzp_order_id": payment.order_id,
             "razorpay_payment_result.rzp_payment_id": payment.id,
             "razorpay_payment_result.rzp_signature": rzp_signature,
-            "razorpay_payment_result.rzp_payment_status": "PAID",
+            "razorpay_payment_result.rzp_payment_status": paymentStatus,
             "payment_details.method": payment.method?.toUpperCase() || "OTHER",
             ...(payment.refund_status && {
               "payment_details.refund_status": payment.refund_status,
