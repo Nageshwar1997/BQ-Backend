@@ -89,11 +89,11 @@ export const createOrderController = async (
     order._id.toString()
   );
 
-  console.log("razorpayOrder", razorpayOrder);
-
   if (razorpayOrder) {
     order.payment.rzp_order_id = razorpayOrder.id;
-    order.payment.rzp_order_receipt = razorpayOrder.receipt || "";
+    order.payment.rzp_order_receipt =
+      razorpayOrder.receipt ||
+      `order_receipt_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
 
     await order.save();
   }
