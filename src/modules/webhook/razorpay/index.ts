@@ -5,6 +5,17 @@ import { AppError } from "../../../classes";
 import { ChatbotModule, OrderModule } from "../..";
 import { isValidMongoId } from "../../../utils";
 
+/**
+ * 🔥 Remove all previous payment method details
+ * This ensures only latest payment method data exists
+ */
+const getPaymentMethodUnsetPayload = () => ({
+  "payment.details.upi": 1,
+  "payment.details.netbanking": 1,
+  "payment.details.card": 1,
+  "payment.details.wallet": 1,
+});
+
 export const razorpayWebhooksController = async (
   req: Request,
   res: Response
@@ -12,174 +23,186 @@ export const razorpayWebhooksController = async (
   const { body } = req;
   const secret = RAZORPAY_WEBHOOK_SECRET!;
 
-  // Verify signature
-  const expected_signature = crypto
+  // 🔐 Verify Razorpay signature
+  const expectedSignature = crypto
     .createHmac("sha256", secret)
     .update(JSON.stringify(body))
     .digest("hex");
 
-  const rzp_signature = req.headers["x-razorpay-signature"];
+  const receivedSignature = req.headers["x-razorpay-signature"];
 
-  if (expected_signature !== rzp_signature) {
-    console.error("Invalid signature");
-    throw new AppError("Invalid signature", 400);
+  if (expectedSignature !== receivedSignature) {
+    console.log("expectedSignature", expectedSignature);
+    console.log("receivedSignature", receivedSignature);
+    console.log("Invalid signature");
+    throw new AppError("Invalid webhook signature", 400);
   }
 
-  const payment = req.body.payload.payment.entity;
+  const event = body.event;
+  const payment = body?.payload?.payment?.entity;
 
-  try {
-    const event = body.event;
+  if (!payment) {
+    console.log("Payment payload missing");
+    throw new AppError("Payment payload missing", 400);
+  }
 
-    const orderDBId = payment?.notes?.db_order_id;
-    const userId = payment?.notes?.buyer_id;
+  const orderDBId = payment?.notes?.db_order_id;
+  const userId = payment?.notes?.buyer_id;
 
-    isValidMongoId(orderDBId, "Invalid order id in notes", 400);
-    isValidMongoId(userId, "Invalid user id in notes", 400);
+  isValidMongoId(orderDBId, "Invalid order id in notes", 400);
+  isValidMongoId(userId, "Invalid user id in notes", 400);
 
-    // Build common payment details
-    const paymentCommonBody = {
-      "payment.razorpay.payment_id": payment.id,
-      "payment.razorpay.signature": rzp_signature,
-      "payment.details.method": payment.method?.toUpperCase() || "OTHER",
-      ...(payment.wallet && { "payment.details.wallet": payment.wallet }),
-      ...(payment.email && { "payment.details.email": payment.email }),
-      ...(payment.contact && { "payment.details.contact": payment.contact }),
-      ...(payment.fee > 0 && {
-        "payment.details.fee": Number(payment.fee) / 100,
-      }),
-      ...(payment.tax > 0 && {
-        "payment.details.tax": Number(payment.tax) / 100,
-      }),
-      ...((payment.vpa || payment.upi) && {
-        "payment.details.upi": {
-          ...(payment.acquirer_data && {
-            rrn: payment.acquirer_data.rrn,
-            upi_transaction_id: payment.acquirer_data.upi_transaction_id,
-          }),
+  const order = await OrderModule.Models.Order.findById(orderDBId);
+  if (!order) {
+    console.log("Order not found");
+    throw new AppError("Order not found", 404);
+  }
+
+  /**
+   * 🔁 Common payment payload
+   */
+  const paymentCommonBody = {
+    "payment.razorpay.payment_id": payment.id,
+    "payment.razorpay.signature": receivedSignature,
+
+    "payment.details.method": payment.method?.toUpperCase() || "OTHER",
+    ...(payment.email && { "payment.details.email": payment.email }),
+    ...(payment.contact && { "payment.details.contact": payment.contact }),
+    ...(payment.fee > 0 && {
+      "payment.details.fee": Number(payment.fee) / 100,
+    }),
+    ...(payment.tax > 0 && {
+      "payment.details.tax": Number(payment.tax) / 100,
+    }),
+    ...((payment.vpa || payment.upi) && {
+      "payment.details": {
+        ...order.payment.details,
+        upi: {
+          rrn: payment.acquirer_data?.rrn,
+          upi_transaction_id: payment.acquirer_data?.upi_transaction_id,
           vpa: payment.vpa || payment.upi?.vpa,
           flow: payment.upi?.flow,
         },
-      }),
-      ...((payment.acquirer_data?.bank_transaction_id || payment.bank) && {
-        "payment.details.netbanking": {
-          ...(payment.acquirer_data?.bank_transaction_id && {
-            bank_transaction_id: payment.acquirer_data.bank_transaction_id,
-          }),
-          ...(payment.bank && { bank: payment.bank }),
+      },
+    }),
+    ...((payment.acquirer_data?.bank_transaction_id || payment.bank) && {
+      "payment.details": {
+        ...order.payment.details,
+        netbanking: {
+          bank_transaction_id: payment.acquirer_data?.bank_transaction_id,
+          bank: payment.bank,
         },
-      }),
-      ...((payment.token_id || payment.card) && {
-        "payment.details.card": {
-          ...((payment.token_id || payment.card?.token_iin) && {
-            token_id: payment.token_id || payment.card?.token_iin,
-          }),
-          ...(payment.acquirer_data?.auth_code && {
-            auth_code: payment.acquirer_data.auth_code,
-          }),
-          ...(payment.card && {
-            id: payment.card.id,
-            name: payment.card.name,
-            last4: payment.card.last4,
-            network: payment.card.network,
-            type: payment.card.type,
-            issuer: payment.card.issuer,
-          }),
+      },
+    }),
+    ...(payment.card && {
+      "payment.details": {
+        ...order.payment.details,
+        card: {
+          id: payment.card.id,
+          name: payment.card.name,
+          last4: payment.card.last4,
+          network: payment.card.network,
+          type: payment.card.type,
+          issuer: payment.card.issuer,
+          token_id: payment.token_id || payment.card?.token_iin,
+          auth_code: payment.acquirer_data?.auth_code,
         },
-      }),
-    };
+      },
+    }),
+  };
 
-    // Fetch order first for idempotent updates
-    const order = await OrderModule.Models.Order.findById(orderDBId);
-    if (!order) throw new AppError("Order not found", 404);
+  let update = {};
+  let unset = {};
 
-    let updatePayload = {};
+  switch (event) {
+    /**
+     * ✅ FINAL SUCCESS EVENT
+     */
+    case "payment.captured":
+      if (order.payment.status === "UNPAID") {
+        unset = getPaymentMethodUnsetPayload();
 
-    console.log(event + " :", payment);
-    switch (event) {
-      // *NOTE - Working Fine
-      case "payment.captured":
-        if (["UNPAID"].includes(order.payment.status)) {
-          updatePayload = {
-            ...paymentCommonBody,
-            "payment.status": "PAID",
-            status: "PROCESSING",
-            "payment.receipt": `payment_receipt_${Date.now()}`,
-          };
-        }
-        break;
-      // *NOTE - Working Fine
-      case "payment.failed":
-        if (
-          ["UNPAID"].includes(order.payment.status) &&
-          ["PENDING"].includes(order.status)
-        ) {
-          console.log("HELLO TRIGGERED");
-          updatePayload = {
-            ...paymentCommonBody,
-            "payment.status": "FAILED",
-            status: "FAILED",
-            message: payment.error_description,
-          };
-        }
-        break;
+        update = {
+          ...paymentCommonBody,
+          "payment.status": "PAID",
+          status: "PROCESSING",
+          payment_receipt: `payment_receipt_${Date.now()}`,
+          "payment.paid_at": new Date(payment.created_at * 1000),
+        };
+      }
+      break;
 
-      // *NOTE - Working Fine
-      case "order.paid":
-        // Only confirm if order is not already cancelled or refunded
-        if (["PENDING", "FAILED", "PROCESSING"].includes(order.status)) {
-          updatePayload = {
-            ...paymentCommonBody,
-            status: "CONFIRMED",
-            "payment.paid_at": new Date(payment.created_at * 1000),
-            // NEw
-            "payment.status": "PAID",
-            ...(!!order.payment.receipt && {
-              "payment.receipt": `payment_receipt_${Date.now()}`,
-            }),
-          };
-        }
-        break;
-      case "refund.created":
-        // Skip if already refunded
-        if (order.payment.status !== "REFUNDED") {
-          updatePayload = { "payment.refund.status": "APPROVED" };
-        }
-        break;
+    /**
+     * ❌ Payment failed (DON'T UNSET)
+     * Retry allowed
+     */
+    case "payment.failed":
+      if (order.payment.status === "UNPAID") {
+        update = {
+          ...paymentCommonBody,
+          "payment.status": "FAILED",
+          status: "FAILED",
+          message: payment.error_description,
+        };
+      }
+      break;
 
-      case "refund.processed":
-        updatePayload = { "payment.refund.status": "REFUNDED" };
-        break;
+    /**
+     * ✅ Safety net (order.paid)
+     */
+    case "order.paid":
+      if (order.payment.status !== "PAID") {
+        unset = getPaymentMethodUnsetPayload();
 
-      case "refund.failed":
-        updatePayload = { "payment.refund.status": "FAILED" };
-        break;
+        update = {
+          ...paymentCommonBody,
+          "payment.status": "PAID",
+          "payment.paid_at": new Date(payment.created_at * 1000),
+          status: "CONFIRMED",
+        };
+      }
+      break;
 
-      default:
-        throw new AppError("Payment event not supported", 404);
-    }
+    /**
+     * 🔁 Refund lifecycle
+     */
+    case "refund.created":
+      // Skip if already refunded
+      if (order.payment.status !== "REFUNDED") {
+        update = { refund_status: "APPROVED" };
+      }
+      break;
 
-    // Update only if there is something to update
-    if (Object.keys(updatePayload).length > 0) {
-      await OrderModule.Models.Order.findByIdAndUpdate(
-        orderDBId,
-        { $set: updatePayload },
-        { new: true }
-      );
-    }
+    case "refund.processed":
+      update = {
+        refund_status: "REFUNDED",
+        refunded_at: new Date(),
+      };
+      break;
 
-    res.success(200, "Payment verified successfully", { status: "ok" });
+    case "refund.failed":
+      update = { refund_status: "FAILED" };
+      break;
 
-    // Update embedded order in chatbot (Background task)
-    (async () => {
-      await ChatbotModule.Services.createOrUpdateEmbeddedOrder({ order });
-    })();
-  } catch (error) {
-    console.error("Error updating payment status:", error);
-    throw new AppError(
-      error instanceof Error
-        ? error.message
-        : "Failed to update payment status.",
-      500
+    default:
+      return res.success(200, "Event ignored");
+  }
+
+  if (Object.keys(update).length || Object.keys(unset).length) {
+    await OrderModule.Models.Order.findByIdAndUpdate(
+      orderDBId,
+      {
+        ...(Object.keys(unset).length && { $unset: unset }),
+        ...(Object.keys(update).length && { $set: update }),
+      }
+      // { new: true }
     );
   }
+
+  res.success(200, "Webhook processed successfully");
+
+  // 🔁 Async chatbot sync
+  setImmediate(async () => {
+    await ChatbotModule.Services.createOrUpdateEmbeddedOrder({ order });
+  });
 };

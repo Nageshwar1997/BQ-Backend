@@ -18,7 +18,7 @@ orderRouter.post(
   "/create",
   RequestMiddleware.checkEmptyRequest({ query: true }),
   AuthMiddleware.authenticated,
-  ResponseMiddleware.catchAsync(createOrderController)
+  ResponseMiddleware.catchAsyncWithTransaction(createOrderController)
 );
 
 orderRouter.patch(

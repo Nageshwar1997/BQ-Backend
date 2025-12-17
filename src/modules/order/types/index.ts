@@ -6,6 +6,7 @@ import {
   ORDER_STATUS,
   RAZORPAY_PAYMENT_METHODS,
   RAZORPAY_PAYMENT_STATUS,
+  RAZORPAY_REFUND_PAYMENT_STATUS,
 } from "../constants";
 
 export interface IOrder {
@@ -23,7 +24,7 @@ export interface IOrder {
     currency: (typeof ALLOWED_CURRENCIES)[number];
     razorpay: {
       order_id: string;
-      payment_id?: string;
+      payment_id: string;
       signature: string;
       receipt: string;
     };
@@ -56,16 +57,14 @@ export interface IOrder {
       netbanking?: { bank_transaction_id: string; bank: string };
     };
   };
+  refund_status: (typeof RAZORPAY_REFUND_PAYMENT_STATUS)[number];
   discount: number;
   charges: number;
   status: (typeof ORDER_STATUS)[number];
   delivered_at?: Date;
   cancelled_at?: Date;
   returned_at?: Date;
-
-  payment_details?: {
-    refund_status?: string | null;
-  };
+  refunded_at?: Date;
   message?: string;
   createdAt: Date;
   updatedAt: Date;

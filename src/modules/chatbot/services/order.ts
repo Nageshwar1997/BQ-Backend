@@ -203,6 +203,6 @@ export const createOrUpdateEmbeddedOrder = async ({
 
     console.log("Background order embedding done");
   } catch (err) {
-    console.error("Background order embedding failed:", err);
+    console.log("Background order embedding failed:", err);
   }
 };

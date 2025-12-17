@@ -21,7 +21,7 @@ export const isValidMongoId = (
   const isValid = Types.ObjectId.isValid(id);
 
   if (!isValid) {
-    console.error(`Invalid ObjectId, ${message} : `, id);
+    console.log(`Invalid ObjectId, ${message} : `, id);
     throw new AppError(message, statusCode || 400);
   }
 

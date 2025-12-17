@@ -1,5 +1,5 @@
-import { Response } from "express";
-import { Types } from "mongoose";
+import { NextFunction, Response } from "express";
+import { ClientSession, Types } from "mongoose";
 import { AuthenticatedRequest } from "../../../types";
 import { Order } from "../models";
 import { AddressModule, CartModule, ChatbotModule } from "../..";
@@ -10,7 +10,9 @@ import { rzp_create_order } from "../services";
 
 export const createOrderController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
+  _next: NextFunction,
+  session: ClientSession
 ) => {
   const user = req.user;
   const { billing, shipping, both } = req.query;
@@ -58,7 +60,7 @@ export const createOrderController = async (
     payment: {
       mode: "ONLINE",
       currency: "INR",
-      status: "PENDING",
+      status: "UNPAID",
       amount: totalPrice + charges,
     },
     discount,
@@ -87,9 +89,16 @@ export const createOrderController = async (
     order._id.toString()
   );
 
-  if (order.payment) {
-    order.payment.razorpay.receipt = razorpayOrder.receipt || "";
-    order.payment.razorpay.order_id = razorpayOrder.id;
+  console.log("razorpayOrder", razorpayOrder);
+
+  if (order.payment && razorpayOrder) {
+    order.payment = {
+      ...order.payment,
+      razorpay: {
+        receipt: razorpayOrder.receipt || "",
+        order_id: razorpayOrder.id,
+      } as IOrder["payment"]["razorpay"],
+    };
     await order.save();
   }
 

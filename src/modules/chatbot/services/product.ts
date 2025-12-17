@@ -210,6 +210,6 @@ export const createOrUpdateEmbeddedProduct = async ({
 
     console.log("Background product embedding done");
   } catch (err) {
-    console.error("Background product embedding failed:", err);
+    console.log("Background product embedding failed:", err);
   }
 };

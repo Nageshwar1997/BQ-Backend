@@ -15,7 +15,7 @@ export const cloudinaryConnection = async (
       message: `Cloudinary ${isImageOrVideoOrProduct} Connected ✅`,
     };
   } catch (err) {
-    console.error(
+    console.log(
       `Cloudinary ${isImageOrVideoOrProduct} Connection Error ❌`,
       err
     );

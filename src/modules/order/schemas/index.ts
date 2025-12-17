@@ -8,6 +8,7 @@ import {
   ORDER_STATUS,
   RAZORPAY_PAYMENT_METHODS,
   RAZORPAY_PAYMENT_STATUS,
+  RAZORPAY_REFUND_PAYMENT_STATUS,
 } from "../constants";
 
 // Sub-schema for addresses
@@ -21,7 +22,6 @@ export const orderProductSchema = new Schema<Omit<TCartProduct, "cart">>(
   { versionKey: false, timestamps: true, _id: false }
 );
 
-// Nested schemas for payment_details
 const upiSchema = new Schema(
   {
     rrn: { type: String },
@@ -54,6 +54,49 @@ const cardDetailSchema = new Schema(
   { _id: false }
 );
 
+const detailSchema = new Schema(
+  {
+    email: { type: String },
+    contact: { type: String },
+    method: { type: String, enum: RAZORPAY_PAYMENT_METHODS },
+    fee: { type: Number },
+    tax: { type: Number },
+    upi: upiSchema,
+    card: cardDetailSchema,
+    wallet: { type: String },
+    netbanking: netbankingSchema,
+  },
+  { _id: false }
+);
+
+const razorpaySchema = new Schema(
+  {
+    order_id: { type: String },
+    payment_id: { type: String },
+    signature: { type: String },
+    receipt: { type: String, unique: true },
+  },
+  { _id: false }
+);
+
+const paymentSchema = new Schema(
+  {
+    mode: { type: String, enum: ALLOWED_PAYMENT_MODE, default: "ONLINE" },
+    currency: { type: String, enum: ALLOWED_CURRENCIES, default: "INR" },
+    status: {
+      type: String,
+      enum: RAZORPAY_PAYMENT_STATUS,
+      default: "UNPAID",
+    },
+    razorpay: razorpaySchema,
+    amount: { type: Number, required: true, default: 0 },
+    paid_at: { type: Date },
+    receipt: { type: String, unique: true },
+    details: detailSchema,
+  },
+  { _id: false }
+);
+
 // Main order schema
 export const orderSchema = new Schema<IOrder>(
   {
@@ -65,45 +108,15 @@ export const orderSchema = new Schema<IOrder>(
       billing: orderAddressSchema,
       both: orderAddressSchema,
     },
-    payment: {
-      mode: { type: String, enum: ALLOWED_PAYMENT_MODE, default: "ONLINE" },
-      currency: { type: String, enum: ALLOWED_CURRENCIES, default: "INR" },
-      status: {
-        type: String,
-        enum: RAZORPAY_PAYMENT_STATUS,
-        default: "UNPAID",
-      },
-      razorpay: {
-        order_id: { type: String },
-        payment_id: { type: String },
-        signature: { type: String },
-        receipt: { type: String, unique: true },
-      },
-      amount: { type: Number, required: true, default: 0 },
-      paid_at: { type: Date },
-      receipt: { type: String, unique: true },
-      details: {
-        email: { type: String },
-        contact: { type: String },
-        method: { type: String, enum: RAZORPAY_PAYMENT_METHODS },
-        fee: { type: Number },
-        tax: { type: Number },
-        upi: upiSchema,
-        card: cardDetailSchema,
-        wallet: { type: String },
-        netbanking: netbankingSchema,
-      },
-    },
+    payment: paymentSchema,
     discount: { type: Number, required: true, default: 0 },
     charges: { type: Number, default: 0 },
     status: { type: String, enum: ORDER_STATUS, default: "PENDING" },
     delivered_at: { type: Date },
     cancelled_at: { type: Date },
     returned_at: { type: Date },
-
-    payment_details: {
-      refund_status: { type: String },
-    },
+    refunded_at: { type: Date },
+    refund_status: { type: String, enum: RAZORPAY_REFUND_PAYMENT_STATUS },
   },
   { timestamps: true, versionKey: false }
 );

@@ -65,7 +65,7 @@ export const cancelOrderController = async (
           { _id: order._id },
           {
             $set: {
-              "payment.refund.status": "REQUESTED",
+              refund_status: "REQUESTED",
             },
           }
         );
@@ -74,7 +74,7 @@ export const cancelOrderController = async (
       // Chatbot update sync (non-critical)
       await ChatbotModule.Services.createOrUpdateEmbeddedOrder({ order });
     } catch (err) {
-      console.error("Cancel order async task failed:", err);
+      console.log("Cancel order async task failed:", err);
     }
   });
 };

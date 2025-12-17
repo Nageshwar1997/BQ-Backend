@@ -11,7 +11,9 @@ export const rzp_create_order = async (
     const razorpayOrder = await razorpay.orders.create({
       amount: amount * 100, // Price in paise
       currency: "INR", // Currency
-      receipt: `order_receipt_${Date.now()}`,
+      receipt: `order_receipt_${Date.now()}_${Math.floor(
+        Math.random() * 10000
+      )}`,
       payment_capture: true,
       notes: {
         db_order_id: orderId,
@@ -24,7 +26,7 @@ export const rzp_create_order = async (
 
     return razorpayOrder;
   } catch (error) {
-    console.error("Razorpay order creation failed:", error);
+    console.log("Razorpay order creation failed:", error);
     throw new AppError("Payment gateway error, please try again later", 502);
   }
 };
