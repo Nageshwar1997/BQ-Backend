@@ -91,14 +91,10 @@ export const createOrderController = async (
 
   console.log("razorpayOrder", razorpayOrder);
 
-  if (order.payment && razorpayOrder) {
-    order.payment = {
-      ...order.payment,
-      razorpay: {
-        receipt: razorpayOrder.receipt || "",
-        order_id: razorpayOrder.id,
-      } as IOrder["payment"]["razorpay"],
-    };
+  if (razorpayOrder) {
+    order.payment.rzp_order_id = razorpayOrder.id;
+    order.payment.rzp_order_receipt = razorpayOrder.receipt || "";
+
     await order.save();
   }
 
