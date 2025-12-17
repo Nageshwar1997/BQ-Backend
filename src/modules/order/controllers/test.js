@@ -1,0 +1,20 @@
+export const razorpayOrder = {
+  amount: 12800,
+  amount_due: 12800,
+  amount_paid: 0,
+  attempts: 0,
+  created_at: 1765971941,
+  currency: "INR",
+  entity: "order",
+  id: "order_RsfPa8ECVAqhM9",
+  notes: {
+    buyer_contact: "9730870409",
+    buyer_email: "master@gmail.com",
+    buyer_id: "68eba546a64e416361e2595d",
+    buyer_name: "Master Account",
+    db_order_id: "694297e52aa64c09b4a085bb",
+  },
+  offer_id: null,
+  receipt: "order_receipt_1765971941650_1884",
+  status: "created",
+};

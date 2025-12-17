@@ -5,17 +5,6 @@ import { AppError } from "../../../classes";
 import { ChatbotModule, OrderModule } from "../..";
 import { isValidMongoId } from "../../../utils";
 
-/**
- * 🔥 Remove all previous payment method details
- * This ensures only latest payment method data exists
- */
-const getPaymentMethodUnsetPayload = () => ({
-  "payment.details.upi": 1,
-  "payment.details.netbanking": 1,
-  "payment.details.card": 1,
-  "payment.details.wallet": 1,
-});
-
 export const razorpayWebhooksController = async (
   req: Request,
   res: Response
@@ -41,6 +30,9 @@ export const razorpayWebhooksController = async (
   const event = body.event;
   const payment = body?.payload?.payment?.entity;
 
+  console.log("payment", payment);
+  console.log("event", event);
+
   if (!payment) {
     console.log("Payment payload missing");
     throw new AppError("Payment payload missing", 400);
@@ -62,53 +54,46 @@ export const razorpayWebhooksController = async (
    * 🔁 Common payment payload
    */
   const paymentCommonBody = {
-    "payment.razorpay.payment_id": payment.id,
-    "payment.razorpay.signature": receivedSignature,
+    "payment.rzp_payment_id": payment.id,
+    "payment.rzp_signature": receivedSignature,
 
-    "payment.details.method": payment.method?.toUpperCase() || "OTHER",
-    ...(payment.email && { "payment.details.email": payment.email }),
-    ...(payment.contact && { "payment.details.contact": payment.contact }),
+    "payment.method": payment.method?.toUpperCase() || "OTHER",
+    ...(payment.email && { "payment.email": payment.email }),
+    ...(payment.contact && { "payment.contact": payment.contact }),
     ...(payment.fee > 0 && {
-      "payment.details.fee": Number(payment.fee) / 100,
+      "payment.fee": Number(payment.fee) / 100,
     }),
     ...(payment.tax > 0 && {
-      "payment.details.tax": Number(payment.tax) / 100,
+      "payment.tax": Number(payment.tax) / 100,
     }),
     ...((payment.vpa || payment.upi) && {
-      "payment.details": {
-        ...order.payment.details,
-        upi: {
-          rrn: payment.acquirer_data?.rrn,
-          upi_transaction_id: payment.acquirer_data?.upi_transaction_id,
-          vpa: payment.vpa || payment.upi?.vpa,
-          flow: payment.upi?.flow,
-        },
+      transaction: {
+        upi_rrn: payment.acquirer_data?.rrn,
+        upi_transaction_id: payment.acquirer_data?.upi_transaction_id,
+        upi_vpa: payment.vpa || payment.upi?.vpa,
+        upi_flow: payment.upi?.flow,
       },
     }),
     ...((payment.acquirer_data?.bank_transaction_id || payment.bank) && {
-      "payment.details": {
-        ...order.payment.details,
-        netbanking: {
-          bank_transaction_id: payment.acquirer_data?.bank_transaction_id,
-          bank: payment.bank,
-        },
+      transaction: {
+        netbanking_bank_transaction_id:
+          payment.acquirer_data?.bank_transaction_id,
+        netbanking_bank: payment.bank,
       },
     }),
     ...(payment.card && {
-      "payment.details": {
-        ...order.payment.details,
-        card: {
-          id: payment.card.id,
-          name: payment.card.name,
-          last4: payment.card.last4,
-          network: payment.card.network,
-          type: payment.card.type,
-          issuer: payment.card.issuer,
-          token_id: payment.token_id || payment.card?.token_iin,
-          auth_code: payment.acquirer_data?.auth_code,
-        },
+      transaction: {
+        card_id: payment.card.id,
+        card_name: payment.card.name,
+        card_last4: payment.card.last4,
+        card_network: payment.card.network,
+        card_type: payment.card.type,
+        card_issuer: payment.card.issuer,
+        card_token_id: payment.token_id || payment.card?.token_iin,
+        card_auth_code: payment.acquirer_data?.auth_code,
       },
     }),
+    ...(payment.wallet && { transaction: { wallet: payment.wallet } }),
   };
 
   let update = {};
@@ -120,8 +105,6 @@ export const razorpayWebhooksController = async (
      */
     case "payment.captured":
       if (order.payment.status === "UNPAID") {
-        unset = getPaymentMethodUnsetPayload();
-
         update = {
           ...paymentCommonBody,
           "payment.status": "PAID",
@@ -152,8 +135,6 @@ export const razorpayWebhooksController = async (
      */
     case "order.paid":
       if (order.payment.status !== "PAID") {
-        unset = getPaymentMethodUnsetPayload();
-
         update = {
           ...paymentCommonBody,
           "payment.status": "PAID",
@@ -188,15 +169,10 @@ export const razorpayWebhooksController = async (
       return res.success(200, "Event ignored");
   }
 
-  if (Object.keys(update).length || Object.keys(unset).length) {
-    await OrderModule.Models.Order.findByIdAndUpdate(
-      orderDBId,
-      {
-        ...(Object.keys(unset).length && { $unset: unset }),
-        ...(Object.keys(update).length && { $set: update }),
-      }
-      // { new: true }
-    );
+  if (Object.keys(update).length) {
+    await OrderModule.Models.Order.findByIdAndUpdate(orderDBId, {
+      $set: update,
+    });
   }
 
   res.success(200, "Webhook processed successfully");

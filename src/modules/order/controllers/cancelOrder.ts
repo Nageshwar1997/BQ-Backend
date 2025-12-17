@@ -48,7 +48,7 @@ export const cancelOrderController = async (
     try {
       const isPaid = order.payment.status === "PAID";
 
-      const paymentId = order.payment.razorpay.payment_id;
+      const paymentId = order.payment.rzp_payment_id;
 
       // Refund initiate only if payment captured
       if (isPaid && paymentId) {

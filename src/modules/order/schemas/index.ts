@@ -22,77 +22,63 @@ export const orderProductSchema = new Schema<Omit<TCartProduct, "cart">>(
   { versionKey: false, timestamps: true, _id: false }
 );
 
-const upiSchema = new Schema(
+// Transaction sub-schema
+const transactionSchema = new Schema(
   {
-    rrn: { type: String },
-    upi_transaction_id: { type: String },
-    vpa: { type: String },
-    flow: { type: String },
+    // UPI Transaction
+    upi_rrn: String,
+    upi_transaction_id: String,
+    upi_vpa: String,
+    upi_flow: String,
+
+    // CARD Transaction
+    card_id: String,
+    card_name: String,
+    card_last4: String,
+    card_network: String,
+    card_type: String,
+    card_issuer: String,
+    card_token_id: String,
+    card_auth_code: String,
+
+    // WALLET Transaction
+    wallet: String,
+
+    // NETBANKING Transaction
+    netbanking_bank_transaction_id: String,
+    netbanking_bank: String,
   },
   { _id: false }
 );
 
-const netbankingSchema = new Schema(
+// Addresses sub-schema
+const addressesSchema = new Schema(
   {
-    bank: { type: String },
-    bank_transaction_id: { type: String },
+    shipping: orderAddressSchema,
+    billing: orderAddressSchema,
+    both: orderAddressSchema,
   },
   { _id: false }
 );
 
-const cardDetailSchema = new Schema(
-  {
-    id: { type: String },
-    name: { type: String },
-    last4: { type: String },
-    network: { type: String },
-    type: { type: String },
-    issuer: { type: String },
-    token_id: { type: String },
-    auth_code: { type: String },
-  },
-  { _id: false }
-);
-
-const detailSchema = new Schema(
-  {
-    email: { type: String },
-    contact: { type: String },
-    method: { type: String, enum: RAZORPAY_PAYMENT_METHODS },
-    fee: { type: Number },
-    tax: { type: Number },
-    upi: upiSchema,
-    card: cardDetailSchema,
-    wallet: { type: String },
-    netbanking: netbankingSchema,
-  },
-  { _id: false }
-);
-
-const razorpaySchema = new Schema(
-  {
-    order_id: { type: String },
-    payment_id: { type: String },
-    signature: { type: String },
-    receipt: { type: String, unique: true },
-  },
-  { _id: false }
-);
-
+// Payment sub-schema
 const paymentSchema = new Schema(
   {
     mode: { type: String, enum: ALLOWED_PAYMENT_MODE, default: "ONLINE" },
     currency: { type: String, enum: ALLOWED_CURRENCIES, default: "INR" },
-    status: {
-      type: String,
-      enum: RAZORPAY_PAYMENT_STATUS,
-      default: "UNPAID",
-    },
-    razorpay: razorpaySchema,
+    status: { type: String, enum: RAZORPAY_PAYMENT_STATUS, default: "UNPAID" },
+    email: String,
+    contact: String,
+    method: { type: String, enum: RAZORPAY_PAYMENT_METHODS },
+    fee: Number,
+    tax: Number,
+    rzp_order_id: String,
+    rzp_payment_id: String,
+    rzp_signature: String,
+    rzp_order_receipt: String,
+    rzp_payment_receipt: String,
     amount: { type: Number, required: true, default: 0 },
-    paid_at: { type: Date },
-    receipt: { type: String, unique: true },
-    details: detailSchema,
+    paid_at: Date,
   },
   { _id: false }
 );
@@ -102,20 +88,17 @@ export const orderSchema = new Schema<IOrder>(
   {
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     products: [orderProductSchema],
-    message: { type: String },
-    addresses: {
-      shipping: orderAddressSchema,
-      billing: orderAddressSchema,
-      both: orderAddressSchema,
-    },
+    message: String,
+    addresses: addressesSchema,
+    transaction: transactionSchema,
     payment: paymentSchema,
     discount: { type: Number, required: true, default: 0 },
     charges: { type: Number, default: 0 },
     status: { type: String, enum: ORDER_STATUS, default: "PENDING" },
-    delivered_at: { type: Date },
-    cancelled_at: { type: Date },
-    returned_at: { type: Date },
-    refunded_at: { type: Date },
+    delivered_at: Date,
+    cancelled_at: Date,
+    returned_at: Date,
+    refunded_at: Date,
     refund_status: { type: String, enum: RAZORPAY_REFUND_PAYMENT_STATUS },
   },
   { timestamps: true, versionKey: false }

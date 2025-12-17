@@ -22,40 +22,42 @@ export interface IOrder {
     mode: (typeof ALLOWED_PAYMENT_MODE)[number];
     status: (typeof RAZORPAY_PAYMENT_STATUS)[number];
     currency: (typeof ALLOWED_CURRENCIES)[number];
-    razorpay: {
-      order_id: string;
-      payment_id: string;
-      signature: string;
-      receipt: string;
-    };
+    rzp_order_id?: string;
+    rzp_payment_id?: string;
+    rzp_signature?: string;
+    rzp_order_receipt: string;
+    rzp_payment_receipt?: string;
     amount: number;
     paid_at?: Date;
-    receipt?: string;
-    details?: {
-      email: string;
-      contact: string;
-      method: (typeof RAZORPAY_PAYMENT_METHODS)[number];
-      fee: number;
-      tax: number;
-      upi?: {
-        rrn: string;
-        upi_transaction_id: string;
-        vpa: string;
-        flow: string;
-      };
-      card?: {
-        token_id: string;
-        auth_code: string;
-        id?: string;
-        name?: string;
-        last4: string;
-        network: string;
-        type: string;
-        issuer: string;
-      };
-      wallet?: string;
-      netbanking?: { bank_transaction_id: string; bank: string };
-    };
+    email: string;
+    contact: string;
+    method: (typeof RAZORPAY_PAYMENT_METHODS)[number];
+    fee: number;
+    tax: number;
+  };
+  transaction?: {
+    // UPI Transaction
+    upi_rrn?: string;
+    upi_transaction_id?: string;
+    upi_vpa?: string;
+    upi_flow?: string;
+
+    // CARD Transaction
+    card_token_id?: string;
+    card_auth_code?: string;
+    card_id?: string;
+    card_name?: string;
+    card_last4?: string;
+    card_network?: string;
+    card_type?: string;
+    card_issuer?: string;
+
+    // WALLET Transaction
+    wallet?: string;
+
+    // NETBANKING Transaction
+    netbanking_bank_transaction_id?: string;
+    netbanking_bank?: string;
   };
   refund_status: (typeof RAZORPAY_REFUND_PAYMENT_STATUS)[number];
   discount: number;
