@@ -21,7 +21,13 @@ export const RAZORPAY_PAYMENT_METHODS = [
   "OTHER",
 ];
 
-export const RAZORPAY_PAYMENT_STATUS = ["UNPAID", "PAID", "FAILED", "REFUNDED"];
+export const RAZORPAY_PAYMENT_STATUS = [
+  "UNPAID",
+  "CAPTURED",
+  "PAID",
+  "FAILED",
+  "REFUNDED",
+];
 
 export const RAZORPAY_REFUND_PAYMENT_STATUS = [
   "REQUESTED",
