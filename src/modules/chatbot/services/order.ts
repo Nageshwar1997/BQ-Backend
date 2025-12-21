@@ -204,5 +204,6 @@ export const createOrUpdateEmbeddedOrder = async ({
     console.log("Background order embedding done");
   } catch (err) {
     console.log("Background order embedding failed:", err);
+    // TODO - Implement retry logic here
   }
 };
