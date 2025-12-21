@@ -1,31 +1,36 @@
-import { OrderModule } from "../../..";
-import {
-  ORDER_STATUS_PRIORITY,
-  PAYMENT_STATUS_PRIORITY,
-  REFUND_STATUS_PRIORITY,
-} from "../../../order/constants";
+import { OrderModule } from "../..";
 import { IRazorPayPayment } from "../types";
 
 export const canUpdateOrderStatus = (
   current: OrderModule.Types.IOrder["status"],
   incoming: OrderModule.Types.IOrder["status"]
 ) => {
-  return ORDER_STATUS_PRIORITY[incoming] > ORDER_STATUS_PRIORITY[current];
+  return (
+    OrderModule.Constants.ORDER_STATUS_PRIORITY[incoming] >
+    OrderModule.Constants.ORDER_STATUS_PRIORITY[current]
+  );
 };
 
 export const canUpdatePaymentStatus = (
   current: OrderModule.Types.IOrder["payment"]["status"],
   incoming: OrderModule.Types.IOrder["payment"]["status"]
 ) => {
-  return PAYMENT_STATUS_PRIORITY[incoming] > PAYMENT_STATUS_PRIORITY[current];
+  return (
+    OrderModule.Constants.PAYMENT_STATUS_PRIORITY[incoming] >
+    OrderModule.Constants.PAYMENT_STATUS_PRIORITY[current]
+  );
 };
 
 export const canUpdateRefundStatus = (
   current: string | null | undefined,
   incoming: string
 ) => {
-  const currentPriority = current ? REFUND_STATUS_PRIORITY[current] ?? -1 : -1;
-  return REFUND_STATUS_PRIORITY[incoming] > currentPriority;
+  const currentPriority = current
+    ? OrderModule.Constants.REFUND_STATUS_PRIORITY[current] ?? -1
+    : -1;
+  return (
+    OrderModule.Constants.REFUND_STATUS_PRIORITY[incoming] > currentPriority
+  );
 };
 
 export const getTransactionDetails = (payment: IRazorPayPayment) => {

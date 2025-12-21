@@ -4,13 +4,13 @@ import { RAZORPAY_WEBHOOK_SECRET } from "../../../envs";
 import { AppError } from "../../../classes";
 import { ChatbotModule, OrderModule } from "../..";
 import { isValidMongoId } from "../../../utils";
-import { IRazorPayPayment } from "./types";
+import { IRazorPayPayment } from "../types";
 import { RAZORPAY_ACTIVE_EVENTS } from "../../../constants";
 import {
   canUpdateOrderStatus,
   canUpdatePaymentStatus,
   get_rzp_OrderUpdateBody,
-} from "./utils";
+} from "../utils";
 
 export const razorpayWebhooksController = async (
   req: Request,
