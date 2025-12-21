@@ -25,20 +25,19 @@ export const createOrderController = async (
 
   const addressIds = [];
 
-  if (shipping && !billing) {
+  if (shipping && !billing)
     throw new AppError("Billing address is required", 400);
-  } else if (billing && !shipping) {
+  if (billing && !shipping)
     throw new AppError("Shipping address is required", 400);
-  } else if (billing && shipping) {
-    addressIds.push(shipping, billing);
-  } else {
-    addressIds.push(both);
-  }
+  if (billing && shipping) addressIds.push(shipping, billing);
+  else if (both) addressIds.push(both);
 
   const foundAddresses: IAddress[] = await AddressModule.Models.Address.find({
     user: user?._id,
     _id: { $in: addressIds },
-  }).lean();
+  })
+    .session(session)
+    .lean();
 
   if (!foundAddresses?.length) throw new AppError("Address not found", 404);
 
@@ -53,7 +52,7 @@ export const createOrderController = async (
   );
   const charges = totalPrice < 499 ? 40 : 0;
 
-  const orderBody = {
+  const orderBody: Partial<IOrder> = {
     user: new Types.ObjectId(user?._id),
     products: cart.products || [],
     addresses: {} as IOrder["addresses"],
@@ -62,26 +61,25 @@ export const createOrderController = async (
       currency: "INR",
       status: "UNPAID",
       amount: totalPrice + charges,
-    },
+    } as IOrder["payment"],
     discount,
     charges,
     status: "PENDING",
   };
+
   if (foundAddresses.length === 1 && both) {
-    orderBody.addresses.both = foundAddresses[0];
+    orderBody.addresses!.both = foundAddresses[0];
   } else {
     foundAddresses.forEach((address) => {
-      if (address.type === "shipping") orderBody.addresses.shipping = address;
+      if (address.type === "shipping") orderBody.addresses!.shipping = address;
       else if (address.type === "billing")
-        orderBody.addresses.billing = address;
+        orderBody.addresses!.billing = address;
     });
   }
 
-  const order = await new Order(orderBody).save();
+  const order = await new Order(orderBody).save({ session });
 
-  if (!order) {
-    throw new AppError("Failed to create order", 400);
-  }
+  if (!order) throw new AppError("Failed to create order", 400);
 
   const razorpayOrder = await rzp_create_order(
     user!,
@@ -89,15 +87,16 @@ export const createOrderController = async (
     order._id.toString()
   );
 
-  if (razorpayOrder) {
-    order.payment.rzp_order_id = razorpayOrder.id;
-    order.payment.rzp_order_receipt =
-      razorpayOrder.receipt ||
-      `order_receipt_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-
-    await order.save();
+  if (!razorpayOrder) {
+    throw new AppError("Failed to create Razorpay order", 500);
   }
 
+  order.payment.rzp_order_id = razorpayOrder.id;
+  order.payment.rzp_order_receipt =
+    razorpayOrder.receipt ||
+    `order_receipt_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+
+  await order.save({ session });
   res.success(201, "Order created successfully", {
     orderId: order._id,
     razorpayOrder: {
@@ -108,7 +107,14 @@ export const createOrderController = async (
   });
 
   // Create embedded order in chatbot (Background task)
-  (async () => {
-    await ChatbotModule.Services.createOrUpdateEmbeddedOrder({ order });
-  })();
+  setImmediate(async () => {
+    try {
+      await ChatbotModule.Services.createOrUpdateEmbeddedOrder({
+        order,
+        session,
+      });
+    } catch (err) {
+      console.log("Cancel order async task failed:", err);
+    }
+  });
 };
