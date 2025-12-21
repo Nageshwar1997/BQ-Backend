@@ -63,11 +63,7 @@ export const cancelOrderController = async (
         // Mark refund as REQUESTED (final status will be confirmed by webhook )
         await Order.updateOne(
           { _id: order._id },
-          {
-            $set: {
-              refund_status: "REQUESTED",
-            },
-          }
+          { $set: { refund_status: "REQUESTED" } }
         );
       }
 
