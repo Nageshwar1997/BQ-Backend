@@ -55,8 +55,6 @@ export const getAllOrdersController = async (
 
   const totalOrders = await Order.countDocuments(filter);
 
-  if (!orders?.length) throw new AppError("Orders not found", 404);
-
   res.success(200, "Orders fetched successfully", {
     orders,
     totalOrders,

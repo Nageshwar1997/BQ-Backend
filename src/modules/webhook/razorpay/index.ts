@@ -5,6 +5,7 @@ import { AppError } from "../../../classes";
 import { ChatbotModule, OrderModule } from "../..";
 import { isValidMongoId } from "../../../utils";
 import { IRazorPayPayment } from "./types";
+import { RAZORPAY_ACTIVE_EVENTS } from "../../../constants";
 
 const getTransactionDetails = (payment: IRazorPayPayment) => {
   let transaction: OrderModule.Types.IOrder["transaction"] = {};
@@ -152,9 +153,6 @@ export const razorpayWebhooksController = async (
   let update = {};
 
   switch (event) {
-    /**
-     * ✅ FINAL SUCCESS EVENT
-     */
     case "payment.captured":
       update = {
         ...paymentCommonBody,
@@ -185,9 +183,6 @@ export const razorpayWebhooksController = async (
       };
       break;
 
-    /**
-     * 🔁 Refund lifecycle
-     */
     case "refund.created":
       update = { refund_status: "APPROVED" };
       break;
@@ -217,6 +212,8 @@ export const razorpayWebhooksController = async (
 
   // 🔁 Async chatbot sync
   setImmediate(async () => {
-    await ChatbotModule.Services.createOrUpdateEmbeddedOrder({ order });
+    if (RAZORPAY_ACTIVE_EVENTS.includes(event)) {
+      await ChatbotModule.Services.createOrUpdateEmbeddedOrder({ order });
+    }
   });
 };

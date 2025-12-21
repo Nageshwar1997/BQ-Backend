@@ -73,3 +73,12 @@ export const ALLOWED_BUSINESSES = [
   "Salon",
   "Wholesale Distributor",
 ];
+
+export const RAZORPAY_ACTIVE_EVENTS = [
+  "payment.captured",
+  "payment.failed",
+  "order.paid",
+  "refund.created",
+  "refund.processed",
+  "refund.failed",
+] as const;
