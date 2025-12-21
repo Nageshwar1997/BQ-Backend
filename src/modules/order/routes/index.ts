@@ -5,7 +5,6 @@ import {
   createOrderController,
   getAllOrdersController,
   getOrderByIdController,
-  verifyPaymentController,
 } from "../controllers";
 import {
   AuthMiddleware,
@@ -19,14 +18,7 @@ orderRouter.post(
   "/create",
   RequestMiddleware.checkEmptyRequest({ query: true }),
   AuthMiddleware.authenticated,
-  ResponseMiddleware.catchAsync(createOrderController)
-);
-
-orderRouter.patch(
-  "/verify-payment",
-  RequestMiddleware.checkEmptyRequest({ body: true }),
-  AuthMiddleware.authenticated,
-  ResponseMiddleware.catchAsyncWithTransaction(verifyPaymentController)
+  ResponseMiddleware.catchAsyncWithTransaction(createOrderController)
 );
 
 orderRouter.patch(

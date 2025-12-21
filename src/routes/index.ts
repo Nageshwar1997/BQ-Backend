@@ -10,6 +10,7 @@ import {
   ProductModule,
   ReviewModule,
   UserModule,
+  WebhookModule,
 } from "../modules";
 
 const router = Router();
@@ -43,5 +44,8 @@ router.use("/addresses", AddressModule.Routes.addressRouter);
 
 // Order routes
 router.use("/orders", OrderModule.Routes.orderRouter);
+
+// Webhook routes
+router.use("/webhook", WebhookModule.Routes.webhookRouter);
 
 export default router;

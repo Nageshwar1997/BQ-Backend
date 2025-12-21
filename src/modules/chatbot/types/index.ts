@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { ClientSession, Types } from "mongoose";
 import { OrderModule, ProductModule, UserModule } from "../..";
 import { SystemMessage, HumanMessage, AIMessage } from "langchain";
 
@@ -46,6 +46,7 @@ export interface TCreateOrUpdateEmbeddedProduct {
   title: IAggregatedEmbeddedProduct["product"]["title"];
   brand: IAggregatedEmbeddedProduct["product"]["brand"];
   category: IAggregatedEmbeddedProduct["product"]["category"];
+  session?: ClientSession;
 }
 
 type TBaseChatSession = {

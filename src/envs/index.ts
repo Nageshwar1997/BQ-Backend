@@ -39,4 +39,9 @@ export const {
   // R
   RAZORPAY_KEY_ID,
   RAZORPAY_KEY_SECRET,
+  RAZORPAY_WEBHOOK_SECRET,
+  // REDIS_HOST,
+  // REDIS_PORT,
+  // REDIS_PASSWORD,
+  // REDIS_USERNAME,
 } = process.env;

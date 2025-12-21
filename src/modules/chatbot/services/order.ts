@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { ClientSession, Types } from "mongoose";
 import { getEmbeddings, postEmbeddings } from "../../../configs";
 import { EmbeddedOrder } from "../models";
 import { IAggregatedEmbeddedOrder } from "../types";
@@ -125,24 +125,24 @@ export const getMinimalOrdersForAiPrompt = (
         "State:- " +
         (order.addresses.both?.state ?? order.addresses.shipping?.state),
       "Created At": order.createdAt,
-      ...(order.order_result.cancelled_at && {
-        "Cancelled  At": order.order_result.cancelled_at,
+      ...(order.cancelled_at && {
+        "Cancelled  At": order.cancelled_at,
       }),
-      ...(order.razorpay_payment_result?.rzp_payment_status === "PAID" &&
-        order.order_result?.order_status === "CONFIRMED" && {
+      ...(order.payment.status === "PAID" &&
+        order.status === "CONFIRMED" && {
           "Expected Delivery": new Date(
-            (order.order_result.paid_at?.getTime() || Date.now()) +
+            (order.payment.paid_at?.getTime() || Date.now()) +
               7 * 24 * 60 * 60 * 1000
           ),
         }),
-      "Order  At": order.order_result.cancelled_at,
-      "Payment Status": order.razorpay_payment_result.rzp_payment_status,
-      "Payment Mode": order.razorpay_payment_result.payment_mode,
-      "Total Amount": order.order_result.price,
-      Discount: order.order_result.discount,
-      Charges: order.order_result.charges,
-      "Customer Email": order.payment_details?.email,
-      "Customer Contact": order.payment_details?.contact,
+      "Order  At": order.cancelled_at,
+      "Payment Status": order.payment.status,
+      "Payment Mode": order.payment.mode,
+      "Total Amount": order.payment.amount,
+      Discount: order.discount,
+      Charges: order.charges,
+      "Customer Email": order.payment.email,
+      "Customer Contact": order.payment.contact,
       Products: order.products.forEach((product) => {
         return {
           "Product Title": product.product.title,
@@ -160,28 +160,29 @@ export const getMinimalOrdersForAiPrompt = (
 
 export const createOrUpdateEmbeddedOrder = async ({
   order,
+  session,
 }: {
   order: IAggregatedEmbeddedOrder["order"];
+  session?: ClientSession;
 }) => {
   const searchText = JSON.stringify({
-    "Order No.": 1,
     "Order ID": order._id,
     "User Id": order.user?._id || order.user,
-    "Order Status": order.order_result.order_status,
-    ...(order.razorpay_payment_result?.rzp_payment_status === "PAID" &&
-      order.order_result?.order_status === "CONFIRMED" && {
+    "Order Status": order.status,
+    ...(order.payment.status === "PAID" &&
+      order.status === "CONFIRMED" && {
         "Expected Delivery": new Date(
-          (order.order_result.paid_at?.getTime() || Date.now()) +
+          (order.payment.paid_at?.getTime() || Date.now()) +
             7 * 24 * 60 * 60 * 1000
         ),
       }),
-    "Payment Status": order.razorpay_payment_result.rzp_payment_status,
-    "Payment Mode": order.razorpay_payment_result.payment_mode,
-    "Total Amount": order.order_result.price,
-    Discount: order.order_result.discount,
-    Charges: order.order_result.charges,
-    "Customer Email": order.payment_details?.email,
-    "Customer Contact": order.payment_details?.contact,
+    "Payment Status": order.payment.status,
+    "Payment Mode": order.payment.mode,
+    "Total Amount": order.payment.amount,
+    Discount: order.discount,
+    Charges: order.charges,
+    "Customer Email": order.payment.email,
+    "Customer Contact": order.payment.contact,
     "Shipping Address":
       "City:- " +
       (order.addresses.both?.city ?? order.addresses.shipping?.city) +
@@ -196,11 +197,12 @@ export const createOrUpdateEmbeddedOrder = async ({
     await EmbeddedOrder.findOneAndUpdate(
       { order: order._id, user: order.user?._id || order.user },
       { $set: { embeddings, searchText } },
-      { new: true, upsert: true }
+      { new: true, upsert: true, ...(session ? { session } : {}) } // only include session if defined
     );
 
     console.log("Background order embedding done");
   } catch (err) {
-    console.error("Background order embedding failed:", err);
+    console.log("Background order embedding failed:", err);
+    // TODO - Implement retry logic here
   }
 };

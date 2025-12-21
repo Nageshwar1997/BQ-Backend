@@ -10,7 +10,7 @@ import { razorpay } from "../../../configs";
 export const cancelOrderController = async (
   req: AuthenticatedRequest,
   res: Response,
-  _: NextFunction,
+  _next: NextFunction,
   session: ClientSession
 ) => {
   const { orderId } = req.params;
@@ -25,7 +25,7 @@ export const cancelOrderController = async (
 
   if (!order) throw new AppError("Order not found", 404);
 
-  const status = order.order_result.order_status;
+  const status = order.status;
 
   if (["DELIVERED", "RETURNED"].includes(status)) {
     throw new AppError("Order cannot be cancelled", 400);
@@ -36,55 +36,41 @@ export const cancelOrderController = async (
   }
 
   // ✅ Cancel order
-  order.order_result.order_status = "CANCELLED";
-  order.order_result.cancelled_at = new Date();
+  order.status = "CANCELLED";
+  order.cancelled_at = new Date();
 
   await order.save({ session });
 
   res.success(200, "Order cancelled successfully");
 
-  // 🔹 Async tasks after response
+  // 🔁 Async tasks (gated, safe)
   setImmediate(async () => {
     try {
-      const isPaid =
-        order.razorpay_payment_result.rzp_payment_status === "PAID";
+      const isPaid = order.payment.status === "PAID";
 
-      if (isPaid) {
-        const paymentId = order.razorpay_payment_result.rzp_payment_id;
-        if (paymentId) {
-          const refundAmount = order.order_result.price * 100; // paise
+      const paymentId = order.payment.rzp_payment_id;
 
-          const refund = await razorpay.payments.refund(paymentId, {
-            amount: refundAmount,
-            notes: {
-              orderId: order._id.toString(),
-              reason: reason || "Order cancelled",
-            },
-          });
+      // Refund initiate only if payment captured
+      if (isPaid && paymentId) {
+        await razorpay.payments.refund(paymentId, {
+          amount: order.payment.amount * 100, // INR → paise
+          notes: {
+            db_order_id: order._id.toString(),
+            reason: reason || "Order cancelled",
+          },
+        });
 
-          // Update DB immediately (optional: will be confirmed by webhook)
-          await Order.updateOne(
-            { _id: order._id },
-            {
-              $set: {
-                "payment_details.refund_status": refund.status,
-                "payment_details.refund_id": refund.id,
-                "payment_details.refunded_at": new Date(),
-              },
-            }
-          );
-        }
+        // Mark refund as REQUESTED (final status will be confirmed by webhook )
+        await Order.updateOne(
+          { _id: order._id },
+          { $set: { refund_status: "REQUESTED" } }
+        );
       }
-    } catch (err) {
-      console.error("RAZORPAY REFUND FAILED:", err);
-      // Webhook / retry job will handle final refund status
-    }
 
-    // Chatbot update
-    try {
+      // Chatbot update sync (non-critical)
       await ChatbotModule.Services.createOrUpdateEmbeddedOrder({ order });
     } catch (err) {
-      console.error("Chatbot update failed:", err);
+      console.log("Cancel order async task failed:", err);
     }
   });
 };

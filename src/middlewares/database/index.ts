@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { connectDB } from "../../configs";
+import {
+  connectDB,
+  // redisClient
+} from "../../configs";
 
 export const checkConnection = async (
   _: Request,
@@ -8,6 +11,7 @@ export const checkConnection = async (
 ) => {
   try {
     await connectDB();
+    // await redisClient.connect(); // FIXME - Create Separate Middleware for this
 
     next();
   } catch (error) {
