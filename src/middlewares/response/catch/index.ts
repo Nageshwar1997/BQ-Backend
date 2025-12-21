@@ -6,7 +6,6 @@ export const catchAsync = (
 ) => {
   return (req: Request, res: Response, next: NextFunction) => {
     fn(req, res, next).catch((err) => {
-      // console.log(err);
       return next;
     });
   };
@@ -28,7 +27,6 @@ export const catchAsyncWithTransaction = (
       await fn(req, res, next, session);
       await session.commitTransaction();
     } catch (err) {
-      // console.log(err);
       await session.abortTransaction();
       next(err);
     } finally {
