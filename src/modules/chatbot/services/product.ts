@@ -197,6 +197,7 @@ export const createOrUpdateEmbeddedProduct = async ({
   brand,
   productId,
   category,
+  session,
 }: TCreateOrUpdateEmbeddedProduct) => {
   try {
     const searchText = `${title} ${brand} ${category.grandParent} ${category.parent} ${category.child}`;
@@ -205,7 +206,7 @@ export const createOrUpdateEmbeddedProduct = async ({
     await EmbeddedProduct.findOneAndUpdate(
       { product: productId },
       { $set: { embeddings, searchText } },
-      { new: true, upsert: true }
+      { new: true, upsert: true, ...(session ? { session } : {}) }
     );
 
     console.log("Background product embedding done");

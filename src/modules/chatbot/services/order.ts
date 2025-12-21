@@ -166,7 +166,6 @@ export const createOrUpdateEmbeddedOrder = async ({
   session?: ClientSession;
 }) => {
   const searchText = JSON.stringify({
-    "Order No.": 1,
     "Order ID": order._id,
     "User Id": order.user?._id || order.user,
     "Order Status": order.status,
