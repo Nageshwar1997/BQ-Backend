@@ -5,7 +5,6 @@ import { AppError } from "../../../classes";
 import { ChatbotModule, OrderModule } from "../..";
 import { isValidMongoId } from "../../../utils";
 import { IRazorPayPayment } from "../types";
-import { RAZORPAY_ACTIVE_EVENTS } from "../../../constants";
 import {
   canUpdateOrderStatus,
   canUpdatePaymentStatus,
@@ -82,11 +81,9 @@ export const razorpayWebhooksController = async (
 
       if (paymentChanged || orderChanged) {
         setImmediate(async () => {
-          if (RAZORPAY_ACTIVE_EVENTS.includes(event)) {
-            await ChatbotModule.Services.createOrUpdateEmbeddedOrder({
-              order: updatedOrder,
-            });
-          }
+          await ChatbotModule.Services.createOrUpdateEmbeddedOrder({
+            order: updatedOrder,
+          });
         });
       }
     }
