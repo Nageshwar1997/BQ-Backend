@@ -23,23 +23,28 @@ export const cancelPaymentController = async (
     throw new AppError("You can not cancel another user's order", 401);
   }
 
-  await order.updateOne({
-    $set: {
-      "payment.status": "FAILED",
-      status: "FAILED",
-      message: `${
-        flag === "tab_closed"
-          ? "Tab closed"
-          : flag === "modal_closed"
-          ? "Payment modal closed"
-          : "Payment cancelled by user"
-      }, we have cancelled the payment`,
-    },
-  });
+  let isOrderUpdated = false;
+
+  if (order.payment.status === "UNPAID" && order.status === "PENDING") {
+    order.payment.status = "FAILED";
+    order.status = "FAILED";
+    order.message =
+      flag === "tab_closed"
+        ? "Payment failed: tab closed by user"
+        : flag === "modal_closed"
+        ? "Payment failed: modal closed by user"
+        : "Payment failed: cancelled by user";
+
+    await order.save();
+
+    isOrderUpdated = true;
+  }
 
   res.success(200, "Payment cancelled successfully");
 
-  (async () => {
-    await ChatbotModule.Services.createOrUpdateEmbeddedOrder({ order });
-  })();
+  if (isOrderUpdated) {
+    setImmediate(async () => {
+      await ChatbotModule.Services.createOrUpdateEmbeddedOrder({ order });
+    });
+  }
 };

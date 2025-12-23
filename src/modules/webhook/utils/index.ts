@@ -76,6 +76,7 @@ export const getTransactionDetails = (payment: IRazorPayPayment) => {
       break;
   }
 
+  // Remove undefined/null values
   return Object.fromEntries(Object.entries(transaction).filter(([_, v]) => v));
 };
 
@@ -101,7 +102,7 @@ export const get_rzp_OrderUpdateBody = (
 
   switch (event) {
     case "payment.captured": {
-      update = { ...paymentCommonBody };
+      update = { ...paymentCommonBody, message: undefined };
 
       if (canUpdatePaymentStatus(order.payment.status, "CAPTURED")) {
         update["payment.status"] = "CAPTURED";
@@ -125,18 +126,8 @@ export const get_rzp_OrderUpdateBody = (
       break;
     }
 
-    case "payment.failed": {
-      update = {
-        ...paymentCommonBody,
-        "payment.status": "FAILED",
-        status: "FAILED",
-        message: payment.error_description,
-      };
-      break;
-    }
-
     case "order.paid": {
-      update = { ...paymentCommonBody };
+      update = { ...paymentCommonBody, message: undefined };
 
       if (canUpdatePaymentStatus(order.payment.status, "PAID")) {
         update["payment.status"] = "PAID";
@@ -157,6 +148,16 @@ export const get_rzp_OrderUpdateBody = (
       if (canUpdateOrderStatus(order.status, "CONFIRMED")) {
         update.status = "CONFIRMED";
       }
+      break;
+    }
+
+    case "payment.failed": {
+      update = {
+        ...paymentCommonBody,
+        "payment.status": "FAILED",
+        status: "FAILED",
+        message: payment.error_description || "Payment failed by Razorpay",
+      };
       break;
     }
 
@@ -182,9 +183,16 @@ export const get_rzp_OrderUpdateBody = (
       }
       break;
 
-    default:
+    default: {
       update = {};
+    }
   }
+
+  // Remove any undefined or null values before saving to DB
+  Object.keys(update).forEach(
+    (key) =>
+      (update[key] === undefined || update[key] === null) && delete update[key]
+  );
 
   return update;
 };
