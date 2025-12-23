@@ -88,7 +88,7 @@ export const orderSchema = new Schema<IOrder>(
   {
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     products: [orderProductSchema],
-    message: String,
+    reason: String,
     addresses: addressesSchema,
     transaction: transactionSchema,
     payment: paymentSchema,

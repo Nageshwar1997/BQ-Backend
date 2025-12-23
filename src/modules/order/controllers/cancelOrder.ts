@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
-import { AuthenticatedRequest } from "../../../types";
 import { ClientSession } from "mongoose";
+import { INormalizeError } from "razorpay/dist/types/api";
+import { AuthenticatedRequest } from "../../../types";
 import { Order } from "../models";
 import { AppError } from "../../../classes";
 import { isValidMongoId } from "../../../utils";
@@ -35,42 +36,44 @@ export const cancelOrderController = async (
     throw new AppError("Order already cancelled", 400);
   }
 
-  // ✅ Cancel order
+  const isPaid = order.payment.status === "PAID";
+  const paymentId = order.payment.rzp_payment_id;
+
+  if (isPaid && paymentId) {
+    try {
+      await razorpay.payments.refund(paymentId, {
+        amount: order.payment.amount * 100,
+        notes: {
+          db_order_id: order._id.toString(),
+          reason: reason || "Order cancelled",
+        },
+      });
+
+      order.refund_status = "REQUESTED";
+    } catch (err) {
+      console.error("Razorpay refund failed:", err);
+
+      throw new AppError(
+        (err as INormalizeError)?.error?.description ||
+          "Refund failed. Order was not cancelled. Please try again.",
+        500
+      );
+    }
+  }
+
   order.status = "CANCELLED";
   order.cancelled_at = new Date();
+  order.reason = reason;
 
   await order.save({ session });
 
   res.success(200, "Order cancelled successfully");
 
-  // 🔁 Async tasks (gated, safe)
   setImmediate(async () => {
     try {
-      const isPaid = order.payment.status === "PAID";
-
-      const paymentId = order.payment.rzp_payment_id;
-
-      // Refund initiate only if payment captured
-      if (isPaid && paymentId) {
-        await razorpay.payments.refund(paymentId, {
-          amount: order.payment.amount * 100, // INR → paise
-          notes: {
-            db_order_id: order._id.toString(),
-            reason: reason || "Order cancelled",
-          },
-        });
-
-        // Mark refund as REQUESTED (final status will be confirmed by webhook )
-        await Order.updateOne(
-          { _id: order._id },
-          { $set: { refund_status: "REQUESTED" } }
-        );
-      }
-
-      // Chatbot update sync (non-critical)
       await ChatbotModule.Services.createOrUpdateEmbeddedOrder({ order });
     } catch (err) {
-      console.log("Cancel order async task failed:", err);
+      console.log("Chatbot update failed:", err);
     }
   });
 };

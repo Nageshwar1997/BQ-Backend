@@ -76,8 +76,8 @@ const handlePaymentSuccess = (
   newPaymentStatus: OrderModule.Types.IOrder["payment"]["status"],
   newOrderStatus: OrderModule.Types.IOrder["status"]
 ) => {
-  // Remove previous message
-  update.message = undefined;
+  // Remove previous reason
+  update.reason = undefined;
 
   if (canUpdatePaymentStatus(order.payment.status, newPaymentStatus)) {
     update["payment.status"] = newPaymentStatus;
@@ -146,7 +146,7 @@ export const get_rzp_OrderUpdateBody = (
         ...paymentCommonBody,
         "payment.status": "FAILED",
         status: "FAILED",
-        message: payment.error_description || "Payment failed by Razorpay",
+        reason: payment.error_description || "Payment failed by Razorpay",
       };
       break;
 

@@ -28,7 +28,7 @@ export const cancelPaymentController = async (
   if (order.payment.status === "UNPAID" && order.status === "PENDING") {
     order.payment.status = "FAILED";
     order.status = "FAILED";
-    order.message =
+    order.reason =
       flag === "tab_closed"
         ? "Payment failed: tab closed by user"
         : flag === "modal_closed"

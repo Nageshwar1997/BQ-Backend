@@ -67,7 +67,7 @@ export interface IOrder {
   cancelled_at?: Date;
   returned_at?: Date;
   refunded_at?: Date;
-  message?: string;
+  reason?: string;
   createdAt: Date;
   updatedAt: Date;
 }
