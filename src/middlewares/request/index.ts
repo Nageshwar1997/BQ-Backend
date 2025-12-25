@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { randomUUID } from "crypto";
 import { AppError } from "../../classes";
 
 type CheckOptions = {
@@ -75,3 +76,10 @@ export const checkEmptyRequest =
       next(error);
     }
   };
+
+export const requestId = (req: Request, res: Response, next: NextFunction) => {
+  const id = randomUUID();
+  req.requestId = id; // ← must be on req
+  res.setHeader("X-Request-Id", id);
+  next();
+};

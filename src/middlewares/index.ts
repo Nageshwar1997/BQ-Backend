@@ -6,3 +6,4 @@ export * as MulterMiddleware from "./multer";
 export * as ResponseMiddleware from "./response";
 export * as JSONParseMiddleware from "./JSONParse";
 export * as RequestMiddleware from "./request";
+export * as LoggerMiddleware from "./logger";

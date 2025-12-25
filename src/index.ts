@@ -10,18 +10,29 @@ import {
   ResponseMiddleware,
   CorsMiddleware,
   DatabaseMiddleware,
+  RequestMiddleware,
+  LoggerMiddleware,
 } from "./middlewares";
 import { PORT } from "./envs";
 
 const app = express();
 const port = PORT || 5454;
 
-// Middlewares
+// ----------------- MIDDLEWARES ORDER -----------------
+
+// 1. Assign requestId first (for tracing logs)
+app.use(RequestMiddleware.requestId);
+
+// 2. Body parsers & static files
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.resolve("public")));
 app.set("query parser", (str: string) => QueryString.parse(str));
 
+// 3. Logger (logs all requests)
+app.use(LoggerMiddleware.expressLogger);
+
+// 4. Custom middlewares
 app.use(ResponseMiddleware.success);
 app.use(CorsMiddleware.checkOrigin);
 app.use(DatabaseMiddleware.checkDbConnection);
@@ -37,6 +48,7 @@ app.use("/api", router);
 
 // ----------------- ERROR HANDLING -----------------
 app.use(ResponseMiddleware.notFound);
+app.use(LoggerMiddleware.expressErrorLogger);
 app.use(ResponseMiddleware.error);
 
 // ----------------- SERVER SETUP -----------------

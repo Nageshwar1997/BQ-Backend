@@ -4,40 +4,42 @@ import { Error as MongooseError } from "mongoose";
 import { AppError } from "../../../classes";
 import { NODE_ENV } from "../../../envs";
 
-const sendDevError = (err: AppError, res: Response): void => {
+const commonErr = { success: false, error: true };
+
+const sendDevError = (err: AppError, req: Request, res: Response) => {
   res.status(err.statusCode || 500).json({
-    success: false,
-    error: true,
+    ...commonErr,
     message: err.message,
     statusCode: err.statusCode || 500,
     stack: err.stack,
+    requestId: req.requestId,
   });
 };
 
-const sendProdError = (err: AppError, res: Response): void => {
+const sendProdError = (err: AppError, req: Request, res: Response) => {
   if (err.isOperational) {
     res.status(err.statusCode || 500).json({
-      success: false,
-      error: true,
+      ...commonErr,
       message: err.message,
       statusCode: err.statusCode || 500,
+      requestId: req.requestId,
     });
   } else {
     res.status(500).json({
-      success: false,
-      error: true,
+      ...commonErr,
       message: "Something went wrong!",
       statusCode: 500,
+      requestId: req.requestId,
     });
   }
 };
 
 export const error = (
   err: Error | AppError | MongooseError,
-  _: Request,
+  req: Request,
   res: Response,
-  __: NextFunction
-): void => {
+  _: NextFunction
+) => {
   let error: AppError;
 
   if (err instanceof MongooseError.ValidationError) {
@@ -73,8 +75,8 @@ export const error = (
   error.isOperational ??= false;
 
   if (NODE_ENV === "development") {
-    return sendDevError(error, res);
+    return sendDevError(error, req, res);
   } else {
-    return sendProdError(error, res);
+    return sendProdError(error, req, res);
   }
 };
