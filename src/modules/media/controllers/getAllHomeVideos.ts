@@ -1,11 +1,10 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 
-import { AuthorizedRequest } from "../../../types";
 import { HomeVideo } from "../models";
 import { AppError } from "../../../classes";
 
 export const getAllHomeVideosController = async (
-  req: AuthorizedRequest,
+  req: Request,
   res: Response
 ) => {
   const page = Number(req.query.page);

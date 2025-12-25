@@ -1,11 +1,11 @@
 import "dotenv/config";
 import path from "path";
-import express from "express";
+import express, { Request, Response } from "express";
 import QueryString from "qs";
 import http from "http";
 
 import router from "./routes";
-import { handleNamespace, initSocket } from "./configs";
+import { connectDB, handleNamespace, initSocket } from "./configs";
 import {
   ResponseMiddleware,
   CorsMiddleware,
@@ -24,21 +24,22 @@ app.set("query parser", (str: string) => QueryString.parse(str));
 
 app.use(ResponseMiddleware.success);
 app.use(CorsMiddleware.checkOrigin);
-app.use(DatabaseMiddleware.checkConnection);
+app.use(DatabaseMiddleware.checkDbConnection);
 
+// ----------------- ROUTES -----------------
 // Home Route
-app.get("/", (_, res) =>
+app.get("/", (_: Request, res: Response) =>
   res.success(200, "Welcome to the MERN Beautinique API")
 );
 
 // API Routes
 app.use("/api", router);
 
-// Error Handling
+// ----------------- ERROR HANDLING -----------------
 app.use(ResponseMiddleware.notFound);
 app.use(ResponseMiddleware.error);
 
-// Create HTTP server
+// ----------------- SERVER SETUP -----------------
 const server = http.createServer(app);
 
 // Initialize Socket.IO
@@ -47,10 +48,17 @@ initSocket(server);
 handleNamespace("products");
 handleNamespace("orders");
 
-// Start server
+(async () => {
+  try {
+    await connectDB();
 
-server.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
+    server.listen(port, () => {
+      console.log(`Server running on http://localhost:${port}`);
+    });
+  } catch (err) {
+    console.error("❌ Failed to start server:", err);
+    process.exit(1);
+  }
+})();
 
 export { app, server };

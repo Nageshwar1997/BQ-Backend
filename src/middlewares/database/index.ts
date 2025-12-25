@@ -1,17 +1,19 @@
 import { NextFunction, Request, Response } from "express";
-import {
-  connectDB,
-  // redisClient
-} from "../../configs";
+import { connection } from "mongoose";
+import { AppError } from "../../classes";
 
-export const checkConnection = async (
+export const checkDbConnection = async (
   _: Request,
   __: Response,
   next: NextFunction
 ) => {
   try {
-    await connectDB();
-    // await redisClient.connect(); // FIXME - Create Separate Middleware for this
+    if (connection.readyState === 1) {
+      console.log("✅ Database is ready");
+    } else {
+      console.warn("⚠️ Database not ready, readyState:", connection.readyState);
+      throw new AppError("Database not ready", 500);
+    }
 
     next();
   } catch (error) {

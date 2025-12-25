@@ -32,49 +32,46 @@ const MONGO_OPTIONS: IMongoOptions = {
  */
 
 export const connectDB = async (): Promise<typeof mongoose> => {
+  // Use cached connection if exists
   if (cachedConnection) {
-    console.log("🚀 Using cached MongoDB connection");
     return cachedConnection;
   }
 
-  try {
-    if (!MONGODB_URI) {
-      throw new Error("MONGODB_URI environment variable not defined");
-    }
-
-    console.log("🔌 Establishing new MongoDB connection...");
-
-    const newConnection = await mongoose.connect(MONGODB_URI, {
-      ...MONGO_OPTIONS,
-      ...(NODE_ENV === "development" && {
-        maxPoolSize: 5, // Smaller pool for dev
-        minPoolSize: 1,
-      }),
-    });
-
-    // Store in global variable for dev hot-reload
-    if (NODE_ENV === "development") {
-      global.mongooseConn = newConnection;
-    }
-
-    cachedConnection = newConnection;
-    console.log("✅ MongoDB connected successfully");
-
-    // Connection event handlers
-    newConnection.connection.on("error", (err) => {
-      console.error("❌ MongoDB connection error:", err);
-      cachedConnection = null;
-    });
-
-    newConnection.connection.on("disconnected", () => {
-      console.warn("⚠️ MongoDB disconnected");
-      cachedConnection = null;
-    });
-
-    return newConnection;
-  } catch (error) {
-    console.error("❌ Failed to connect to MongoDB:", error);
-    cachedConnection = null;
-    throw error;
+  if (!MONGODB_URI) {
+    throw new Error("MONGODB_URI environment variable not defined");
   }
+
+  // Only log in development for clarity
+  if (NODE_ENV === "development") {
+    console.log("🔌 Establishing new MongoDB connection...");
+  }
+
+  const newConnection = await mongoose.connect(MONGODB_URI, {
+    ...MONGO_OPTIONS,
+    ...(NODE_ENV === "development" && { maxPoolSize: 5, minPoolSize: 1 }),
+  });
+
+  cachedConnection = newConnection;
+
+  // Store globally for hot reload (dev)
+  if (NODE_ENV === "development") {
+    global.mongooseConn = newConnection;
+  }
+
+  if (NODE_ENV === "development") {
+    console.log("✅ MongoDB connected successfully");
+  }
+
+  // Event handlers
+  newConnection.connection.on("error", (err) => {
+    console.error("❌ MongoDB connection error:", err);
+    cachedConnection = null;
+  });
+
+  newConnection.connection.on("disconnected", () => {
+    console.warn("⚠️ MongoDB disconnected");
+    cachedConnection = null;
+  });
+
+  return newConnection;
 };
