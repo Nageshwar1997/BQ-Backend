@@ -176,7 +176,12 @@ export const get_rzp_OrderUpdateBody = (
 
     case "refund.failed":
       if (canUpdateRefundStatus(order.refund_status, "FAILED")) {
-        update = { refund_status: "FAILED" };
+        update = {
+          refund_status: "FAILED",
+          reason:
+            payment.error_description ||
+            "Razorpay could not complete the refund. Our support team is here to help—please contact us.",
+        };
       }
       break;
 
