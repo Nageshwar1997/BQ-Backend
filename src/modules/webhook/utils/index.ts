@@ -152,7 +152,12 @@ export const get_rzp_OrderUpdateBody = (
 
     case "refund.created":
       if (canUpdateRefundStatus(order.refund_status, "APPROVED")) {
-        update = { refund_status: "APPROVED" };
+        update = {
+          refund_status: "APPROVED",
+          reason:
+            payment.error_description ||
+            "Razorpay has created your refund, and the amount will be reflected in your account soon.",
+        };
       }
       break;
 
@@ -162,6 +167,9 @@ export const get_rzp_OrderUpdateBody = (
           refund_status: "REFUNDED",
           refunded_at: new Date(),
           "payment.status": "REFUNDED",
+          reason:
+            payment.error_description ||
+            "The amount will be credited to your account within 5-7 working days.",
         };
       }
       break;
