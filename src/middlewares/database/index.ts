@@ -9,7 +9,7 @@ export const checkDbConnection = async (
 ) => {
   try {
     if (connection.readyState === 1) {
-      console.log("✅ Database is ready");
+      console.log("✅ DB connection is ready");
     } else {
       console.warn("⚠️ Database not ready, readyState:", connection.readyState);
       throw new AppError("Database not ready", 500);
