@@ -9,6 +9,8 @@ import {
   FRONTEND_PRODUCTION_MASTER_URL,
 } from "../../envs";
 
+export const AUTH_PROVIDERS = ["MANUAL", "GOOGLE"];
+
 export const allowedOrigins = [
   FRONTEND_LOCAL_HOST_CLIENT_URL,
   FRONTEND_LOCAL_HOST_ADMIN_URL,

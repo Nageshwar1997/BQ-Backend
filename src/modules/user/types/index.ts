@@ -10,6 +10,7 @@ export interface UserProps {
   phoneNumber: string;
   password: string;
   role: (typeof ROLES)[number];
+  provider: "GOOGLE" | "MANUAL";
   profilePic?: string;
   createdAt: Date;
   updatedAt: Date;

@@ -1,6 +1,11 @@
 import { Router } from "express";
 
-import { loginController, registerController } from "../controllers";
+import {
+  googleCallback,
+  googleLogin,
+  loginController,
+  registerController,
+} from "../controllers";
 import { loginZodSchema, registerZodSchema } from "../validations";
 import {
   ZodMiddleware,
@@ -26,4 +31,10 @@ authRouter.post(
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ZodMiddleware.validateZodSchema(loginZodSchema),
   ResponseMiddleware.catchAsync(loginController)
+);
+
+authRouter.get("/google", ResponseMiddleware.catchAsync(googleLogin));
+authRouter.get(
+  "/google/callback",
+  ResponseMiddleware.catchAsync(googleCallback)
 );

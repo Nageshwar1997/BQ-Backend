@@ -16,6 +16,7 @@ export const userSchema = new Schema<UserProps>(
     profilePic: { type: String, default: "", trim: true },
     role: { type: String, enum: ROLES, default: "USER" },
     password: { type: String, trim: true },
+    provider: { type: String, trim: true },
     // addresses: [{ type: Schema.Types.ObjectId, ref: "Address" }],
     // cart: [{ type: Schema.Types.ObjectId, ref: "Cart" }],
     // wishlist: [{ type: Schema.Types.ObjectId, ref: "Wishlist" }],
