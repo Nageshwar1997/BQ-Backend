@@ -3,6 +3,8 @@ import { Router } from "express";
 import {
   googleCallback,
   googleLogin,
+  linkedinCallback,
+  linkedinLogin,
   loginController,
   registerController,
 } from "../controllers";
@@ -33,8 +35,16 @@ authRouter.post(
   ResponseMiddleware.catchAsync(loginController)
 );
 
+// Google Auth
 authRouter.get("/google", ResponseMiddleware.catchAsync(googleLogin));
 authRouter.get(
   "/google/callback",
   ResponseMiddleware.catchAsync(googleCallback)
+);
+
+// LinkedIn Auth
+authRouter.get("/linkedin", ResponseMiddleware.catchAsync(linkedinLogin));
+authRouter.get(
+  "/linkedin/callback",
+  ResponseMiddleware.catchAsync(linkedinCallback)
 );

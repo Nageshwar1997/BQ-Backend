@@ -8,8 +8,13 @@ import {
   FRONTEND_PRODUCTION_ADMIN_URL,
   FRONTEND_PRODUCTION_MASTER_URL,
 } from "../../envs";
+import { TAuthProvider } from "../../modules/user/types";
 
-export const AUTH_PROVIDERS = ["MANUAL", "GOOGLE"];
+export const AUTH_PROVIDERS: TAuthProvider[] = [
+  "MANUAL",
+  "GOOGLE",
+  "LINKEDIN",
+] as const;
 
 export const allowedOrigins = [
   FRONTEND_LOCAL_HOST_CLIENT_URL,

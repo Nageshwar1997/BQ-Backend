@@ -29,6 +29,11 @@ export const {
   // J
   JWT_SECRET,
 
+  // L
+  LINKEDIN_CLIENT_ID,
+  LINKEDIN_CLIENT_SECRET,
+  LINKEDIN_REDIRECT_URI,
+
   // M
   MISTRAL_API_KEY, // Mistral automatically read it with this name only don't change it
   MISTRAL_API_KEY_POST,

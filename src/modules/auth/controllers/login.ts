@@ -5,13 +5,9 @@ import axios from "axios";
 import { AppError } from "../../../classes";
 import { UserModule } from "../..";
 import { generateToken } from "../services";
-import { googleAuthClient } from "../../../configs/o-auth";
-import {
-  FRONTEND_LOCAL_HOST_CLIENT_URL,
-  FRONTEND_PRODUCTION_CLIENT_URL,
-  GOOGLE_REDIRECT_URI,
-  NODE_ENV,
-} from "../../../envs";
+import { googleAuthClient, linkedinAuthClient } from "../../../configs/o-auth";
+import { GOOGLE_REDIRECT_URI } from "../../../envs";
+import { authSuccessRedirectUrl, getOAuthDbPayload } from "../utils";
 
 export const loginController = async (req: Request, res: Response) => {
   const { email, password, phoneNumber } = req.body ?? {};
@@ -80,28 +76,50 @@ export const googleCallback = async (
 
     let user = await UserModule.Services.getUserByEmail(data.email);
 
+    const payload = getOAuthDbPayload(data, "GOOGLE");
+
     if (!user) {
-      user = await UserModule.Models.User.create({
-        email: data.email,
-        firstName: data.given_name || data.name?.split(" ")[0] || "",
-        lastName: data.family_name || data.name?.split(" ")[1] || "",
-        phoneNumber: data.phone_number || "",
-        password: "",
-        role: "USER",
-        profilePic: data.picture || "",
-        provider: "GOOGLE",
-      });
+      user = await UserModule.Models.User.create(payload);
     }
 
     const token = generateToken(user._id);
 
-    res.redirect(
-      `${
-        NODE_ENV === "production"
-          ? FRONTEND_PRODUCTION_CLIENT_URL
-          : FRONTEND_LOCAL_HOST_CLIENT_URL
-      }/oauth-success?token=${token}`
-    );
+    res.redirect(authSuccessRedirectUrl(token));
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const linkedinLogin = async (_req: Request, res: Response) => {
+  const url = linkedinAuthClient.url;
+
+  res.redirect(url);
+};
+
+export const linkedinCallback = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { code } = req.query;
+    if (!code) throw new Error("No code returned from LinkedIn");
+
+    const { id_token } = await linkedinAuthClient.token_response(code);
+
+    const data = linkedinAuthClient.decode(id_token);
+
+    const payload = getOAuthDbPayload(data, "LINKEDIN");
+
+    let user = await UserModule.Services.getUserByEmail(payload.email);
+
+    if (!user) {
+      user = await UserModule.Models.User.create(payload);
+    }
+
+    const token = generateToken(user._id);
+
+    res.redirect(authSuccessRedirectUrl(token));
   } catch (err) {
     next(err);
   }

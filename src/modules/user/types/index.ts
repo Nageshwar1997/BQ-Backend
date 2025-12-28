@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { ROLES } from "../../../constants";
 import { AddressModule, ProductModule } from "../..";
 
+export type TAuthProvider = "GOOGLE" | "MANUAL" | "LINKEDIN";
 export interface UserProps {
   _id: string | Types.ObjectId;
   firstName: string;
@@ -10,7 +11,7 @@ export interface UserProps {
   phoneNumber: string;
   password: string;
   role: (typeof ROLES)[number];
-  provider: "GOOGLE" | "MANUAL";
+  provider: TAuthProvider;
   profilePic?: string;
   createdAt: Date;
   updatedAt: Date;

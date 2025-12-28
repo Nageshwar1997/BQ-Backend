@@ -3,6 +3,7 @@ import { IWishlist, SellerProps, UserProps } from "../types";
 import {
   ALLOWED_BUSINESSES,
   ALLOWED_COUNTRIES,
+  AUTH_PROVIDERS,
   ROLES,
   STATES_AND_UNION_TERRITORIES,
 } from "../../../constants";
@@ -16,7 +17,7 @@ export const userSchema = new Schema<UserProps>(
     profilePic: { type: String, default: "", trim: true },
     role: { type: String, enum: ROLES, default: "USER" },
     password: { type: String, trim: true },
-    provider: { type: String, trim: true },
+    provider: { type: String, enum: AUTH_PROVIDERS, default: "MANUAL" },
     // addresses: [{ type: Schema.Types.ObjectId, ref: "Address" }],
     // cart: [{ type: Schema.Types.ObjectId, ref: "Cart" }],
     // wishlist: [{ type: Schema.Types.ObjectId, ref: "Wishlist" }],
@@ -29,7 +30,10 @@ export const userSchema = new Schema<UserProps>(
 );
 
 userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ phoneNumber: 1 }, { unique: true });
+userSchema.index(
+  { phoneNumber: 1 },
+  { unique: true, partialFilterExpression: { phoneNumber: { $ne: "" } } }
+);
 userSchema.index({ role: 1 });
 
 const businessAddressSchema = new Schema<SellerProps["businessAddress"]>(
