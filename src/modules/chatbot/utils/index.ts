@@ -1,10 +1,21 @@
-import { HumanMessage, initChatModel } from "langchain";
+import { ContentBlock, HumanMessage, initChatModel } from "langchain";
 import { IProductChatSession } from "../types";
+
+const normalizeAIContent = (
+  content: string | (ContentBlock | { text?: string })[] | undefined
+): string => {
+  if (!content) return "";
+
+  if (typeof content === "string") return content;
+
+  // Array of content blocks → join text
+  return content.map((block) => block?.text ?? "").join("");
+};
 
 export const getAiGeneratedSuggestedQuestion = async (
   lastResponse: string,
   isOrderOrProduct: "order" | "product",
-  history: IProductChatSession["history"][]
+  history: IProductChatSession["history"]
 ): Promise<string[]> => {
   try {
     const model = await initChatModel("mistral-small-latest", {
@@ -22,7 +33,7 @@ export const getAiGeneratedSuggestedQuestion = async (
     // Use invoke to get a single response chunk
     const aiOutput = await model.invoke([...history, new HumanMessage(prompt)]);
 
-    let content = aiOutput.content ?? "";
+    let content = normalizeAIContent(aiOutput.content);
 
     // Remove ```json and ``` if present
     content = content
@@ -39,8 +50,8 @@ export const getAiGeneratedSuggestedQuestion = async (
       // fallback: split by newlines and remove empty lines
       return content
         ?.split("\n")
-        ?.map((line: string) => line.trim())
-        ?.filter((line: string) => line.length > 0);
+        ?.map((q) => q.trim())
+        ?.filter(Boolean);
     }
 
     return [];
