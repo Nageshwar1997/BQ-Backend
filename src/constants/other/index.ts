@@ -14,6 +14,7 @@ export const AUTH_PROVIDERS: TAuthProvider[] = [
   "MANUAL",
   "GOOGLE",
   "LINKEDIN",
+  "GITHUB",
 ] as const;
 
 export const allowedOrigins = [

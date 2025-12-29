@@ -6,7 +6,12 @@ import { AppError } from "../../../classes";
 import { UserModule } from "../..";
 import { generateToken } from "../services";
 import { googleAuthClient, linkedinAuthClient } from "../../../configs/o-auth";
-import { GOOGLE_REDIRECT_URI } from "../../../envs";
+import {
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
+  GITHUB_REDIRECT_URI,
+  GOOGLE_REDIRECT_URI,
+} from "../../../envs";
 import { authSuccessRedirectUrl, getOAuthDbPayload } from "../utils";
 
 export const loginController = async (req: Request, res: Response) => {
@@ -121,6 +126,78 @@ export const linkedinCallback = async (
 
     res.redirect(authSuccessRedirectUrl(token));
   } catch (err) {
+    next(err);
+  }
+};
+
+export const githubLogin = async (_req: Request, res: Response) => {
+  const params = new URLSearchParams({
+    client_id: GITHUB_CLIENT_ID!,
+    redirect_uri: GITHUB_REDIRECT_URI!,
+    scope: "read:user user:email",
+    allow_signup: "true",
+  });
+
+  res.redirect(`https://github.com/login/oauth/authorize?${params.toString()}`);
+};
+
+export const githubCallback = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const code = req.query.code as string;
+
+  if (!code) throw new AppError("No code returned from GitHub", 400);
+
+  try {
+    const tokenResponse = await axios.post(
+      "https://github.com/login/oauth/access_token",
+      {
+        client_id: GITHUB_CLIENT_ID,
+        client_secret: GITHUB_CLIENT_SECRET,
+        code,
+        redirect_uri: GITHUB_REDIRECT_URI,
+      },
+      { headers: { Accept: "application/json" } }
+    );
+
+    const { access_token } = tokenResponse.data;
+
+    if (!access_token) {
+      throw new AppError("Access token not found", 400);
+    }
+
+    const userResponse = await axios.get("https://api.github.com/user", {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+
+    const emailsResponse = await axios.get(
+      "https://api.github.com/user/emails",
+      { headers: { Authorization: `Bearer ${access_token}` } }
+    );
+
+    const profile = userResponse.data;
+    const emails = emailsResponse.data;
+
+    const primaryEmailObj =
+      emails.find((email: Record<string, string | boolean>) => email.primary) ||
+      emails[0];
+
+    const email = profile.email || primaryEmailObj.email;
+
+    const payload = getOAuthDbPayload({ ...profile, email }, "GITHUB");
+    let user = await UserModule.Services.getUserByEmail(email);
+
+    if (!user) {
+      user = await UserModule.Models.User.create(payload);
+    }
+
+    const token = generateToken(user._id);
+
+    res.redirect(authSuccessRedirectUrl(token));
+  } catch (err) {
+    console.log(err);
     next(err);
   }
 };

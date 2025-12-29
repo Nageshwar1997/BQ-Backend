@@ -1,6 +1,8 @@
 import { Router } from "express";
 
 import {
+  githubCallback,
+  githubLogin,
   googleCallback,
   googleLogin,
   linkedinCallback,
@@ -47,4 +49,11 @@ authRouter.get("/linkedin", ResponseMiddleware.catchAsync(linkedinLogin));
 authRouter.get(
   "/linkedin/callback",
   ResponseMiddleware.catchAsync(linkedinCallback)
+);
+
+// GitHub Auth
+authRouter.get("/github", ResponseMiddleware.catchAsync(githubLogin));
+authRouter.get(
+  "/github/callback",
+  ResponseMiddleware.catchAsync(githubCallback)
 );

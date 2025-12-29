@@ -39,16 +39,24 @@ export const getOAuthDbPayload = (
   data: Record<string, string>,
   provider: TAuthProvider
 ) => {
-  const payload = {
+  const fullName = data.name?.trim() || "";
+  const nameParts = fullName.split(/\s+/);
+
+  const firstName = data.given_name || nameParts[0];
+  const lastName =
+    data.family_name ||
+    (nameParts.length > 1 ? nameParts?.slice(1)?.join(" ") : "") ||
+    "";
+  const profilePic = data.picture || data.avatar_url || "";
+
+  return {
     email: data.email,
-    firstName: data.given_name || data.name?.split(" ")[0] || "",
-    lastName: data.family_name || data.name?.split(" ")[1] || "",
-    profilePic: data.picture || "",
+    firstName,
+    lastName,
+    profilePic,
     password: "",
     phoneNumber: "",
     provider,
     role: "USER",
   };
-
-  return payload;
 };

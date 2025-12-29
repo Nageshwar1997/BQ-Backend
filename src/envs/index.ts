@@ -22,6 +22,9 @@ export const {
   FRONTEND_PRODUCTION_MASTER_URL,
 
   // G
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
+  GITHUB_REDIRECT_URI,
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   GOOGLE_REDIRECT_URI,
@@ -54,4 +57,4 @@ export const {
   // REDIS_PORT,
   // REDIS_PASSWORD,
   // REDIS_USERNAME,
-} = process.env;
+}: NodeJS.ProcessEnv = process.env;
