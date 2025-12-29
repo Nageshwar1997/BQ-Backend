@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
-
 import { AppError } from "../../../classes";
 import { MediaModule, UserModule } from "../..";
 import { generateToken } from "../services";
@@ -8,20 +7,20 @@ import { generateToken } from "../services";
 export const registerController = async (req: Request, res: Response) => {
   const { firstName, lastName, email, password, phoneNumber } = req.body ?? {};
 
-  const isEmailExists = await UserModule.Services.getUserByEmail(email);
+  let [user, existingPhoneUser] = await Promise.all([
+    UserModule.Services.getUserByEmail(email, false),
+    UserModule.Services.getUserByPhoneNumber(phoneNumber, true),
+  ]);
 
-  if (isEmailExists) {
-    throw new AppError("Email already exists", 400);
-  }
-
-  const isPhoneNumberExists = await UserModule.Services.getUserByPhoneNumber(
-    phoneNumber
-  );
+  const isPhoneNumberExists =
+    existingPhoneUser &&
+    existingPhoneUser._id.toString() !== user?._id.toString();
 
   if (isPhoneNumberExists) {
     throw new AppError("Phone number already exists", 400);
   }
 
+  // Profile picture upload
   const file = req.file;
   let profilePic = "";
   if (file) {
@@ -36,29 +35,40 @@ export const registerController = async (req: Request, res: Response) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    const user = await UserModule.Models.User.create({
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      password: hashedPassword,
-      profilePic,
-    });
+    if (user) {
+      // User exists → OAuth-only
+      if (!user.providers.includes("MANUAL")) {
+        user.password = hashedPassword;
+        user.providers.push("MANUAL");
+        user.firstName = firstName;
+        user.lastName = lastName;
+        user.phoneNumber = phoneNumber;
+        if (profilePic) user.profilePic = profilePic;
+        await user.save();
+      } else {
+        throw new AppError("Email already exists", 400);
+      }
+    } else {
+      // Completely new user → create
+      user = await UserModule.Models.User.create({
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        password: hashedPassword,
+        profilePic,
+        providers: ["MANUAL"],
+      });
+    }
+
+    const { password: _, ...restUser } = user;
+
     const token = generateToken(user._id);
 
-    res.success(201, "User registered successfully", {
-      token,
-      user: {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        profilePic: user.profilePic,
-        role: user.role,
-      },
-    });
+    res.success(201, "User registered successfully", { token, user: restUser });
   } catch (error) {
-    await MediaModule.Utils.singleImageRemover(profilePic, "image");
+    if (profilePic)
+      await MediaModule.Utils.singleImageRemover(profilePic, "image");
     throw new AppError("Failed to register user", 500);
   }
 };

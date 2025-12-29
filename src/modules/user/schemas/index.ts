@@ -3,7 +3,6 @@ import { IWishlist, SellerProps, UserProps } from "../types";
 import {
   ALLOWED_BUSINESSES,
   ALLOWED_COUNTRIES,
-  AUTH_PROVIDERS,
   ROLES,
   STATES_AND_UNION_TERRITORIES,
 } from "../../../constants";
@@ -17,7 +16,7 @@ export const userSchema = new Schema<UserProps>(
     profilePic: { type: String, default: "", trim: true },
     role: { type: String, enum: ROLES, default: "USER" },
     password: { type: String, trim: true },
-    provider: { type: String, enum: AUTH_PROVIDERS, default: "MANUAL" },
+    providers: { type: [String], default: ["MANUAL"] },
     // addresses: [{ type: Schema.Types.ObjectId, ref: "Address" }],
     // cart: [{ type: Schema.Types.ObjectId, ref: "Cart" }],
     // wishlist: [{ type: Schema.Types.ObjectId, ref: "Wishlist" }],

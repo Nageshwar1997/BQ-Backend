@@ -1,41 +1,51 @@
 import { AppError } from "../../../classes";
 import { User } from "../models";
+import { UserProps } from "../types";
 
-export const getUserByEmail = async (email: string) => {
-  try {
-    const user = await User.findOne({ email }).lean();
-    return user;
-  } catch (error) {
-    throw error;
+export const getUserByEmail = async (email: string, lean?: boolean) => {
+  let user = null;
+  if (lean) {
+    user = await User.findOne({ email }).lean();
+  } else {
+    user = await User.findOne({ email });
   }
+  return user;
 };
 
-export const getUserByPhoneNumber = async (phoneNumber: string) => {
-  try {
-    const user = await User.findOne({ phoneNumber }).lean();
-    return user;
-  } catch (error) {
-    throw error;
+export const getUserByPhoneNumber = async (
+  phoneNumber: string,
+  lean?: boolean
+) => {
+  let user = null;
+  if (lean) {
+    user = await User.findOne({ phoneNumber }).lean();
+  } else {
+    user = await User.findOne({ phoneNumber });
   }
+  return user;
 };
 
 export const getUserByEmailOrPhoneNumber = async (
   email: string,
-  phoneNumber: string
+  phoneNumber: string,
+  lean?: boolean
 ) => {
-  try {
-    const user = await User.findOne({
+  let user = null;
+  if (lean) {
+    user = await User.findOne({
       $or: [{ email }, { phoneNumber }],
     }).lean();
-
-    if (!user) {
-      throw new AppError("User not found", 404);
-    }
-
-    return user;
-  } catch (error) {
-    throw error;
+  } else {
+    user = await User.findOne({
+      $or: [{ email }, { phoneNumber }],
+    });
   }
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  return user;
 };
 
 export const getUserById = async (id: string, needPassword?: boolean) => {
@@ -49,7 +59,7 @@ export const getUserById = async (id: string, needPassword?: boolean) => {
     if (!user) {
       throw new AppError("User not found", 404);
     }
-    return user;
+    return user as unknown as UserProps;
   } catch (error) {
     throw error;
   }

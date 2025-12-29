@@ -56,7 +56,7 @@ export const getOAuthDbPayload = (
     profilePic,
     password: "",
     phoneNumber: "",
-    provider,
+    providers: [provider],
     role: "USER",
   };
 };
