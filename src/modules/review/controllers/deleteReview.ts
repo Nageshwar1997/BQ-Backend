@@ -1,4 +1,5 @@
 import { Response } from "express";
+import { Types } from "mongoose";
 import { MediaModule, ProductModule } from "../..";
 import { AuthenticatedRequest } from "../../../types";
 import { AppError } from "../../../classes";
@@ -34,7 +35,7 @@ export const deleteReviewController = async (
   if (req.user?.role !== "MASTER") {
     checkUserPermission({
       checkId: review.user,
-      userId: req.user?._id as string,
+      userId: new Types.ObjectId(req.user?._id),
       message: "You are not authorized to delete this review",
       statusCode: 403,
     });

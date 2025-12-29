@@ -16,9 +16,34 @@ export const loginController = async (req: Request, res: Response) => {
 
   const user = await UserModule.Services.getUserByEmailOrPhoneNumber(
     email,
-    phoneNumber
+    phoneNumber,
+    true
   );
 
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  if (!user.providers.includes("MANUAL")) {
+    // Check if user has MANUAL login
+    throw new AppError(
+      `This account was created using an OAuth (${user.providers.join(
+        " / "
+      )}) login. Please login using your provider (e.g., ${user.providers.join(
+        ", "
+      )}).`,
+      400
+    );
+  }
+
+  if (!user.password) {
+    throw new AppError(
+      "No password set for this account. Please set a password to login manually.",
+      400
+    );
+  }
+
+  // Compare password
   const isPasswordMatch = bcrypt.compareSync(password, user.password);
 
   if (!isPasswordMatch) {
@@ -27,18 +52,9 @@ export const loginController = async (req: Request, res: Response) => {
 
   const token = generateToken(user._id);
 
-  res.success(200, "User logged in successfully", {
-    token,
-    user: {
-      _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      phoneNumber: user.phoneNumber,
-      email: user.email,
-      profilePic: user.profilePic,
-      role: user.role,
-    },
-  });
+  const { password: _, ...restUser } = user;
+
+  res.success(200, "User logged in successfully", { token, user: restUser });
 };
 
 export const googleLogin = async (_req: Request, res: Response) => {

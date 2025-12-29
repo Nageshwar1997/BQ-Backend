@@ -1,10 +1,9 @@
-import { Types } from "mongoose";
+import { Document, Types } from "mongoose";
 import { ROLES } from "../../../constants";
 import { AddressModule, ProductModule } from "../..";
 
 export type TAuthProvider = "GOOGLE" | "MANUAL" | "LINKEDIN" | "GITHUB";
-export interface UserProps {
-  _id: string | Types.ObjectId;
+export interface UserProps extends Document {
   firstName: string;
   lastName: string;
   email: string;

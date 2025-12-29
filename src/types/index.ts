@@ -55,8 +55,8 @@ export interface ValidateRequiredFileFieldsParams {
 }
 
 export interface CheckUserPermission {
-  userId: string | Types.ObjectId;
-  checkId: string | Types.ObjectId;
+  userId: Types.ObjectId;
+  checkId: Types.ObjectId;
   message: string;
   statusCode?: number;
 }
