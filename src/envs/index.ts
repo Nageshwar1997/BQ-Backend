@@ -21,8 +21,21 @@ export const {
   FRONTEND_PRODUCTION_ADMIN_URL,
   FRONTEND_PRODUCTION_MASTER_URL,
 
+  // G
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
+  GITHUB_REDIRECT_URI,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_REDIRECT_URI,
+
   // J
   JWT_SECRET,
+
+  // L
+  LINKEDIN_CLIENT_ID,
+  LINKEDIN_CLIENT_SECRET,
+  LINKEDIN_REDIRECT_URI,
 
   // M
   MISTRAL_API_KEY, // Mistral automatically read it with this name only don't change it
@@ -44,4 +57,4 @@ export const {
   // REDIS_PORT,
   // REDIS_PASSWORD,
   // REDIS_USERNAME,
-} = process.env;
+}: NodeJS.ProcessEnv = process.env;

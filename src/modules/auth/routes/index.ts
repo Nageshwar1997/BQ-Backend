@@ -1,6 +1,15 @@
 import { Router } from "express";
 
-import { loginController, registerController } from "../controllers";
+import {
+  githubCallback,
+  githubLogin,
+  googleCallback,
+  googleLogin,
+  linkedinCallback,
+  linkedinLogin,
+  loginController,
+  registerController,
+} from "../controllers";
 import { loginZodSchema, registerZodSchema } from "../validations";
 import {
   ZodMiddleware,
@@ -26,4 +35,25 @@ authRouter.post(
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ZodMiddleware.validateZodSchema(loginZodSchema),
   ResponseMiddleware.catchAsync(loginController)
+);
+
+// Google Auth
+authRouter.get("/google", ResponseMiddleware.catchAsync(googleLogin));
+authRouter.get(
+  "/google/callback",
+  ResponseMiddleware.catchAsync(googleCallback)
+);
+
+// LinkedIn Auth
+authRouter.get("/linkedin", ResponseMiddleware.catchAsync(linkedinLogin));
+authRouter.get(
+  "/linkedin/callback",
+  ResponseMiddleware.catchAsync(linkedinCallback)
+);
+
+// GitHub Auth
+authRouter.get("/github", ResponseMiddleware.catchAsync(githubLogin));
+authRouter.get(
+  "/github/callback",
+  ResponseMiddleware.catchAsync(githubCallback)
 );
