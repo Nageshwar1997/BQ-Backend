@@ -11,7 +11,7 @@ export interface UserProps {
   phoneNumber: string;
   password: string;
   role: (typeof ROLES)[number];
-  provider: TAuthProvider;
+  providers: TAuthProvider[];
   profilePic?: string;
   createdAt: Date;
   updatedAt: Date;

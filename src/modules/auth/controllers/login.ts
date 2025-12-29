@@ -56,18 +56,26 @@ export const googleCallback = async (
 
     if (!code) throw new AppError("No code returned from Google", 400);
 
-    // Fetch user info
+    // Fetch user info from Google
     const profile = await googleAuthClient.decode(code);
+    if (!profile) throw new AppError("User info not found", 400);
 
-    if (!profile) {
-      throw new AppError("User info not found", 400);
-    }
-
-    let user = await UserModule.Services.getUserByEmail(profile.email);
-
+    // Prepare payload
     const payload = getOAuthDbPayload(profile, "GOOGLE");
 
-    if (!user) {
+    // Check if user already exists (email = primary identity)
+    let user = await UserModule.Models.User.findOne({
+      email: payload.email,
+    });
+
+    if (user) {
+      // If GOOGLE not linked yet, link it
+      if (!user.providers.includes("GOOGLE")) {
+        user.providers.push("GOOGLE");
+        await user.save();
+      }
+    } else {
+      // Create new user
       user = await UserModule.Models.User.create(payload);
     }
 
@@ -101,9 +109,19 @@ export const linkedinCallback = async (
 
     const payload = getOAuthDbPayload(data, "LINKEDIN");
 
-    let user = await UserModule.Services.getUserByEmail(payload.email);
+    // Find user by email (primary identity)
+    let user = await UserModule.Models.User.findOne({
+      email: payload.email,
+    });
 
-    if (!user) {
+    if (user) {
+      // Link provider if not already linked
+      if (!user.providers.includes("LINKEDIN")) {
+        user.providers.push("LINKEDIN");
+        await user.save();
+      }
+    } else {
+      // Create new user
       user = await UserModule.Models.User.create(payload);
     }
 
@@ -126,11 +144,11 @@ export const githubCallback = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { code } = req.query;
-
-  if (!code) throw new AppError("No code returned from GitHub", 400);
-
   try {
+    const { code } = req.query;
+
+    if (!code) throw new AppError("No code returned from GitHub", 400);
+
     const { access_token } = await githubAuthClient.token_response(code);
 
     if (!access_token) {
@@ -141,9 +159,19 @@ export const githubCallback = async (
 
     const payload = getOAuthDbPayload(data, "GITHUB");
 
-    let user = await UserModule.Services.getUserByEmail(payload.email);
+    // Find user by email (primary identity)
+    let user = await UserModule.Models.User.findOne({
+      email: payload.email,
+    });
 
-    if (!user) {
+    if (user) {
+      // Link GitHub provider if not already linked
+      if (!user.providers.includes("GITHUB")) {
+        user.providers.push("GITHUB");
+        await user.save();
+      }
+    } else {
+      // Create new user
       user = await UserModule.Models.User.create(payload);
     }
 
