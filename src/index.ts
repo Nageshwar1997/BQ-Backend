@@ -1,7 +1,7 @@
 import "dotenv/config";
 import path from "path";
 import express, { Request, Response } from "express";
-import QueryString from "qs";
+import { parse } from "qs";
 import http from "http";
 
 import router from "./routes";
@@ -27,7 +27,7 @@ app.use(RequestMiddleware.requestId);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.resolve("public")));
-app.set("query parser", (str: string) => QueryString.parse(str));
+app.set("query parser", (str: string) => parse(str));
 
 // 3. Logger (logs all requests)
 app.use(LoggerMiddleware.expressLogger);

@@ -1,17 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import axios from "axios";
 
 import { AppError } from "../../../classes";
 import { UserModule } from "../..";
 import { generateToken } from "../services";
-import { googleAuthClient, linkedinAuthClient } from "../../../configs/o-auth";
 import {
-  GITHUB_CLIENT_ID,
-  GITHUB_CLIENT_SECRET,
-  GITHUB_REDIRECT_URI,
-  GOOGLE_REDIRECT_URI,
-} from "../../../envs";
+  githubAuthClient,
+  googleAuthClient,
+  linkedinAuthClient,
+} from "../../../configs";
 import { authSuccessRedirectUrl, getOAuthDbPayload } from "../utils";
 
 export const loginController = async (req: Request, res: Response) => {
@@ -45,15 +42,7 @@ export const loginController = async (req: Request, res: Response) => {
 };
 
 export const googleLogin = async (_req: Request, res: Response) => {
-  const url = googleAuthClient.generateAuthUrl({
-    access_type: "offline",
-    scope: [
-      "https://www.googleapis.com/auth/userinfo.profile",
-      "https://www.googleapis.com/auth/userinfo.email",
-    ],
-    prompt: "consent",
-    redirect_uri: GOOGLE_REDIRECT_URI,
-  });
+  const url = googleAuthClient.url;
   res.redirect(url);
 };
 
@@ -63,25 +52,20 @@ export const googleCallback = async (
   next: NextFunction
 ) => {
   try {
-    const code = req.query?.code as string;
+    const { code } = req.query;
 
-    const { tokens } = await googleAuthClient.getToken(code);
-
-    googleAuthClient.setCredentials(tokens);
+    if (!code) throw new AppError("No code returned from Google", 400);
 
     // Fetch user info
-    const { data } = await axios.get(
-      "https://www.googleapis.com/oauth2/v2/userinfo",
-      { headers: { Authorization: `Bearer ${tokens.access_token}` } }
-    );
+    const profile = await googleAuthClient.decode(code);
 
-    if (!data) {
+    if (!profile) {
       throw new AppError("User info not found", 400);
     }
 
-    let user = await UserModule.Services.getUserByEmail(data.email);
+    let user = await UserModule.Services.getUserByEmail(profile.email);
 
-    const payload = getOAuthDbPayload(data, "GOOGLE");
+    const payload = getOAuthDbPayload(profile, "GOOGLE");
 
     if (!user) {
       user = await UserModule.Models.User.create(payload);
@@ -108,7 +92,8 @@ export const linkedinCallback = async (
 ) => {
   try {
     const { code } = req.query;
-    if (!code) throw new Error("No code returned from LinkedIn");
+
+    if (!code) throw new AppError("No code returned from LinkedIn", 400);
 
     const { id_token } = await linkedinAuthClient.token_response(code);
 
@@ -131,14 +116,9 @@ export const linkedinCallback = async (
 };
 
 export const githubLogin = async (_req: Request, res: Response) => {
-  const params = new URLSearchParams({
-    client_id: GITHUB_CLIENT_ID!,
-    redirect_uri: GITHUB_REDIRECT_URI!,
-    scope: "read:user user:email",
-    allow_signup: "true",
-  });
+  const url = githubAuthClient.url;
 
-  res.redirect(`https://github.com/login/oauth/authorize?${params.toString()}`);
+  res.redirect(url);
 };
 
 export const githubCallback = async (
@@ -146,48 +126,22 @@ export const githubCallback = async (
   res: Response,
   next: NextFunction
 ) => {
-  const code = req.query.code as string;
+  const { code } = req.query;
 
   if (!code) throw new AppError("No code returned from GitHub", 400);
 
   try {
-    const tokenResponse = await axios.post(
-      "https://github.com/login/oauth/access_token",
-      {
-        client_id: GITHUB_CLIENT_ID,
-        client_secret: GITHUB_CLIENT_SECRET,
-        code,
-        redirect_uri: GITHUB_REDIRECT_URI,
-      },
-      { headers: { Accept: "application/json" } }
-    );
-
-    const { access_token } = tokenResponse.data;
+    const { access_token } = await githubAuthClient.token_response(code);
 
     if (!access_token) {
       throw new AppError("Access token not found", 400);
     }
 
-    const userResponse = await axios.get("https://api.github.com/user", {
-      headers: { Authorization: `Bearer ${access_token}` },
-    });
+    const data = await githubAuthClient.decode(access_token);
 
-    const emailsResponse = await axios.get(
-      "https://api.github.com/user/emails",
-      { headers: { Authorization: `Bearer ${access_token}` } }
-    );
+    const payload = getOAuthDbPayload(data, "GITHUB");
 
-    const profile = userResponse.data;
-    const emails = emailsResponse.data;
-
-    const primaryEmailObj =
-      emails.find((email: Record<string, string | boolean>) => email.primary) ||
-      emails[0];
-
-    const email = profile.email || primaryEmailObj.email;
-
-    const payload = getOAuthDbPayload({ ...profile, email }, "GITHUB");
-    let user = await UserModule.Services.getUserByEmail(email);
+    let user = await UserModule.Services.getUserByEmail(payload.email);
 
     if (!user) {
       user = await UserModule.Models.User.create(payload);
@@ -197,7 +151,6 @@ export const githubCallback = async (
 
     res.redirect(authSuccessRedirectUrl(token));
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };
