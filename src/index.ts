@@ -14,6 +14,7 @@ import {
   LoggerMiddleware,
 } from "./middlewares";
 import { PORT } from "./envs";
+import { transporter } from "./classes";
 
 const app = express();
 const port = PORT || 5454;
@@ -63,6 +64,8 @@ handleNamespace("orders");
 (async () => {
   try {
     await connectDB();
+
+    await transporter.verifyConnection();
 
     server.listen(port, () => {
       console.log(`Server running on http://localhost:${port}`);
