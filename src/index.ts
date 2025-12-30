@@ -14,7 +14,7 @@ import {
   LoggerMiddleware,
 } from "./middlewares";
 import { PORT } from "./envs";
-import { transporter } from "./classes";
+import { redisService, transporter } from "./classes";
 
 const app = express();
 const port = PORT || 5454;
@@ -64,7 +64,7 @@ handleNamespace("orders");
 (async () => {
   try {
     await connectDB();
-
+    await redisService.connect();
     await transporter.verifyConnection();
 
     server.listen(port, () => {

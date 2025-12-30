@@ -4,4 +4,4 @@ export * from "./chatbot";
 export * from "./socket";
 export * from "./o-auth";
 export * from "./nodemailer";
-// export * from "./redis";
+export * from "./redis";
