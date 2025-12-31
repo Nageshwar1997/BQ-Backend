@@ -82,8 +82,8 @@ export const ALLOWED_BUSINESSES = [
   "Wholesale Distributor",
 ];
 
-export const MIN = 60;
+export const MINUTE = 60;
 
-export const OTP_EXPIRY = 10 * MIN;
+export const OTP_EXPIRY = 10 * MINUTE;
 
 export const MAX_RESEND_OTP = 3;

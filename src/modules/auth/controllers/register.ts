@@ -53,7 +53,8 @@ export const registerResendOtpController = async (
     .getClient()
     ?.get(`register_data:${otpToken}`);
 
-  if (!storedData) throw new AppError("OTP session expired or invalid", 400);
+  if (!storedData)
+    throw new AppError("OTP session expired or invalid Go Back", 400); // NOTE - Don't change message anyway, In frontend we handled logic base on message
 
   const parsedData = PARSE_DATA(storedData);
   if (!parsedData.otp || !parsedData.email) {
@@ -61,13 +62,13 @@ export const registerResendOtpController = async (
   }
 
   if (parsedData.email !== email) {
-    throw new AppError("OTP session expired or invalid", 400);
+    throw new AppError("OTP session expired or invalid Go Back", 400); // NOTE - Don't change message anyway, In frontend we handled logic base on message
   }
 
   // Increment sendCount and check limit
   const sendCount = (parsedData.sendCount ?? 1) + 1;
   if (sendCount > MAX_RESEND_OTP)
-    throw new AppError("Maximum resend attempts reached", 400);
+    throw new AppError("Maximum resend attempts reached Go Back", 400); // NOTE - Don't change message anyway, In frontend we handled logic base on message
 
   // Generate new OTP
   const newOtp = generateOtp();
