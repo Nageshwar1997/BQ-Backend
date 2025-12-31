@@ -13,6 +13,22 @@ import {
 import { AppError } from "../classes";
 import { regexes } from "../constants";
 
+export const STRINGIFY_DATA = (data: unknown): string => {
+  try {
+    return JSON.stringify(data);
+  } catch {
+    return "";
+  }
+};
+
+export const PARSE_DATA = (rawData: string) => {
+  try {
+    return JSON.parse(rawData);
+  } catch {
+    return rawData;
+  }
+};
+
 export const isValidMongoId = (
   id: string,
   message: string,

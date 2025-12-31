@@ -85,3 +85,5 @@ export const ALLOWED_BUSINESSES = [
 export const MIN = 60;
 
 export const OTP_EXPIRY = 10 * MIN;
+
+export const MAX_RESEND_OTP = 3;

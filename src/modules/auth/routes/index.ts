@@ -8,6 +8,7 @@ import {
   linkedinCallback,
   linkedinLogin,
   loginController,
+  registerResendOtpController,
   registerSendOtpController,
   registerVerifyOtpController,
 } from "../controllers";
@@ -26,6 +27,12 @@ authRouter.post(
   "/register/send-otp",
   RequestMiddleware.checkEmptyRequest({ query: true }),
   ResponseMiddleware.catchAsync(registerSendOtpController)
+);
+
+authRouter.post(
+  "/register/resend-otp",
+  RequestMiddleware.checkEmptyRequest({ query: true }),
+  ResponseMiddleware.catchAsync(registerResendOtpController)
 );
 
 authRouter.post(
