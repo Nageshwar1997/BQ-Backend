@@ -1,5 +1,7 @@
+import { convert } from "html-to-text";
 import { transporterConfig } from "../configs";
 import { EMAIL_FROM } from "../envs";
+import { getOtpHtmlMessage } from "../utils";
 
 class EmailService {
   private transporter;
@@ -22,25 +24,25 @@ class EmailService {
   public async sendMail(options: {
     to: string;
     subject: string;
-    text?: string;
-    html?: string;
+    htmlOrText: string;
   }) {
+    // const htmlToText =
+    const text = convert(options.htmlOrText, {
+      wordwrap: 130,
+    });
     return this.transporter.sendMail({
       from: EMAIL_FROM,
       to: options.to,
       subject: options.subject,
-      text: options.text,
-      html: options.html,
+      text,
+      html: options.htmlOrText,
     });
   }
 
   // OTP Email Example
   public async sendOtpEmail(to: string, otp: string) {
-    const html = `
-      <h2>Your OTP is <b>${otp}</b></h2>
-      <p>It will expire in 10 minutes.</p>
-    `;
-    await this.sendMail({ to, subject: "Your OTP Code 🔑", html });
+    const html = getOtpHtmlMessage("OTP Verification", otp);
+    await this.sendMail({ to, subject: "Your OTP Code 🔑", htmlOrText: html });
   }
 
   // Order Confirmation Example
@@ -49,7 +51,11 @@ class EmailService {
       <h2>Order Confirmed 🎉</h2>
       <p>Your order <b>#${orderId}</b> has been placed successfully.</p>
     `;
-    await this.sendMail({ to, subject: "Order Confirmation ✅", html });
+    await this.sendMail({
+      to,
+      subject: "Order Confirmation ✅",
+      htmlOrText: html,
+    });
   }
 }
 

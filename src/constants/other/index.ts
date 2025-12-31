@@ -81,3 +81,7 @@ export const ALLOWED_BUSINESSES = [
   "Salon",
   "Wholesale Distributor",
 ];
+
+export const MIN = 60;
+
+export const OTP_EXPIRY = 10 * MIN;

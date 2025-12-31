@@ -8,7 +8,8 @@ import {
   linkedinCallback,
   linkedinLogin,
   loginController,
-  registerController,
+  registerSendOtpController,
+  registerVerifyOtpController,
 } from "../controllers";
 import { loginZodSchema, registerZodSchema } from "../validations";
 import {
@@ -22,11 +23,21 @@ export const authRouter = Router();
 
 // Register Route
 authRouter.post(
-  "/register",
+  "/register/send-otp",
+  RequestMiddleware.checkEmptyRequest({ query: true }),
+  ResponseMiddleware.catchAsync(registerSendOtpController)
+);
+
+authRouter.post(
+  "/register/verify-otp",
   MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
-  RequestMiddleware.checkEmptyRequest({ filesOrBody: true, body: true }),
+  RequestMiddleware.checkEmptyRequest({
+    filesOrBody: true,
+    body: true,
+    query: true,
+  }),
   ZodMiddleware.validateZodSchema(registerZodSchema),
-  ResponseMiddleware.catchAsync(registerController)
+  ResponseMiddleware.catchAsync(registerVerifyOtpController)
 );
 
 // Login Route

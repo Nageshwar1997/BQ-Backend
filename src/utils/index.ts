@@ -328,3 +328,35 @@ export const toArray = (value?: string | ParsedQs | (string | ParsedQs)[]) => {
   if (typeof value === "string") return value.split(",").map((v) => v.trim());
   return [];
 };
+
+export const getOtpHtmlMessage = (title: string, otp: string) => {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>${title}</title>
+    </head>
+    <body style="margin:0; padding:0; font-family: 'Helvetica', Arial, sans-serif; background-color:#f4f4f7;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f7; padding: 40px 0;">
+        <tr>
+          <td align="center">
+            <table width="400" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); padding: 30px; text-align:center;">
+              <tr>
+                <td>
+                  <h1 style="color:#333333;">${title}</h1>
+                  <p style="color:#555555; font-size:16px;">Use the following OTP to complete your verification process.</p>
+                  <h2 style="color:#111111; font-size:28px; margin:20px 0;"><b>${otp}</b></h2>
+                  <p style="color:#777777; font-size:14px;">It will expire in <b>10 minutes</b>.</p>
+                  <hr style="border:none; border-top:1px solid #eeeeee; margin:20px 0;">
+                  <p style="color:#999999; font-size:12px;">If you did not request this OTP, please ignore this email.</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+};

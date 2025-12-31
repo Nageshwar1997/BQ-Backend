@@ -13,7 +13,8 @@ export type TLoginFieldsOnly = keyof Pick<
 export type TRegisterFieldsOnly =
   | TLoginFieldsOnly
   | keyof Pick<UserModule.Types.UserProps, "firstName" | "lastName">
-  | "confirmPassword";
+  | "confirmPassword"
+  | "otp";
 
 export interface ValidateAuthFieldConfigs extends ValidateZodFieldConfigs {
   field: TRegisterFieldsOnly;

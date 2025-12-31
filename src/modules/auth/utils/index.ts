@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 import { AppError } from "../../../classes";
 import {
   FRONTEND_LOCAL_HOST_CLIENT_URL,
@@ -12,6 +13,7 @@ export const validateAuthField = (props: ValidateAuthFieldConfigs) => {
   const { field, nonEmpty = true } = props;
   switch (field) {
     case "firstName":
+    case "otp":
     case "lastName":
     case "email":
     case "password":
@@ -60,3 +62,8 @@ export const getOAuthDbPayload = (
     role: "USER",
   };
 };
+
+export const generateOtp = () =>
+  String(Math.floor(100000 + Math.random() * 900000));
+
+export const generateOtpToken = () => randomBytes(20).toString("hex");

@@ -39,7 +39,7 @@ class RedisService {
   }
 
   public getClient(): RedisClientType | null {
-    if (!this.isReady) return null;
+    if (!this.isReady || !this.client) return null;
     return this.client;
   }
 
