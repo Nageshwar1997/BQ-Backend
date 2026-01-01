@@ -39,20 +39,20 @@ userRouter.patch(
 );
 
 userRouter.patch(
-  "/user/change-password",
-  AuthMiddleware.authenticated(true),
-  RequestMiddleware.checkEmptyRequest({ body: true }),
-  ZodMiddleware.validateZodSchema(changePasswordZodSchema),
-  ResponseMiddleware.catchAsync(changePasswordController)
-);
-
-userRouter.patch(
-  "/user",
+  "/user/update",
   AuthMiddleware.authenticated,
   MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
   RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
   ZodMiddleware.validateZodSchema(updateUserZodSchema),
   ResponseMiddleware.catchAsync(updateUserController)
+);
+
+userRouter.patch(
+  "/user/change-password",
+  AuthMiddleware.authenticated(true),
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  ZodMiddleware.validateZodSchema(changePasswordZodSchema),
+  ResponseMiddleware.catchAsync(changePasswordController)
 );
 
 // Seller Routes
