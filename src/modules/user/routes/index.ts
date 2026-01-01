@@ -28,6 +28,7 @@ import { MB } from "../../../constants";
 
 export const userRouter = Router();
 
+// User Routes
 userRouter.get("/user", ResponseMiddleware.catchAsync(getUserController));
 
 userRouter.patch(
