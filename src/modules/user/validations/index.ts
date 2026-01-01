@@ -89,6 +89,7 @@ export const sellerRequestZodSchema = z.object({
         field: "email",
         parentField: "businessDetails",
         blockSingleSpace: true,
+        lowerCase: true,
         customRegexes: [
           {
             regex: regexes.email,
@@ -96,7 +97,7 @@ export const sellerRequestZodSchema = z.object({
               "please provide a valid email address, like example@domain.com",
           },
         ],
-      }).transform((val) => val?.toLowerCase()),
+      }),
       phoneNumber: validateZodString({
         field: "phoneNumber",
         parentField: "businessDetails",
@@ -125,5 +126,63 @@ export const sellerRequestZodSchema = z.object({
   agreeTerms: z.coerce.boolean({
     required_error: "agreeTerms is required",
     invalid_type_error: "agreeTerms must be boolean",
+  }),
+});
+
+export const updateUserZodSchema = z.object({
+  firstName: validateZodString({
+    field: "firstName",
+    blockMultipleSpaces: true,
+    isOptional: true,
+    min: 2,
+    max: 50,
+    customRegexes: [
+      {
+        regex: regexes.name,
+        message:
+          "can only contain letters and only one space is allowed between words",
+      },
+    ],
+  }),
+  lastName: validateZodString({
+    field: "lastName",
+    blockMultipleSpaces: true,
+    isOptional: true,
+    min: 2,
+    max: 50,
+    customRegexes: [
+      {
+        regex: regexes.name,
+        message:
+          "can only contain letters and only one space is allowed between words",
+      },
+    ],
+  }),
+  email: validateZodString({
+    field: "email",
+    blockSingleSpace: true,
+    lowerCase: true,
+    isOptional: true,
+    customRegexes: [
+      {
+        regex: regexes.email,
+        message:
+          "please provide a valid email address, like example@domain.com",
+      },
+    ],
+  }),
+  phoneNumber: validateZodString({
+    field: "phoneNumber",
+    blockSingleSpace: true,
+    isOptional: true,
+    min: 10,
+    max: 10,
+    customRegexes: [
+      {
+        regex: regexes.phoneNumber,
+        message:
+          "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
+      },
+    ],
   }),
 });

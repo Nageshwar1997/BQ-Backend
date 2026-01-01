@@ -79,6 +79,7 @@ const addressBaseSchema = z.object({
   email: validateZodString({
     field: "email",
     blockSingleSpace: true,
+    lowerCase: true,
     customRegexes: [
       {
         regex: regexes.email,
@@ -86,7 +87,7 @@ const addressBaseSchema = z.object({
           "please provide a valid email address, like example@domain.com",
       },
     ],
-  }).transform((val) => val?.toLowerCase()),
+  }),
   phoneNumber: validateZodString({
     field: "phoneNumber",
     blockSingleSpace: true,

@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { AppError } from "../../../classes";
 import { User } from "../models";
 import { UserProps } from "../types";
@@ -9,6 +10,14 @@ export const getUserByEmail = async (email: string, lean?: boolean) => {
   } else {
     user = await User.findOne({ email });
   }
+  return user;
+};
+
+export const updateUser = async (
+  data: UserProps,
+  userId?: string | Types.ObjectId
+) => {
+  const user = await User.findByIdAndUpdate(userId, data, { new: true });
   return user;
 };
 

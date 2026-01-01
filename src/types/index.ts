@@ -76,6 +76,7 @@ export interface ZodStringConfigs extends ZodCommonConfigs, ZodCompareConfigs {
   blockMultipleSpaces?: boolean;
   blockSingleSpace?: boolean;
   nonEmpty?: boolean;
+  lowerCase?: boolean;
   customRegexes?: {
     regex: RegExp;
     message: string | number;

@@ -147,6 +147,7 @@ export const validateZodString = ({
   blockMultipleSpaces,
   parentField,
   customRegexes,
+  lowerCase = false,
   isOptional = false,
 }: ZodStringConfigs) => {
   const nestedField = parentField
@@ -192,6 +193,10 @@ export const validateZodString = ({
 
   if (blockSingleSpace) {
     schema = schema.regex(regexes.noSpace, messages.single_space);
+  }
+
+  if (lowerCase) {
+    schema = schema.toLowerCase();
   }
 
   if (customRegexes?.length) {

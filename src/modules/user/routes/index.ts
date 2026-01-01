@@ -15,12 +15,22 @@ import {
   ResponseMiddleware,
   ZodMiddleware,
 } from "../../../middlewares";
-import { sellerRequestZodSchema } from "../validations";
+import { sellerRequestZodSchema, updateUserZodSchema } from "../validations";
 import { MB } from "../../../constants";
+import { updateUserController } from "../controllers/updateUser";
 
 export const userRouter = Router();
 
 userRouter.get("/user", ResponseMiddleware.catchAsync(getUserController));
+
+userRouter.patch(
+  "/user",
+  AuthMiddleware.authenticated,
+  MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
+  RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
+  ZodMiddleware.validateZodSchema(updateUserZodSchema),
+  ResponseMiddleware.catchAsync(updateUserController)
+);
 
 // Seller Routes
 userRouter.post(
