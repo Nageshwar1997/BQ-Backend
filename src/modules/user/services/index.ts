@@ -14,10 +14,15 @@ export const getUserByEmail = async (email: string, lean?: boolean) => {
 };
 
 export const updateUser = async (
-  data: UserProps,
-  userId?: string | Types.ObjectId
+  userId: string | Types.ObjectId | undefined,
+  data: Partial<UserProps>
 ) => {
+  if (!userId) throw new AppError("UserId not provided", 400);
+
   const user = await User.findByIdAndUpdate(userId, data, { new: true });
+
+  if (!user) throw new AppError("User not found to update", 404);
+
   return user;
 };
 

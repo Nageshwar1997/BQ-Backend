@@ -22,7 +22,7 @@ export const updateUserController = async (
     profilePic = cldResp?.secure_url || "";
   }
 
-  const updatedUser = await updateUser({ ...req.body, profilePic }, user?._id);
+  const updatedUser = await updateUser(user?._id, { ...req.body, profilePic });
 
   if (!updatedUser && profilePic) {
     await MediaModule.Utils.singleImageRemover(profilePic, "image");
