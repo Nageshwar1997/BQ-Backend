@@ -186,3 +186,84 @@ export const updateUserZodSchema = z.object({
     ],
   }),
 });
+
+export const createPasswordZodSchema = z
+  .object({
+    password: validateZodString({
+      min: 6,
+      max: 20,
+      blockSingleSpace: true,
+      field: "password",
+      customRegexes: [
+        {
+          regex: regexes.password,
+          message:
+            "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+        },
+      ],
+    }),
+    confirmPassword: validateZodString({
+      min: 6,
+      max: 20,
+      blockSingleSpace: true,
+      field: "confirmPassword",
+      customRegexes: [
+        {
+          regex: regexes.password,
+          message:
+            "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+        },
+      ],
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords don't match.",
+  });
+
+export const changePasswordZodSchema = z
+  .object({
+    oldPassword: validateZodString({
+      min: 6,
+      max: 20,
+      blockSingleSpace: true,
+      field: "oldPassword",
+      customRegexes: [
+        {
+          regex: regexes.password,
+          message:
+            "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+        },
+      ],
+    }),
+    newPassword: validateZodString({
+      min: 6,
+      max: 20,
+      blockSingleSpace: true,
+      field: "newPassword",
+      customRegexes: [
+        {
+          regex: regexes.password,
+          message:
+            "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+        },
+      ],
+    }),
+    confirmPassword: validateZodString({
+      min: 6,
+      max: 20,
+      blockSingleSpace: true,
+      field: "confirmPassword",
+      customRegexes: [
+        {
+          regex: regexes.password,
+          message:
+            "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+        },
+      ],
+    }),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords don't match.",
+  });

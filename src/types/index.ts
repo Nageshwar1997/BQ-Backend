@@ -2,12 +2,12 @@ import { Request } from "express";
 
 // Interface for authenticated requests with user
 export interface AuthenticatedRequest extends Request {
-  user?: Omit<UserModule.Types.UserProps, "password">; // User object without password
+  user?: UserModule.Types.UserProps; // User object without password
 }
 
 // Interface for authorized requests with user
 export interface AuthorizedRequest extends Request {
-  user?: Omit<UserModule.Types.UserProps, "password">; // User object without password
+  user?: UserModule.Types.UserProps; // User object without password
 }
 
 import multer from "multer";

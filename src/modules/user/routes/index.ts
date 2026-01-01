@@ -15,13 +15,38 @@ import {
   ResponseMiddleware,
   ZodMiddleware,
 } from "../../../middlewares";
-import { sellerRequestZodSchema, updateUserZodSchema } from "../validations";
+import {
+  changePasswordZodSchema,
+  createPasswordZodSchema,
+  sellerRequestZodSchema,
+  updateUserZodSchema,
+} from "../validations";
 import { MB } from "../../../constants";
 import { updateUserController } from "../controllers/updateUser";
+import {
+  changePasswordController,
+  createPasswordController,
+} from "../controllers/handlePassword";
 
 export const userRouter = Router();
 
 userRouter.get("/user", ResponseMiddleware.catchAsync(getUserController));
+
+userRouter.patch(
+  "/user/create-password",
+  AuthMiddleware.authenticated(true),
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  ZodMiddleware.validateZodSchema(createPasswordZodSchema),
+  ResponseMiddleware.catchAsync(createPasswordController)
+);
+
+userRouter.patch(
+  "/user/change-password",
+  AuthMiddleware.authenticated(true),
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  ZodMiddleware.validateZodSchema(changePasswordZodSchema),
+  ResponseMiddleware.catchAsync(changePasswordController)
+);
 
 userRouter.patch(
   "/user",
