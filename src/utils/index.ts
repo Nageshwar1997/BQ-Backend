@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { z, ZodType } from "zod";
 import { ParsedQs } from "qs";
+import axios from "axios";
 
 import {
   ValidateRequiredFileFieldsParams,
@@ -27,6 +28,15 @@ export const PARSE_DATA = (rawData: string) => {
   } catch {
     return rawData;
   }
+};
+
+export const getImageAsBuffer = async (url: string) => {
+  const response = await axios.get(url, { responseType: "arraybuffer" });
+
+  return {
+    buffer: Buffer.from(response.data),
+    mimetype: response.headers["content-type"],
+  };
 };
 
 export const isValidMongoId = (

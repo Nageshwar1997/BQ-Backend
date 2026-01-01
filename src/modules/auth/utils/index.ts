@@ -5,9 +5,10 @@ import {
   FRONTEND_PRODUCTION_CLIENT_URL,
   NODE_ENV,
 } from "../../../envs";
-import { validateZodString } from "../../../utils";
+import { getImageAsBuffer, validateZodString } from "../../../utils";
 import { TAuthProvider } from "../../user/types";
 import { ValidateAuthFieldConfigs } from "../types";
+import { MediaModule } from "../..";
 
 export const validateAuthField = (props: ValidateAuthFieldConfigs) => {
   const { field, nonEmpty = true } = props;
@@ -37,7 +38,24 @@ export const authSuccessRedirectUrl = (token: string) => {
   }/oauth-success?token=${token}`;
 };
 
-export const getOAuthDbPayload = (
+const getProfilePic = async (url: string) => {
+  if (!url) return "";
+  const { buffer, mimetype } = await getImageAsBuffer(url);
+  const file = {
+    buffer,
+    mimetype,
+    originalname: "profile-pic.jpg",
+  } as Express.Multer.File;
+  const cldResp = await MediaModule.Utils.singleImageUploader({
+    file,
+    cloudinaryConfigOption: "image",
+    folder: "Profile_Pictures",
+  });
+
+  return cldResp?.secure_url || url;
+};
+
+export const getOAuthDbPayload = async (
   data: Record<string, string>,
   provider: TAuthProvider
 ) => {
@@ -49,7 +67,8 @@ export const getOAuthDbPayload = (
     data.family_name ||
     (nameParts.length > 1 ? nameParts?.slice(1)?.join(" ") : "") ||
     "";
-  const profilePic = data.picture || data.avatar_url || "";
+
+  const profilePic = await getProfilePic(data.picture || data.avatar_url);
 
   return {
     email: data.email,
