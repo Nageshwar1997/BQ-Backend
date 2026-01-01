@@ -3,3 +3,5 @@ export * from "./createSellerRequest";
 export * from "./getWishlist";
 export * from "./addProductToWishlist";
 export * from "./removeProductFromWishlist";
+export * from "./updateUser";
+export * from "./handlePassword";

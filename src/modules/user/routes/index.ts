@@ -2,10 +2,13 @@ import { Router } from "express";
 
 import {
   addProductToWishlistController,
+  changePasswordController,
+  createPasswordController,
   createSellerRequestController,
   getUserController,
   getWishlistController,
   removeProductFromWishlistController,
+  updateUserController,
 } from "../controllers";
 import {
   AuthMiddleware,
@@ -22,11 +25,6 @@ import {
   updateUserZodSchema,
 } from "../validations";
 import { MB } from "../../../constants";
-import { updateUserController } from "../controllers/updateUser";
-import {
-  changePasswordController,
-  createPasswordController,
-} from "../controllers/handlePassword";
 
 export const userRouter = Router();
 
