@@ -8,27 +8,17 @@ import {
 } from "../../types";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
 import { AppError } from "../../../../classes";
-import { CLOUDINARY_MAIN_FOLDER } from "../../../../envs";
-
-const mainFolder = CLOUDINARY_MAIN_FOLDER;
+import { getSafeFolderName, getSafePublicId } from "../common";
 
 // ========== COMMON VIDEO UPLOADER FUNCTION ==========
 const uploadVideoToCloudinary = async (
-  file: Express.Multer.File,
+  file:
+    | Express.Multer.File
+    | { buffer: Buffer; originalname: string; mimetype: string },
   folder: string,
   cloudinaryConfigOption: CloudinaryConfigOption
 ): Promise<UploadApiResponse & { playback_url: string }> => {
   const bufferStream = Readable.from(file.buffer);
-  const subFolder = folder?.split(" ").join("_") || "Common_Folder";
-
-  const publicId = `${new Date()
-    ?.toLocaleDateString()
-    ?.replace(/\//g, "-")}_${Date.now()}_${file?.originalname
-    ?.split(" ")
-    ?.join("_")
-    ?.split(".")
-    ?.slice(0, -1)
-    ?.join("")}`;
 
   const cloudinary = myCloudinary(cloudinaryConfigOption);
 
@@ -37,8 +27,8 @@ const uploadVideoToCloudinary = async (
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           resource_type: "video",
-          folder: `${mainFolder}/${subFolder}`,
-          public_id: publicId,
+          folder: getSafeFolderName(folder),
+          public_id: getSafePublicId(file.originalname),
           allowed_formats: ["mp4", "webm"],
           overwrite: true,
           invalidate: true,
@@ -52,7 +42,7 @@ const uploadVideoToCloudinary = async (
               )
             );
           } else if (result) {
-            // Add playback_url property to match the expected type
+            // Always return playback_url (fallback to secure_url)
             const playback_url = result.playback_url || result.secure_url;
             resolve({ ...result, playback_url });
           } else {

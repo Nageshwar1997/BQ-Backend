@@ -7,61 +7,46 @@ import {
   MultipleFileUploaderProps,
   SingleFileUploaderProps,
 } from "../../types";
-import { CLOUDINARY_MAIN_FOLDER } from "../../../../envs";
 import { getCloudinaryOptimizedUrl } from "../../../../utils";
+import { getSafeFolderName, getSafePublicId } from "../common";
 
-const mainFolder = CLOUDINARY_MAIN_FOLDER;
-
-const sanitize = (str: string) => str?.replace(/[&|\/\\#?%]/g, "_");
-
-// ========== COMMON UPLOADER FUNCTION ==========
-const uploadToCloudinary = async (
+// ========== COMMON IMAGE UPLOADER FUNCTION ==========
+const uploadImageToCloudinary = async (
   file: Express.Multer.File,
   folder: string,
   cloudinaryConfigOption: CloudinaryConfigOption
 ): Promise<UploadApiResponse> => {
-  const subFolder = folder?.split(" ").join("_") || "Common_Folder";
-
-  const publicId = `${new Date()
-    .toLocaleDateString()
-    ?.replace(/\//g, "-")}_${Date.now()}_${file?.originalname
-    ?.split(" ")
-    ?.join("_")
-    ?.split(".")
-    ?.slice(0, -1)
-    ?.join("")}`;
-
   const cloudinary = myCloudinary(cloudinaryConfigOption);
 
   return new Promise<UploadApiResponse>((resolve, reject) => {
-    cloudinary.uploader
-      .upload_stream(
-        {
-          folder: sanitize(`${mainFolder}/${subFolder}`),
-          public_id: publicId,
-          resource_type: "image",
-          allowed_formats: ["jpg", "jpeg", "png", "webp", "svg"],
-          format: "webp", // convert to webp
-          transformation: [{ fetch_format: "webp", quality: "auto" }],
-        },
-        (error, result) => {
-          if (error) {
-            return reject(
-              new AppError(
-                error.message || "Failed to upload image on Cloudinary",
-                500
-              )
-            );
-          } else if (result) {
-            const optimizedUrl = getCloudinaryOptimizedUrl(result.secure_url);
-            const finalResult = { ...result, secure_url: optimizedUrl };
-            resolve(finalResult);
-          } else {
-            reject(new AppError("Failed to upload image on Cloudinary", 500));
-          }
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: getSafeFolderName(folder),
+        public_id: getSafePublicId(file.originalname),
+        resource_type: "image",
+        allowed_formats: ["jpg", "jpeg", "png", "webp", "svg"],
+        format: "webp", // convert to webp
+        transformation: [{ fetch_format: "webp", quality: "auto" }],
+      },
+      (error, result) => {
+        if (error) {
+          return reject(
+            new AppError(
+              error.message || "Failed to upload image on Cloudinary",
+              500
+            )
+          );
+        } else if (result) {
+          const optimizedUrl = getCloudinaryOptimizedUrl(result.secure_url);
+          resolve({ ...result, secure_url: optimizedUrl });
+        } else {
+          reject(new AppError("Failed to upload image on Cloudinary", 500));
         }
-      )
-      .end(file?.buffer);
+      }
+    );
+
+    // End the stream with buffer
+    stream.end(file.buffer);
   });
 };
 
@@ -80,7 +65,7 @@ export const singleImageUploader = async ({
       throw new AppError(cloudinaryConnectionTest.message, 500);
     }
 
-    const result = await uploadToCloudinary(
+    const result = await uploadImageToCloudinary(
       file,
       folder,
       cloudinaryConfigOption
@@ -110,7 +95,7 @@ export const multipleImagesUploader = async ({
     }
 
     const uploadPromises = files.map((file) =>
-      uploadToCloudinary(file, folder, cloudinaryConfigOption)
+      uploadImageToCloudinary(file, folder, cloudinaryConfigOption)
     );
 
     const uploadResults = await Promise.all(uploadPromises);
