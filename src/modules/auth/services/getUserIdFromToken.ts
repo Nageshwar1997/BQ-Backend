@@ -4,6 +4,7 @@ import { Request } from "express";
 import { AppError } from "../../../classes";
 import { JWT_SECRET } from "../../../envs";
 import { DecodedToken } from "../types";
+import { getAuthorizationToken } from "../../../utils";
 
 export const getUserIdFromToken = (req: Request) => {
   try {
@@ -13,9 +14,7 @@ export const getUserIdFromToken = (req: Request) => {
       throw new AppError("You are not authenticated, please login", 401);
     }
 
-    const tokenWithoutBearer = token.startsWith("Bearer ")
-      ? token.slice(7)
-      : token;
+    const tokenWithoutBearer = getAuthorizationToken(token);
 
     const decoded = jwt.verify(
       tokenWithoutBearer,

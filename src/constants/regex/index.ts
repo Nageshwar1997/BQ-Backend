@@ -17,6 +17,7 @@ type RegexKeys =
   | "onlyLetters"
   | "onlyUppercase"
   | "onlyLowercase"
+  | "otp"
   | "atLeastOneDigit"
   | "onlyLettersAndSpaces"
   | "atLeastOneLowercaseLetter"
@@ -40,6 +41,7 @@ export const regexes: Record<RegexKeys, RegExp> = {
   escapeSpecialChars: /[.*+?^${}()|[\]\\]/g,
   gst: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i, // Check valid GST number
   pinCode: /^[1-9][0-9]{5}$/, // Check valid pin code
+  otp: /^[0-9]{6}$/,
   url: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/[\w\-._~:/?#[\]@!$&'()*+,;=%]*)?$/i,
   pan: /^[A-Za-z]{5}[0-9]{4}[A-Za-z]$/,
   atLeastOneUppercaseLetter: /[A-Z]/, // At least one uppercase letter

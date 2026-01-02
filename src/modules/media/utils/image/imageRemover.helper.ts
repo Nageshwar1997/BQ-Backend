@@ -3,9 +3,10 @@ import { UploadApiResponse } from "cloudinary";
 import { AppError } from "../../../../classes";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
 import { CloudinaryConfigOption } from "../../types";
+import { extractPublicId } from "../common";
 
 // ========== COMMON REMOVER FUNCTION ==========
-const removeFromCloudinary = async (
+const removeImageFromCloudinary = async (
   publicId: string,
   cloudinaryConfigOption: CloudinaryConfigOption = "image"
 ): Promise<UploadApiResponse> => {
@@ -31,18 +32,6 @@ const removeFromCloudinary = async (
   });
 };
 
-// ========== HELPER: Extract publicId from URL ==========
-const extractPublicId = (imageUrl: string): string => {
-  const regex = /\/v\d+\/(.+?)\.(jpg|jpeg|png|webp)$/;
-  const match = imageUrl.match(regex);
-
-  if (!match || !match[1]) {
-    throw new AppError("Invalid Cloudinary image URL", 400);
-  }
-
-  return match[1];
-};
-
 // ========== SINGLE IMAGE REMOVER ==========
 export const singleImageRemover = async (
   imageUrl: string,
@@ -61,8 +50,11 @@ export const singleImageRemover = async (
   }
 
   try {
-    const publicId = extractPublicId(imageUrl);
-    const result = await removeFromCloudinary(publicId, cloudinaryConfigOption);
+    const publicId = extractPublicId(imageUrl, "image");
+    const result = await removeImageFromCloudinary(
+      publicId,
+      cloudinaryConfigOption
+    );
     return result;
   } catch (error) {
     throw new AppError(
@@ -90,8 +82,8 @@ export const multipleImagesRemover = async (
 
   try {
     const removePromises = imageUrls.map(async (url) => {
-      const publicId = extractPublicId(url);
-      return removeFromCloudinary(publicId, cloudinaryConfigOption);
+      const publicId = extractPublicId(url, "image");
+      return removeImageFromCloudinary(publicId, cloudinaryConfigOption);
     });
 
     const removeResults = await Promise.all(removePromises);

@@ -2,10 +2,17 @@ import { Router } from "express";
 
 import {
   addProductToWishlistController,
+  changePasswordController,
+  updatePasswordController,
   createSellerRequestController,
   getUserController,
   getWishlistController,
   removeProductFromWishlistController,
+  updateUserController,
+  resetPasswordSendLinkController,
+  resetPasswordController,
+  validResetPasswordTokenController,
+  forgotPasswordController,
 } from "../controllers";
 import {
   AuthMiddleware,
@@ -15,17 +22,70 @@ import {
   ResponseMiddleware,
   ZodMiddleware,
 } from "../../../middlewares";
-import { sellerRequestZodSchema } from "../validations";
+import {
+  changePasswordZodSchema,
+  sellerRequestZodSchema,
+  updatePasswordZodSchema,
+  updateUserZodSchema,
+} from "../validations";
 import { MB } from "../../../constants";
 
 export const userRouter = Router();
 
+// User Routes
 userRouter.get("/user", ResponseMiddleware.catchAsync(getUserController));
+
+userRouter.patch(
+  "/user/update",
+  AuthMiddleware.authenticated(false),
+  MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
+  RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
+  ZodMiddleware.validateZodSchema(updateUserZodSchema),
+  ResponseMiddleware.catchAsync(updateUserController)
+);
+
+userRouter.patch(
+  "/user/update-password",
+  AuthMiddleware.authenticated(true),
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  ZodMiddleware.validateZodSchema(updatePasswordZodSchema),
+  ResponseMiddleware.catchAsync(updatePasswordController)
+);
+
+userRouter.patch(
+  "/user/send-reset-password-link",
+  AuthMiddleware.authenticated(false),
+  ResponseMiddleware.catchAsync(resetPasswordSendLinkController)
+);
+
+userRouter.patch(
+  "/user/reset-password",
+  ResponseMiddleware.catchAsync(resetPasswordController)
+);
+
+userRouter.get(
+  "/user/check-token-validity",
+  ResponseMiddleware.catchAsync(validResetPasswordTokenController)
+);
+
+userRouter.post(
+  "/user/forgot-password/:email",
+  RequestMiddleware.checkEmptyRequest({ params: true }),
+  ResponseMiddleware.catchAsync(forgotPasswordController)
+);
+
+userRouter.patch(
+  "/user/change-password",
+  AuthMiddleware.authenticated(true),
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  ZodMiddleware.validateZodSchema(changePasswordZodSchema),
+  ResponseMiddleware.catchAsync(changePasswordController)
+);
 
 // Seller Routes
 userRouter.post(
   "/seller/create",
-  AuthMiddleware.authenticated,
+  AuthMiddleware.authenticated(false),
   MulterMiddleware.validateFiles({
     fieldName: "requiredDocuments",
     type: "fields",
@@ -46,21 +106,21 @@ userRouter.post(
 // Wishlist Routes
 userRouter.get(
   "/wishlist",
-  AuthMiddleware.authenticated,
+  AuthMiddleware.authenticated(false),
   ResponseMiddleware.catchAsync(getWishlistController)
 );
 
 userRouter.post(
   "/wishlist/add/:productId",
   RequestMiddleware.checkEmptyRequest({ params: true }),
-  AuthMiddleware.authenticated,
+  AuthMiddleware.authenticated(false),
   ResponseMiddleware.catchAsync(addProductToWishlistController)
 );
 
 userRouter.delete(
   "/wishlist/remove/:productId",
   RequestMiddleware.checkEmptyRequest({ params: true }),
-  AuthMiddleware.authenticated,
+  AuthMiddleware.authenticated(false),
   ResponseMiddleware.catchAsyncWithTransaction(
     removeProductFromWishlistController
   )

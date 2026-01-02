@@ -14,7 +14,7 @@ import { updateCartProductQuantityZodSchema } from "../validations";
 
 export const cartProductRouter = Router();
 
-cartProductRouter.use(AuthMiddleware.authenticated);
+cartProductRouter.use(AuthMiddleware.authenticated(false));
 
 cartProductRouter.post(
   "/add/:productId",

@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { z, ZodType } from "zod";
 import { ParsedQs } from "qs";
+import axios from "axios";
 
 import {
   ValidateRequiredFileFieldsParams,
@@ -9,9 +10,44 @@ import {
   ZodNumberConfigs,
   ZodStringConfigs,
   ZodCommonConfigs,
+  TRole,
 } from "../types";
 import { AppError } from "../classes";
 import { regexes } from "../constants";
+import {
+  FRONTEND_LOCAL_HOST_ADMIN_URL,
+  FRONTEND_LOCAL_HOST_CLIENT_URL,
+  FRONTEND_LOCAL_HOST_MASTER_URL,
+  FRONTEND_PRODUCTION_ADMIN_URL,
+  FRONTEND_PRODUCTION_CLIENT_URL,
+  FRONTEND_PRODUCTION_MASTER_URL,
+  NODE_ENV,
+} from "../envs";
+
+export const STRINGIFY_DATA = (data: unknown): string => {
+  try {
+    return JSON.stringify(data);
+  } catch {
+    return "";
+  }
+};
+
+export const PARSE_DATA = (rawData: string) => {
+  try {
+    return JSON.parse(rawData);
+  } catch {
+    return rawData;
+  }
+};
+
+export const getImageAsBuffer = async (url: string) => {
+  const response = await axios.get(url, { responseType: "arraybuffer" });
+
+  return {
+    buffer: Buffer.from(response.data),
+    mimetype: response.headers["content-type"],
+  };
+};
 
 export const isValidMongoId = (
   id: string,
@@ -121,6 +157,7 @@ export const validateZodString = ({
   blockMultipleSpaces,
   parentField,
   customRegexes,
+  lowerCase = false,
   isOptional = false,
 }: ZodStringConfigs) => {
   const nestedField = parentField
@@ -166,6 +203,10 @@ export const validateZodString = ({
 
   if (blockSingleSpace) {
     schema = schema.regex(regexes.noSpace, messages.single_space);
+  }
+
+  if (lowerCase) {
+    schema = schema.toLowerCase();
   }
 
   if (customRegexes?.length) {
@@ -318,6 +359,48 @@ export const validateZodDate = ({
       })) as unknown as ZodType<Date | undefined>;
 };
 
+export const getAuthorizationToken = (token: string) => {
+  return token.startsWith("Bearer ") ? token.split(" ")?.[1] : token;
+};
+
+export const getFrontendURL = (role: TRole) => {
+  let url = "";
+  const getURL = (devUrl: string, prodUrl: string) => {
+    const isDev = NODE_ENV === "development";
+
+    return isDev ? devUrl : prodUrl;
+  };
+
+  switch (role) {
+    case "ADMIN":
+    case "SELLER": {
+      url = getURL(
+        FRONTEND_LOCAL_HOST_ADMIN_URL!,
+        FRONTEND_PRODUCTION_ADMIN_URL!
+      );
+
+      break;
+    }
+    case "MASTER": {
+      url = getURL(
+        FRONTEND_LOCAL_HOST_MASTER_URL!,
+        FRONTEND_PRODUCTION_MASTER_URL!
+      );
+      break;
+    }
+    case "USER":
+    default: {
+      url = getURL(
+        FRONTEND_LOCAL_HOST_CLIENT_URL!,
+        FRONTEND_PRODUCTION_CLIENT_URL!
+      );
+      break;
+    }
+  }
+
+  return url;
+};
+
 export const escapeRegexSpecialChars = (value: string): string => {
   return value.replace(regexes.escapeSpecialChars, "\\$&");
 };
@@ -327,4 +410,182 @@ export const toArray = (value?: string | ParsedQs | (string | ParsedQs)[]) => {
   if (Array.isArray(value)) return value;
   if (typeof value === "string") return value.split(",").map((v) => v.trim());
   return [];
+};
+
+export const generateRandomPassword = (): string => {
+  const length = 10;
+  const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const lower = "abcdefghijklmnopqrstuvwxyz";
+  const numbers = "0123456789";
+  const special = "@$!%*?&#";
+
+  const allChars = upper + lower + numbers + special;
+
+  // 1️⃣ Ensure each required category is included
+  let password = [
+    upper[Math.floor(Math.random() * upper.length)],
+    lower[Math.floor(Math.random() * lower.length)],
+    numbers[Math.floor(Math.random() * numbers.length)],
+    special[Math.floor(Math.random() * special.length)],
+  ];
+
+  // 2️⃣ Fill remaining characters
+  for (let i = password.length; i < length; i++) {
+    password.push(allChars[Math.floor(Math.random() * allChars.length)]);
+  }
+
+  // 3️⃣ Shuffle password
+  for (let i = password.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [password[i], password[j]] = [password[j], password[i]];
+  }
+
+  return password.join("");
+};
+
+export const getOtpHtmlMessage = (title: string, otp: string) => {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>${title}</title>
+    </head>
+    <body style="margin:0; padding:0; font-family: 'Helvetica', Arial, sans-serif; background-color:#f4f4f7;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f7; padding: 40px 0;">
+        <tr>
+          <td align="center">
+            <table width="400" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); padding: 30px; text-align:center;">
+              <tr>
+                <td>
+                  <h1 style="color:#333333;">${title}</h1>
+                  <p style="color:#555555; font-size:16px;">Use the following OTP to complete your verification process.</p>
+                  <h2 style="color:#111111; font-size:28px; margin:20px 0;"><strong>${otp}</strong></h2>
+                  <p style="color:#777777; font-size:14px;">It will expire in <strong>10 minutes</strong>.</p>
+                  <hr style="border:none; border-top:1px solid #eeeeee; margin:20px 0;">
+                  <p style="color:#999999; font-size:12px;">If you did not request this OTP, please ignore this email.</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+};
+
+export const getPasswordResetHtmlMessage = (
+  title: string,
+  resetLink: string
+) => {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <title>${title}</title>
+    </head>
+    <body style="margin:0; padding:0; font-family: Helvetica, Arial, sans-serif; background-color:#f4f4f7;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+        <tr>
+          <td align="center">
+            <table width="420" cellpadding="0" cellspacing="0"
+              style="background:#ffffff; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.08); padding:32px; text-align:center;">
+              
+              <tr>
+                <td>
+                  <h1 style="margin-bottom:12px; color:#222;">${title}</h1>
+                  <p style="color:#555; font-size:15px; margin-bottom:24px;">
+                    Click the button below to set your password. This link will expire in <strong>60 minutes</strong>.
+                  </p>
+
+                  <!-- Button -->
+                  <a href="${resetLink}" target="_blank"
+                    style="
+                      display:inline-block;
+                      padding:16px 32px;
+                      background:#9747ff;
+                      color:#ffffff;
+                      text-decoration:none;
+                      border-radius:8px;
+                      font-size:16px;
+                      font-weight:600;
+                    ">
+                    Set Password
+                  </a>
+
+                  <p style="margin-top:24px; font-size:12px; color:#999;">
+                    If you did not request this, you can safely ignore this email.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+};
+
+export const getNewPasswordHtmlMessage = (
+  title: string,
+  password: string,
+  link: string
+) => {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <title>${title}</title>
+    </head>
+    <body style="margin:0; padding:0; font-family: Helvetica, Arial, sans-serif; background-color:#f4f4f7;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+        <tr>
+          <td align="center">
+            <table width="420" cellpadding="0" cellspacing="0"
+              style="background:#ffffff; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.08); padding:32px; text-align:center;">
+              
+              <tr>
+                <td>
+                  <h1 style="margin-bottom:12px; color:#222;">${title}</h1>
+                  <p style="color:#555; font-size:15px; margin-bottom:24px;">
+                    Use the following password to login to your account. Once logged in, you can change your password in the <strong>Profile</strong> section.
+                  </p>
+                  <h2
+                    style="
+                      margin:12px;
+                      font-weight:700;
+                    ">
+                    ${password}
+                  </h2>
+
+                  <a href="${link}" target="_blank"
+                    style="
+                      display:inline-block;
+                      padding:12px 32px;
+                      background:#9747ff;
+                      color:#ffffff;
+                      text-decoration:none;
+                      border-radius:8px;
+                      font-size:16px;
+                      font-weight:600;
+                    ">
+                    Login
+                  </a>
+
+                  <p style="margin-top:24px; font-size:12px; color:#999;">
+                    If you did not request this, you can safely ignore this email.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
 };

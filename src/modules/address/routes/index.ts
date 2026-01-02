@@ -15,7 +15,7 @@ import {
 
 export const addressRouter = Router();
 
-addressRouter.use(AuthMiddleware.authenticated);
+addressRouter.use(AuthMiddleware.authenticated(false));
 
 // Address Routes
 addressRouter.post(

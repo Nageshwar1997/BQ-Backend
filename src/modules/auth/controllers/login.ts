@@ -77,7 +77,7 @@ export const googleCallback = async (
     if (!profile) throw new AppError("User info not found", 400);
 
     // Prepare payload
-    const payload = getOAuthDbPayload(profile, "GOOGLE");
+    const payload = await getOAuthDbPayload(profile, "GOOGLE");
 
     // Check if user already exists (email = primary identity)
     let user = await UserModule.Models.User.findOne({
@@ -123,7 +123,7 @@ export const linkedinCallback = async (
 
     const data = linkedinAuthClient.decode(id_token);
 
-    const payload = getOAuthDbPayload(data, "LINKEDIN");
+    const payload = await getOAuthDbPayload(data, "LINKEDIN");
 
     // Find user by email (primary identity)
     let user = await UserModule.Models.User.findOne({
@@ -173,7 +173,7 @@ export const githubCallback = async (
 
     const data = await githubAuthClient.decode(access_token);
 
-    const payload = getOAuthDbPayload(data, "GITHUB");
+    const payload = await getOAuthDbPayload(data, "GITHUB");
 
     // Find user by email (primary identity)
     let user = await UserModule.Models.User.findOne({

@@ -22,6 +22,10 @@ const customRegexes = {
     message:
       "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
   },
+  otp: {
+    regex: regexes.otp,
+    message: "must be a valid 6 digit number. It can contain only digits.",
+  },
   password: {
     regex: regexes.password,
     message:
@@ -68,6 +72,14 @@ const registerFieldValidations: Record<
   ValidateAuthFieldConfigs
 > = {
   ...loginFieldValidations,
+  otp: {
+    field: "otp",
+    min: 6,
+    max: 6,
+    blockSingleSpace: true,
+    nonEmpty: true,
+    customRegexes: [customRegexes.otp],
+  },
   email: { ...loginFieldValidations.email, isOptional: false, nonEmpty: true },
   phoneNumber: {
     ...loginFieldValidations.phoneNumber,

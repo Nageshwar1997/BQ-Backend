@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { AppError } from "../../../classes";
 import { User } from "../models";
 import { UserProps } from "../types";
@@ -9,6 +10,19 @@ export const getUserByEmail = async (email: string, lean?: boolean) => {
   } else {
     user = await User.findOne({ email });
   }
+  return user;
+};
+
+export const updateUser = async (
+  userId: string | Types.ObjectId | undefined,
+  data: Partial<UserProps>
+) => {
+  if (!userId) throw new AppError("UserId not provided", 400);
+
+  const user = await User.findByIdAndUpdate(userId, data, { new: true });
+
+  if (!user) throw new AppError("User not found to update", 404);
+
   return user;
 };
 

@@ -3,22 +3,20 @@ import { AuthenticatedRequest } from "../../types";
 import { AuthModule, UserModule } from "../../modules";
 import { isValidMongoId } from "../../utils";
 
-export const authenticated = async (
-  req: AuthenticatedRequest,
-  _: Response,
-  next: NextFunction
-) => {
-  try {
-    const userId = AuthModule.Services.getUserIdFromToken(req);
+export const authenticated =
+  (needPassword?: boolean) =>
+  async (req: AuthenticatedRequest, _: Response, next: NextFunction) => {
+    try {
+      const userId = AuthModule.Services.getUserIdFromToken(req);
 
-    isValidMongoId(userId, "Invalid userId", 400);
+      isValidMongoId(userId, "Invalid userId", 400);
 
-    const user = await UserModule.Services.getUserById(userId);
+      const user = await UserModule.Services.getUserById(userId, needPassword);
 
-    req.user = user;
+      req.user = user;
 
-    next();
-  } catch (error) {
-    next(error);
-  }
-};
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
