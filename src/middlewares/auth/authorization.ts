@@ -1,12 +1,11 @@
 import { NextFunction, Response } from "express";
 import { AuthModule, UserModule } from "../../modules";
-import { AuthorizedRequest } from "../../types";
+import { AuthorizedRequest, TRole } from "../../types";
 import { isValidMongoId } from "../../utils";
 import { AppError } from "../../classes";
-import { ROLES } from "../../constants";
 
 export const authorization =
-  (allowedRoles: (typeof ROLES)[number][]) =>
+  (allowedRoles: TRole[]) =>
   async (req: AuthorizedRequest, _: Response, next: NextFunction) => {
     try {
       const userId = AuthModule.Services.getUserIdFromToken(req);

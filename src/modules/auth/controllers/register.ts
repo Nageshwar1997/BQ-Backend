@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { AppError, redisService, transporter } from "../../../classes";
 import { MediaModule, UserModule } from "../..";
 
-import { generateOtp, generateOtpToken } from "../utils";
+import { generateOtp, generateTokenForRedis } from "../utils";
 import { MAX_RESEND_OTP, OTP_EXPIRY } from "../../../constants";
 import { generateToken } from "../services";
 import { PARSE_DATA, STRINGIFY_DATA } from "../../../utils";
@@ -24,7 +24,7 @@ export const registerSendOtpController = async (
   }
 
   const otp = generateOtp();
-  const otpToken = generateOtpToken();
+  const otpToken = generateTokenForRedis(20);
 
   // Store OTP + email + sendCount in Redis
   await redisService

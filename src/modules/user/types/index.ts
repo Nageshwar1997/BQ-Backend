@@ -1,5 +1,5 @@
 import { Document, Types } from "mongoose";
-import { ROLES } from "../../../constants";
+import { TRole } from "../../../types";
 import { AddressModule, ProductModule } from "../..";
 
 export type TAuthProvider = "GOOGLE" | "MANUAL" | "LINKEDIN" | "GITHUB";
@@ -9,7 +9,7 @@ export interface UserProps extends Document {
   email: string;
   phoneNumber: string;
   password: string;
-  role: (typeof ROLES)[number];
+  role: TRole;
   providers: TAuthProvider[];
   profilePic?: string;
   createdAt: Date;

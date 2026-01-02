@@ -9,6 +9,10 @@ import {
   getWishlistController,
   removeProductFromWishlistController,
   updateUserController,
+  resetPasswordSendLinkController,
+  resetPasswordController,
+  validResetPasswordTokenController,
+  forgotPasswordController,
 } from "../controllers";
 import {
   AuthMiddleware,
@@ -46,6 +50,28 @@ userRouter.patch(
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ZodMiddleware.validateZodSchema(updatePasswordZodSchema),
   ResponseMiddleware.catchAsync(updatePasswordController)
+);
+
+userRouter.patch(
+  "/user/send-reset-password-link",
+  AuthMiddleware.authenticated(false),
+  ResponseMiddleware.catchAsync(resetPasswordSendLinkController)
+);
+
+userRouter.patch(
+  "/user/reset-password",
+  ResponseMiddleware.catchAsync(resetPasswordController)
+);
+
+userRouter.get(
+  "/user/check-token-validity",
+  ResponseMiddleware.catchAsync(validResetPasswordTokenController)
+);
+
+userRouter.post(
+  "/user/forgot-password/:email",
+  RequestMiddleware.checkEmptyRequest({ params: true }),
+  ResponseMiddleware.catchAsync(forgotPasswordController)
 );
 
 userRouter.patch(

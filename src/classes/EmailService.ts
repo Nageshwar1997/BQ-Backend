@@ -1,7 +1,11 @@
 import { convert } from "html-to-text";
 import { transporterConfig } from "../configs";
 import { EMAIL_FROM } from "../envs";
-import { getOtpHtmlMessage } from "../utils";
+import {
+  getNewPasswordHtmlMessage,
+  getOtpHtmlMessage,
+  getPasswordResetHtmlMessage,
+} from "../utils";
 
 class EmailService {
   private transporter;
@@ -39,10 +43,28 @@ class EmailService {
     });
   }
 
-  // OTP Email Example
+  // OTP Email
   public async sendOtpEmail(to: string, otp: string) {
     const html = getOtpHtmlMessage("OTP Verification", otp);
     await this.sendMail({ to, subject: "Your OTP Code 🔑", htmlOrText: html });
+  }
+  // Password Reset Email
+  public async sendPasswordResetEmail(to: string, resetLink: string) {
+    const html = getPasswordResetHtmlMessage("Password Reset", resetLink);
+    await this.sendMail({ to, subject: "Password Reset", htmlOrText: html });
+  }
+  // New Password Email
+  public async sendNewPasswordEmail(
+    to: string,
+    password: string,
+    link: string
+  ) {
+    const html = getNewPasswordHtmlMessage("New Password", password, link);
+    await this.sendMail({
+      to,
+      subject: "New Password",
+      htmlOrText: html,
+    });
   }
 
   // Order Confirmation Example

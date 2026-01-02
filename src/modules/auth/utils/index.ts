@@ -85,4 +85,5 @@ export const getOAuthDbPayload = async (
 export const generateOtp = () =>
   String(Math.floor(100000 + Math.random() * 900000));
 
-export const generateOtpToken = () => randomBytes(20).toString("hex");
+export const generateTokenForRedis = (bytes: number) =>
+  randomBytes(bytes).toString("hex");

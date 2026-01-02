@@ -14,6 +14,8 @@ import multer from "multer";
 import { UserModule } from "../modules";
 import { Types } from "mongoose";
 
+export type TRole = "USER" | "SELLER" | "ADMIN" | "MASTER";
+
 export type MulterType = "single" | "array" | "any" | "fields" | "none";
 
 export type CustomLimitsType = {

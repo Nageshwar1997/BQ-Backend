@@ -9,6 +9,7 @@ import {
   FRONTEND_PRODUCTION_MASTER_URL,
 } from "../../envs";
 import { TAuthProvider } from "../../modules/user/types";
+import { TRole } from "../../types";
 
 export const AUTH_PROVIDERS: TAuthProvider[] = [
   "MANUAL",
@@ -28,7 +29,7 @@ export const allowedOrigins = [
   FRONTEND_PRODUCTION_MASTER_URL,
 ];
 
-export const ROLES = ["USER", "SELLER", "ADMIN", "MASTER"] as const;
+export const ROLES: TRole[] = ["USER", "SELLER", "ADMIN", "MASTER"] as const;
 
 export const STATES_AND_UNION_TERRITORIES = [
   "Andhra Pradesh",
