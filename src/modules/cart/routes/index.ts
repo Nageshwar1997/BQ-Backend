@@ -6,12 +6,12 @@ export const cartRouter = Router();
 
 cartRouter.get(
   "/cart",
-  AuthMiddleware.authenticated,
+  AuthMiddleware.authenticated(false),
   ResponseMiddleware.catchAsync(getCartController)
 );
 
 cartRouter.patch(
   "/clear",
-  AuthMiddleware.authenticated,
+  AuthMiddleware.authenticated(false),
   ResponseMiddleware.catchAsyncWithTransaction(clearCartController)
 );

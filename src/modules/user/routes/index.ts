@@ -41,7 +41,7 @@ userRouter.patch(
 
 userRouter.patch(
   "/user/update",
-  AuthMiddleware.authenticated,
+  AuthMiddleware.authenticated(false),
   MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
   RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
   ZodMiddleware.validateZodSchema(updateUserZodSchema),
@@ -59,7 +59,7 @@ userRouter.patch(
 // Seller Routes
 userRouter.post(
   "/seller/create",
-  AuthMiddleware.authenticated,
+  AuthMiddleware.authenticated(false),
   MulterMiddleware.validateFiles({
     fieldName: "requiredDocuments",
     type: "fields",
@@ -80,21 +80,21 @@ userRouter.post(
 // Wishlist Routes
 userRouter.get(
   "/wishlist",
-  AuthMiddleware.authenticated,
+  AuthMiddleware.authenticated(false),
   ResponseMiddleware.catchAsync(getWishlistController)
 );
 
 userRouter.post(
   "/wishlist/add/:productId",
   RequestMiddleware.checkEmptyRequest({ params: true }),
-  AuthMiddleware.authenticated,
+  AuthMiddleware.authenticated(false),
   ResponseMiddleware.catchAsync(addProductToWishlistController)
 );
 
 userRouter.delete(
   "/wishlist/remove/:productId",
   RequestMiddleware.checkEmptyRequest({ params: true }),
-  AuthMiddleware.authenticated,
+  AuthMiddleware.authenticated(false),
   ResponseMiddleware.catchAsyncWithTransaction(
     removeProductFromWishlistController
   )
