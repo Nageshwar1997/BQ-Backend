@@ -3,6 +3,7 @@ import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { updateUser } from "../services";
 import { TAuthProvider } from "../types";
+import { AppError } from "../../../classes";
 
 export const changePasswordController = async (
   req: AuthenticatedRequest,
@@ -11,13 +12,19 @@ export const changePasswordController = async (
   const user = req.user;
   const { oldPassword, newPassword } = req.body;
 
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-
+  if (user?.password === newPassword || newPassword === oldPassword) {
+    throw new AppError(
+      "New password must be different from current password.",
+      400
+    );
+  }
   const isPasswordMatch = bcrypt.compareSync(oldPassword, user?.password || "");
 
   if (!isPasswordMatch) {
-    throw new Error("Old password is incorrect");
+    throw new AppError("Old password is incorrect", 400);
   }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
 
   const updatedUser = await updateUser(user?._id, { password: hashedPassword });
 
@@ -32,6 +39,13 @@ export const updatePasswordController = async (
 ) => {
   const user = req.user;
   const { newPassword } = req.body;
+
+  if (user?.password === newPassword) {
+    throw new AppError(
+      "New password must be different from current password.",
+      400
+    );
+  }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
 
