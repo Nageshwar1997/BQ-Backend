@@ -3,12 +3,26 @@ import { AuthenticatedRequest } from "../../../types";
 import { updateUser } from "../services";
 import { MediaModule } from "../..";
 import { AppError } from "../../../classes";
+import { User } from "../models";
 
 export const updateUserController = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
-  const { file, user } = req ?? {};
+  const { file, user, body } = req ?? {};
+
+  const { phoneNumber } = body ?? {};
+
+  if (phoneNumber) {
+    const existingUser = await User.findOne({
+      phoneNumber,
+      _id: { $ne: user?._id },
+    }).lean();
+
+    if (existingUser) {
+      throw new AppError("Phone number already in use", 409);
+    }
+  }
 
   let profilePic;
 
@@ -22,7 +36,7 @@ export const updateUserController = async (
     profilePic = cldResp?.secure_url || "";
   }
 
-  const updatedUser = await updateUser(user?._id, { ...req.body, profilePic });
+  const updatedUser = await updateUser(user?._id, { ...body, profilePic });
 
   if (!updatedUser && profilePic) {
     await MediaModule.Utils.singleImageRemover(profilePic, "image");
