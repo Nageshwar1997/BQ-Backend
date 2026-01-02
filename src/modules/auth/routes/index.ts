@@ -39,7 +39,7 @@ authRouter.post(
   "/register/verify-otp",
   MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
   RequestMiddleware.checkEmptyRequest({
-    filesOrBody: true,
+    file: false,
     body: true,
     query: true,
   }),
