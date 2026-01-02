@@ -187,7 +187,7 @@ export const updateUserZodSchema = z.object({
   }),
 });
 
-export const createPasswordZodSchema = z
+export const updatePasswordZodSchema = z
   .object({
     password: validateZodString({
       min: 6,

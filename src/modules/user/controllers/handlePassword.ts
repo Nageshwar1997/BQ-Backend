@@ -25,7 +25,7 @@ export const changePasswordController = async (
   res.success(200, "Password changed successfully", { user: restUser });
 };
 
-export const createPasswordController = async (
+export const updatePasswordController = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
@@ -38,7 +38,7 @@ export const createPasswordController = async (
 
   const { password: _, ...restUser } = updatedUser?.toObject() ?? {};
 
-  res.success(200, "Password created successfully", { user: restUser });
+  res.success(200, "Password updated successfully", { user: restUser });
 };
 
 export const forgotPasswordSendOtpController = async (

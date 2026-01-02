@@ -3,7 +3,7 @@ import { Router } from "express";
 import {
   addProductToWishlistController,
   changePasswordController,
-  createPasswordController,
+  updatePasswordController,
   createSellerRequestController,
   getUserController,
   getWishlistController,
@@ -20,8 +20,8 @@ import {
 } from "../../../middlewares";
 import {
   changePasswordZodSchema,
-  createPasswordZodSchema,
   sellerRequestZodSchema,
+  updatePasswordZodSchema,
   updateUserZodSchema,
 } from "../validations";
 import { MB } from "../../../constants";
@@ -32,20 +32,20 @@ export const userRouter = Router();
 userRouter.get("/user", ResponseMiddleware.catchAsync(getUserController));
 
 userRouter.patch(
-  "/user/create-password",
-  AuthMiddleware.authenticated(true),
-  RequestMiddleware.checkEmptyRequest({ body: true }),
-  ZodMiddleware.validateZodSchema(createPasswordZodSchema),
-  ResponseMiddleware.catchAsync(createPasswordController)
-);
-
-userRouter.patch(
   "/user/update",
   AuthMiddleware.authenticated(false),
   MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
   RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
   ZodMiddleware.validateZodSchema(updateUserZodSchema),
   ResponseMiddleware.catchAsync(updateUserController)
+);
+
+userRouter.patch(
+  "/user/update-password",
+  AuthMiddleware.authenticated(true),
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  ZodMiddleware.validateZodSchema(updatePasswordZodSchema),
+  ResponseMiddleware.catchAsync(updatePasswordController)
 );
 
 userRouter.patch(
