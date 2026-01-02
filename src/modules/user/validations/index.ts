@@ -263,7 +263,24 @@ export const changePasswordZodSchema = z
       ],
     }),
   })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "Passwords don't match.",
+  .superRefine((data, ctx) => {
+    const { oldPassword, newPassword, confirmPassword } = data;
+
+    // Old password & new password must be different
+    if (oldPassword === newPassword) {
+      ctx.addIssue({
+        path: ["newPassword"],
+        code: z.ZodIssueCode.custom,
+        message: "New password must be different from current password.",
+      });
+    }
+
+    // New & confirm password must match
+    if (newPassword !== confirmPassword) {
+      ctx.addIssue({
+        path: ["confirmPassword"],
+        code: z.ZodIssueCode.custom,
+        message: "Passwords don't match.",
+      });
+    }
   });
