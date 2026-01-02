@@ -189,11 +189,11 @@ export const updateUserZodSchema = z.object({
 
 export const updatePasswordZodSchema = z
   .object({
-    password: validateZodString({
+    newPassword: validateZodString({
       min: 6,
       max: 20,
       blockSingleSpace: true,
-      field: "password",
+      field: "newPassword",
       customRegexes: [
         {
           regex: regexes.password,
@@ -216,7 +216,7 @@ export const updatePasswordZodSchema = z
       ],
     }),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((data) => data.newPassword === data.confirmPassword, {
     path: ["confirmPassword"],
     message: "Passwords don't match.",
   });

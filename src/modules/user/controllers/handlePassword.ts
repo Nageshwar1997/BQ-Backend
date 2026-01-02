@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { updateUser } from "../services";
+import { TAuthProvider } from "../types";
 
 export const changePasswordController = async (
   req: AuthenticatedRequest,
@@ -30,11 +31,19 @@ export const updatePasswordController = async (
   res: Response
 ) => {
   const user = req.user;
-  const { password } = req.body;
+  const { newPassword } = req.body;
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-  const updatedUser = await updateUser(user?._id, { password: hashedPassword });
+  const updatedProviders: Set<TAuthProvider> = new Set([
+    ...(user?.providers ?? []),
+    "MANUAL",
+  ]);
+
+  const updatedUser = await updateUser(user?._id, {
+    password: hashedPassword,
+    providers: Array.from(updatedProviders),
+  });
 
   const { password: _, ...restUser } = updatedUser?.toObject() ?? {};
 
