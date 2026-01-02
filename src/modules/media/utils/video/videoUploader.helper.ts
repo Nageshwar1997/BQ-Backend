@@ -12,9 +12,7 @@ import { getSafeFolderName, getSafePublicId } from "../common";
 
 // ========== COMMON VIDEO UPLOADER FUNCTION ==========
 const uploadVideoToCloudinary = async (
-  file:
-    | Express.Multer.File
-    | { buffer: Buffer; originalname: string; mimetype: string },
+  file: Express.Multer.File,
   folder: string,
   cloudinaryConfigOption: CloudinaryConfigOption
 ): Promise<UploadApiResponse & { playback_url: string }> => {
