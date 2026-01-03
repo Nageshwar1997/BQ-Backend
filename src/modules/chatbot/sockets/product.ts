@@ -10,7 +10,7 @@ import {
   getMinimalProductsForAiPrompt,
 } from "../services/product";
 import { IProductChatSession } from "../types";
-import { NODE_ENV } from "../../../envs";
+import { IS_DEV } from "../../../envs";
 import { getAiGeneratedSuggestedQuestion } from "../utils";
 
 const productChatHistory = new Map<string, IProductChatSession>();
@@ -103,7 +103,7 @@ export const initProductSocket = (socket: Socket) => {
       let errMsg =
         "The AI shopping assistant is currently under heavy load. Please try again in a few moments.";
 
-      if (NODE_ENV === "development") {
+      if (IS_DEV === "true") {
         if (err?.body) {
           try {
             const parsed = JSON.parse(err.body);

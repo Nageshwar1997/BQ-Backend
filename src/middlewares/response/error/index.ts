@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { Error as MongooseError } from "mongoose";
 
 import { AppError } from "../../../classes";
-import { NODE_ENV } from "../../../envs";
+import { IS_DEV } from "../../../envs";
 
 const commonErr = { success: false, error: true };
 
@@ -63,7 +63,7 @@ export const error = (
     error = err;
   } else {
     error = new AppError(
-      NODE_ENV === "development"
+      IS_DEV === "true"
         ? err.message ?? "Internal Server Error!"
         : "Internal Server Error!",
       500,
@@ -74,7 +74,7 @@ export const error = (
   error.statusCode ||= 500;
   error.isOperational ??= false;
 
-  if (NODE_ENV === "development") {
+  if (IS_DEV === "true") {
     return sendDevError(error, req, res);
   } else {
     return sendProdError(error, req, res);

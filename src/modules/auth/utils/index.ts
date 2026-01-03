@@ -3,7 +3,7 @@ import { AppError } from "../../../classes";
 import {
   FRONTEND_LOCAL_HOST_CLIENT_URL,
   FRONTEND_PRODUCTION_CLIENT_URL,
-  NODE_ENV,
+  IS_DEV,
 } from "../../../envs";
 import { getImageAsBuffer, validateZodString } from "../../../utils";
 import { TAuthProvider } from "../../user/types";
@@ -32,9 +32,9 @@ export const validateAuthField = (props: ValidateAuthFieldConfigs) => {
 
 export const authSuccessRedirectUrl = (token: string) => {
   return `${
-    NODE_ENV === "production"
-      ? FRONTEND_PRODUCTION_CLIENT_URL
-      : FRONTEND_LOCAL_HOST_CLIENT_URL
+    IS_DEV === "true"
+      ? FRONTEND_LOCAL_HOST_CLIENT_URL
+      : FRONTEND_PRODUCTION_CLIENT_URL
   }/oauth-success?token=${token}`;
 };
 

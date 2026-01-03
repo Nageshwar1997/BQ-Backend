@@ -52,7 +52,7 @@ export const {
   MONGODB_URI,
 
   // N
-  NODE_ENV,
+  IS_DEV,
 
   // P
   PORT,
