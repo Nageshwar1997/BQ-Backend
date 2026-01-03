@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { MONGODB_URI, NODE_ENV } from "../../envs";
+import { MONGODB_URI, IS_PROD } from "../../envs";
 
 // TypeScript global augmentation
 declare global {
@@ -42,23 +42,23 @@ export const connectDB = async (): Promise<typeof mongoose> => {
   }
 
   // Only log in development for clarity
-  if (NODE_ENV === "development") {
+  if (IS_PROD === "false") {
     console.log("🔌 Establishing new MongoDB connection...");
   }
 
   const newConnection = await mongoose.connect(MONGODB_URI, {
     ...MONGO_OPTIONS,
-    ...(NODE_ENV === "development" && { maxPoolSize: 5, minPoolSize: 1 }),
+    ...(IS_PROD === "false" && { maxPoolSize: 5, minPoolSize: 1 }),
   });
 
   cachedConnection = newConnection;
 
   // Store globally for hot reload (dev)
-  if (NODE_ENV === "development") {
+  if (IS_PROD === "false") {
     global.mongooseConn = newConnection;
   }
 
-  if (NODE_ENV === "development") {
+  if (IS_PROD === "false") {
     console.log("✅ MongoDB connected successfully");
   }
 

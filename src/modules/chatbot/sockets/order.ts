@@ -8,7 +8,7 @@ import {
 } from "langchain";
 import { getEmbeddedOrders, getMinimalOrdersForAiPrompt } from "../services";
 import { getAiGeneratedSuggestedQuestion } from "../utils";
-import { NODE_ENV } from "../../../envs";
+import { IS_PROD } from "../../../envs";
 
 const orderChatHistory = new Map<string, IOrderChatSession>();
 
@@ -114,7 +114,7 @@ export const initOrderSocket = (socket: Socket) => {
       let errMsg =
         "The AI shopping assistant is currently under heavy load. Please try again in a few moments.";
 
-      if (NODE_ENV === "development") {
+      if (IS_PROD === "false") {
         if (err?.body) {
           try {
             const parsed = JSON.parse(err.body);

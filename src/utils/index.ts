@@ -21,7 +21,7 @@ import {
   FRONTEND_PRODUCTION_ADMIN_URL,
   FRONTEND_PRODUCTION_CLIENT_URL,
   FRONTEND_PRODUCTION_MASTER_URL,
-  NODE_ENV,
+  IS_PROD,
 } from "../envs";
 
 export const STRINGIFY_DATA = (data: unknown): string => {
@@ -366,7 +366,7 @@ export const getAuthorizationToken = (token: string) => {
 export const getFrontendURL = (role: TRole) => {
   let url = "";
   const getURL = (devUrl: string, prodUrl: string) => {
-    const isDev = NODE_ENV === "development";
+    const isDev = IS_PROD === "false";
 
     return isDev ? devUrl : prodUrl;
   };
