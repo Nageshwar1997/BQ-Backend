@@ -15,14 +15,20 @@ import {
 import { AppError } from "../classes";
 import { regexes } from "../constants";
 import {
+  BACKEND_LOCALHOST_URL,
+  BACKEND_PRODUCTION_URL,
   FRONTEND_LOCAL_HOST_ADMIN_URL,
   FRONTEND_LOCAL_HOST_CLIENT_URL,
   FRONTEND_LOCAL_HOST_MASTER_URL,
   FRONTEND_PRODUCTION_ADMIN_URL,
   FRONTEND_PRODUCTION_CLIENT_URL,
   FRONTEND_PRODUCTION_MASTER_URL,
+  GITHUB_REDIRECT_ENDPOINT,
+  GOOGLE_REDIRECT_ENDPOINT,
   IS_DEV,
+  LINKEDIN_REDIRECT_ENDPOINT,
 } from "../envs";
+import { TAuthProvider } from "../modules/user/types";
 
 export const STRINGIFY_DATA = (data: unknown): string => {
   try {
@@ -363,42 +369,52 @@ export const getAuthorizationToken = (token: string) => {
   return token.startsWith("Bearer ") ? token.split(" ")?.[1] : token;
 };
 
-export const getFrontendURL = (role: TRole) => {
-  let url = "";
-  const getURL = (devUrl: string, prodUrl: string) => {
-    const isDev = IS_DEV === "true";
+const getURL = (devUrl: string, prodUrl: string) => {
+  const isDev = IS_DEV === "true";
 
-    return isDev ? devUrl : prodUrl;
+  return isDev ? devUrl : prodUrl;
+};
+
+export const getFrontendURL = (role: TRole) => {
+  const roleUrlMap: Record<TRole, string> = {
+    ADMIN: getURL(
+      FRONTEND_LOCAL_HOST_ADMIN_URL!,
+      FRONTEND_PRODUCTION_ADMIN_URL!
+    ),
+    SELLER: getURL(
+      FRONTEND_LOCAL_HOST_ADMIN_URL!,
+      FRONTEND_PRODUCTION_ADMIN_URL!
+    ),
+    MASTER: getURL(
+      FRONTEND_LOCAL_HOST_MASTER_URL!,
+      FRONTEND_PRODUCTION_MASTER_URL!
+    ),
+    USER: getURL(
+      FRONTEND_LOCAL_HOST_CLIENT_URL!,
+      FRONTEND_PRODUCTION_CLIENT_URL!
+    ),
   };
 
-  switch (role) {
-    case "ADMIN":
-    case "SELLER": {
-      url = getURL(
-        FRONTEND_LOCAL_HOST_ADMIN_URL!,
-        FRONTEND_PRODUCTION_ADMIN_URL!
-      );
+  return roleUrlMap[role] ?? roleUrlMap.USER;
+};
 
-      break;
-    }
-    case "MASTER": {
-      url = getURL(
-        FRONTEND_LOCAL_HOST_MASTER_URL!,
-        FRONTEND_PRODUCTION_MASTER_URL!
-      );
-      break;
-    }
-    case "USER":
-    default: {
-      url = getURL(
-        FRONTEND_LOCAL_HOST_CLIENT_URL!,
-        FRONTEND_PRODUCTION_CLIENT_URL!
-      );
-      break;
-    }
-  }
+export const getBackendURL = () => {
+  return getURL(BACKEND_LOCALHOST_URL!, BACKEND_PRODUCTION_URL!);
+};
 
-  return url;
+export const getSocialAuthRedirectURL = (
+  provider: Exclude<TAuthProvider, "MANUAL">
+) => {
+  const baseURL = getBackendURL();
+
+  const redirectMap: Partial<Record<Exclude<TAuthProvider, "MANUAL">, string>> =
+    {
+      GOOGLE: GOOGLE_REDIRECT_ENDPOINT,
+      LINKEDIN: LINKEDIN_REDIRECT_ENDPOINT,
+      GITHUB: GITHUB_REDIRECT_ENDPOINT,
+    };
+
+  return `${baseURL}${redirectMap[provider]}`;
 };
 
 export const escapeRegexSpecialChars = (value: string): string => {
