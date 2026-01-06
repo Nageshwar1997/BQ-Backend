@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
-import { AppError, redisService, transporter } from "../../../classes";
+import { AppError, mailService, redisService } from "../../../classes";
 import { MediaModule, UserModule } from "../..";
 
 import { generateOtp, generateTokenForRedis } from "../utils";
@@ -13,11 +13,13 @@ export const registerSendOtpController = async (
   req: Request,
   res: Response
 ) => {
-  const { email } = req.query ?? {};
+  let { email } = req.query ?? {};
+
+  email = email?.toString()?.trim()?.toLowerCase();
 
   if (!email) throw new AppError("Email is required", 400);
 
-  const user = await UserModule.Services.getUserByEmail(email.toString(), true);
+  const user = await UserModule.Services.getUserByEmail(email, true);
 
   if (user && user.providers.includes("MANUAL")) {
     throw new AppError("User already exists, please login", 400);
@@ -35,7 +37,11 @@ export const registerSendOtpController = async (
       STRINGIFY_DATA({ otp, email, sendCount: 1 })
     );
 
-  await transporter.sendOtpEmail(String(email), otp);
+  const { message, success } = await mailService.sendOtp({ to: email, otp });
+
+  if (!success) {
+    throw new AppError(message, 500);
+  }
 
   res.success(200, "OTP sent successfully", { otpToken, sendCount: 1 });
 };
@@ -45,7 +51,9 @@ export const registerResendOtpController = async (
   req: Request,
   res: Response
 ) => {
-  const { otpToken, email } = req.query ?? {};
+  let { otpToken, email } = req.query ?? {};
+
+  email = email?.toString()?.trim()?.toLowerCase();
 
   if (!otpToken) throw new AppError("OTP token is required", 400);
 
@@ -83,7 +91,14 @@ export const registerResendOtpController = async (
     );
 
   // Send email
-  await transporter.sendOtpEmail(parsedData.email, newOtp);
+  const { message, success } = await mailService.sendOtp({
+    to: parsedData.email,
+    otp: newOtp,
+  });
+
+  if (!success) {
+    throw new AppError(message, 500);
+  }
 
   res.success(200, `OTP resent successfully (${sendCount}/${MAX_RESEND_OTP})`);
 };

@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { getUserByEmail, updateUser } from "../services";
 import { TAuthProvider } from "../types";
-import { AppError, redisService, transporter } from "../../../classes";
+import { AppError, mailService, redisService } from "../../../classes";
 import { generateTokenForRedis } from "../../auth/utils";
 import { MINUTE } from "../../../constants";
 import {
@@ -82,7 +82,7 @@ export const resetPasswordSendLinkController = async (
   await redisService.getClient()?.setEx(
     `resetPassword:${resetToken}`,
     MINUTE * MINUTE, // 1 hour in seconds
-    user!._id.toString()
+    user._id.toString()
   );
 
   // 3️⃣ Create password reset URL
@@ -90,8 +90,14 @@ export const resetPasswordSendLinkController = async (
     user.role
   )}/reset-password/?token=${resetToken}`;
 
-  // 4️⃣ Send email
-  await transporter.sendPasswordResetEmail(user.email, resetUrl);
+  const { message, success } = await mailService.sendPasswordResetLink({
+    to: user.email,
+    resetLink: resetUrl,
+  });
+
+  if (!success) {
+    throw new AppError(message, 500);
+  }
 
   res.success(200, "Password reset link sent successfully");
 };
@@ -148,7 +154,9 @@ export const resetPasswordController = async (req: Request, res: Response) => {
 };
 
 export const forgotPasswordController = async (req: Request, res: Response) => {
-  const { email } = req.params ?? {};
+  let { email } = req.params ?? {};
+
+  email = email?.toString()?.trim()?.toLowerCase();
 
   const user = await getUserByEmail(email);
 
@@ -172,11 +180,19 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
 
   const hashedPassword = await bcrypt.hash(randomPassword, 10);
 
-  await updateUser(user._id, { password: hashedPassword });
-
   const link = `${getFrontendURL(user.role)}/login`;
 
-  await transporter.sendNewPasswordEmail(user.email, randomPassword, link);
+  const { message, success } = await mailService.sendNewPassword({
+    to: user.email,
+    loginLink: link,
+    password: randomPassword,
+  });
+
+  if (!success) {
+    throw new AppError(message, 500);
+  }
+
+  await updateUser(user._id, { password: hashedPassword });
 
   res.success(202, "Password sent on your email address");
 };

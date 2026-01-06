@@ -14,10 +14,9 @@ import {
   LoggerMiddleware,
 } from "./middlewares";
 import { PORT } from "./envs";
-import { redisService, transporter } from "./classes";
+import { mailService, redisService } from "./classes";
 
 const app = express();
-const port = PORT || 5454;
 
 // ----------------- MIDDLEWARES ORDER -----------------
 
@@ -65,10 +64,10 @@ handleNamespace("orders");
   try {
     await connectDB();
     await redisService.connect();
-    await transporter.verifyConnection();
+    await mailService.checkConnection();
 
-    server.listen(port, () => {
-      console.log(`Server running on http://localhost:${port}`);
+    server.listen(PORT, () => {
+      console.log(`Server running on port: ${PORT}`);
     });
   } catch (err) {
     console.error("❌ Failed to start server:", err);
