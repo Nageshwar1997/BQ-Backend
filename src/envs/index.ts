@@ -42,17 +42,12 @@ export const {
   LINKEDIN_REDIRECT_ENDPOINT,
 
   // M
-  MAIL_PORT,
   MAIL_SERVICE_DEVELOPMENT_BASE_URL,
   MAIL_SERVICE_PRODUCTION_BASE_URL,
   MISTRAL_API_KEY, // Mistral automatically read it with this name only don't change it
   MISTRAL_API_KEY_POST,
   MISTRAL_API_KEY_GET,
   MONGODB_URI,
-  MY_MAIL_FROM,
-  MY_MAIL_HOST,
-  MY_MAIL_PASS,
-  MY_MAIL_USER,
 
   // N
   IS_DEV,
