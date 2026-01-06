@@ -41,10 +41,7 @@ export const connectDB = async (): Promise<typeof mongoose> => {
     throw new Error("MONGODB_URI environment variable not defined");
   }
 
-  // Only log in development for clarity
-  if (IS_DEV === "true") {
-    console.log("🔌 Establishing new MongoDB connection...");
-  }
+  console.log("🔌 Establishing new MongoDB connection...");
 
   const newConnection = await mongoose.connect(MONGODB_URI, {
     ...MONGO_OPTIONS,
@@ -58,9 +55,7 @@ export const connectDB = async (): Promise<typeof mongoose> => {
     global.mongooseConn = newConnection;
   }
 
-  if (IS_DEV === "true") {
-    console.log("✅ MongoDB connected successfully");
-  }
+  console.log("✅ MongoDB connected successfully");
 
   // Event handlers
   newConnection.connection.on("error", (err) => {
