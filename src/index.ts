@@ -63,8 +63,7 @@ handleNamespace("orders");
 (async () => {
   try {
     await connectDB();
-    await redisService.connect();
-    await mailService.checkConnection();
+    await Promise.all([redisService.connect(), mailService.checkConnection()]);
 
     server.listen(PORT, () => {
       console.log(`Server running on port: ${PORT}`);
