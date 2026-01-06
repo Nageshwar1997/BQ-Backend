@@ -18,5 +18,4 @@ export const transporterConfig = nodemailer.createTransport({
     user: IS_DEV === "true" ? MY_MAIL_USER : CTRUH_MAIL_USER,
     pass: IS_DEV === "true" ? MY_MAIL_PASS : CTRUH_MAIL_PASS,
   },
-  tls: { ciphers: "SSLv3" },
 });
