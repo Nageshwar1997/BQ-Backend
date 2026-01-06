@@ -1,14 +1,8 @@
 import axios, { AxiosError } from "axios";
-import {
-  IS_DEV,
-  MAIL_SERVICE_DEVELOPMENT_BASE_URL,
-  MAIL_SERVICE_PRODUCTION_BASE_URL,
-} from "../envs";
+import { MAIL_SERVICE_PRODUCTION_BASE_URL } from "../envs";
 
 class MailService {
-  private baseUrl = IS_DEV
-    ? MAIL_SERVICE_DEVELOPMENT_BASE_URL
-    : MAIL_SERVICE_PRODUCTION_BASE_URL;
+  private baseUrl = MAIL_SERVICE_PRODUCTION_BASE_URL;
   private getErrorMessage(error: unknown, defaultMsg = "Something went wrong") {
     const message =
       error instanceof AxiosError
