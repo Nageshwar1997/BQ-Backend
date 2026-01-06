@@ -1,14 +1,13 @@
 import nodemailer from "nodemailer";
-import { CTRUH_MAIL_HOST, CTRUH_MAIL_PASS, CTRUH_MAIL_USER } from "../../envs";
 
 export const transporterConfig = nodemailer.createTransport({
-  host: CTRUH_MAIL_HOST,
-  port: 465,
-  secure: true,
+  host: "smtp.mandrillapp.com",
+  port: 587,
+  secure: false,
   auth: {
-    user: CTRUH_MAIL_USER,
-    pass: CTRUH_MAIL_PASS,
+    user: "Ctruh",
+    pass: "md-Ap3l4MhOpE1qZyxD70f81g",
   },
-  logger: true,
-  debug: true,
+  // logger: true,
+  // debug: true,
 });

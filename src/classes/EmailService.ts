@@ -1,6 +1,5 @@
 import { convert } from "html-to-text";
 import { transporterConfig } from "../configs";
-import { CTRUH_MAIL_FROM, IS_DEV, MY_MAIL_FROM } from "../envs";
 import {
   getNewPasswordHtmlMessage,
   getOtpHtmlMessage,
@@ -35,9 +34,7 @@ class EmailService {
       wordwrap: 130,
     });
     return this.transporter.sendMail({
-      from: `Beautinique <${
-        IS_DEV === "true" ? MY_MAIL_FROM : CTRUH_MAIL_FROM
-      }>`,
+      from: `Beautinique <auth@ctruh.com>`,
       to: options.to,
       subject: options.subject,
       text,
