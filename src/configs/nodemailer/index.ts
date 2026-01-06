@@ -1,15 +1,22 @@
 import nodemailer from "nodemailer";
 import {
-  EMAIL_HOST,
-  EMAIL_PASS,
-  EMAIL_PORT,
-  EMAIL_SECURE,
-  EMAIL_USER,
+  CTRUH_MAIL_HOST,
+  CTRUH_MAIL_PASS,
+  CTRUH_MAIL_USER,
+  IS_DEV,
+  MAIL_PORT,
+  MY_MAIL_HOST,
+  MY_MAIL_PASS,
+  MY_MAIL_USER,
 } from "../../envs";
 
 export const transporterConfig = nodemailer.createTransport({
-  host: EMAIL_HOST,
-  port: Number(EMAIL_PORT),
-  secure: EMAIL_SECURE === "true",
-  auth: { user: EMAIL_USER, pass: EMAIL_PASS },
+  host: IS_DEV === "true" ? MY_MAIL_HOST : CTRUH_MAIL_HOST,
+  port: Number(MAIL_PORT),
+  secure: false,
+  auth: {
+    user: IS_DEV === "true" ? MY_MAIL_USER : CTRUH_MAIL_USER,
+    pass: IS_DEV === "true" ? MY_MAIL_PASS : CTRUH_MAIL_PASS,
+  },
+  tls: { ciphers: "SSLv3" },
 });
