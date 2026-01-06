@@ -13,6 +13,7 @@ const sendDevError = (err: AppError, req: Request, res: Response) => {
     statusCode: err.statusCode || 500,
     stack: err.stack,
     requestId: req.requestId,
+    myErr: err,
   });
 };
 
@@ -23,6 +24,7 @@ const sendProdError = (err: AppError, req: Request, res: Response) => {
       message: err.message,
       statusCode: err.statusCode || 500,
       requestId: req.requestId,
+      myErr: err,
     });
   } else {
     res.status(500).json({
@@ -30,6 +32,7 @@ const sendProdError = (err: AppError, req: Request, res: Response) => {
       message: "Something went wrong!",
       statusCode: 500,
       requestId: req.requestId,
+      myErr: err,
     });
   }
 };
