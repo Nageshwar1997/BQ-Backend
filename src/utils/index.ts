@@ -42,7 +42,7 @@ export const PARSE_DATA = (rawData: string) => {
   try {
     return JSON.parse(rawData);
   } catch {
-    return rawData;
+    return null;
   }
 };
 

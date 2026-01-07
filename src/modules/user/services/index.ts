@@ -1,4 +1,4 @@
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 import { AppError } from "../../../classes";
 import { User } from "../models";
 import { UserProps } from "../types";
@@ -62,34 +62,23 @@ export const getUserByEmailOrPhoneNumber = async (
   return user;
 };
 
-export const getUserById = async <TLean extends boolean = true>({
+export const getUserById = async ({
   id,
-  lean,
+  lean = true,
   password = false,
 }: {
   id: string | Types.ObjectId;
-  lean?: TLean;
+  lean?: boolean;
   password?: boolean;
-}): Promise<TLean extends true ? UserProps : Document & UserProps> => {
-  try {
-    let query = User.findById(id);
+}): Promise<UserProps> => {
+  let query = User.findById(id);
 
-    if (lean) {
-      query = query.lean() as typeof query;
-    }
+  if (lean) query = query.lean() as typeof query;
+  if (password) query = query.select("-password");
 
-    if (password) {
-      query = query.select("-password");
-    }
+  const user = await query;
 
-    const user = await query;
+  if (!user) throw new AppError("User not found", 404);
 
-    if (!user) {
-      throw new AppError("User not found", 404);
-    }
-
-    return user;
-  } catch (error) {
-    throw error;
-  }
+  return user;
 };
