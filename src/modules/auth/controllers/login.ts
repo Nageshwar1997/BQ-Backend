@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcryptjs";
 
-import { AppError } from "../../../classes";
+import { AppError, redisService } from "../../../classes";
 import { UserModule } from "../..";
 import { generateToken } from "../services";
 import {
@@ -54,6 +54,8 @@ export const loginController = async (req: Request, res: Response) => {
 
   const { password: _, ...restUser } = user;
 
+  await redisService.setCachedUser(user);
+
   res.success(200, "User logged in successfully", { token, user: restUser });
 };
 
@@ -96,6 +98,8 @@ export const googleCallback = async (
     }
 
     const token = generateToken(user._id);
+
+    await redisService.setCachedUser(user);
 
     res.redirect(authSuccessRedirectUrl(token));
   } catch (err) {
@@ -142,6 +146,8 @@ export const linkedinCallback = async (
     }
 
     const token = generateToken(user._id);
+
+    await redisService.setCachedUser(user);
 
     res.redirect(authSuccessRedirectUrl(token));
   } catch (err) {
@@ -192,6 +198,8 @@ export const githubCallback = async (
     }
 
     const token = generateToken(user._id);
+
+    await redisService.setCachedUser(user);
 
     res.redirect(authSuccessRedirectUrl(token));
   } catch (err) {

@@ -59,7 +59,7 @@ export const getUserByEmailOrPhoneNumber = async (
     throw new AppError("User not found", 404);
   }
 
-  return user;
+  return user as UserProps;
 };
 
 export const getUserById = async ({
@@ -80,5 +80,5 @@ export const getUserById = async ({
 
   if (!user) throw new AppError("User not found", 404);
 
-  return user;
+  return user as UserProps;
 };

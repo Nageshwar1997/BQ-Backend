@@ -69,10 +69,13 @@ class RedisService {
     const client = this.getClient();
     if (!client || !user) return;
 
+    const { password: _, ...restUser } =
+      typeof user.toObject === "function" ? user.toObject() : user;
+
     await client.setEx(
       `user:${user._id}`,
       MINUTE * MINUTE,
-      STRINGIFY_DATA(user)
+      STRINGIFY_DATA(restUser)
     );
   }
 
