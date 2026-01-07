@@ -8,7 +8,11 @@ export const getUserController = async (req: Request, res: Response) => {
   const userId = AuthModule.Services.getUserIdFromToken(req);
   isValidMongoId(userId, "Invalid userId", 400);
 
-  const user = await getUserById(userId);
+  const user = await getUserById({
+    id: userId,
+    lean: true,
+    password: false,
+  });
 
   res.success(200, "User fetched successfully", { user });
 };

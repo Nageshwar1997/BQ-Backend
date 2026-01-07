@@ -11,7 +11,11 @@ export const authenticated =
 
       isValidMongoId(userId, "Invalid userId", 400);
 
-      const user = await UserModule.Services.getUserById(userId, needPassword);
+      const user = await UserModule.Services.getUserById({
+        id: userId,
+        lean: true,
+        password: needPassword,
+      });
 
       req.user = user;
 
