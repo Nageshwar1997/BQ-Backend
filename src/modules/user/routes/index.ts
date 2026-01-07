@@ -42,7 +42,7 @@ userRouter.patch(
   "/user/update",
   AuthMiddleware.authenticated(false),
   MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
-  RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
+  RequestMiddleware.checkEmptyRequest({ fileOrBody: true }),
   ZodMiddleware.validateZodSchema(updateUserZodSchema),
   ResponseMiddleware.catchAsync(updateUserController)
 );
