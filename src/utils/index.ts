@@ -427,34 +427,3 @@ export const toArray = (value?: string | ParsedQs | (string | ParsedQs)[]) => {
   if (typeof value === "string") return value.split(",").map((v) => v.trim());
   return [];
 };
-
-export const generateRandomPassword = (): string => {
-  const length = 10;
-  const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const lower = "abcdefghijklmnopqrstuvwxyz";
-  const numbers = "0123456789";
-  const special = "@$!%*?&#";
-
-  const allChars = upper + lower + numbers + special;
-
-  // 1️⃣ Ensure each required category is included
-  let password = [
-    upper[Math.floor(Math.random() * upper.length)],
-    lower[Math.floor(Math.random() * lower.length)],
-    numbers[Math.floor(Math.random() * numbers.length)],
-    special[Math.floor(Math.random() * special.length)],
-  ];
-
-  // 2️⃣ Fill remaining characters
-  for (let i = password.length; i < length; i++) {
-    password.push(allChars[Math.floor(Math.random() * allChars.length)]);
-  }
-
-  // 3️⃣ Shuffle password
-  for (let i = password.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [password[i], password[j]] = [password[j], password[i]];
-  }
-
-  return password.join("");
-};

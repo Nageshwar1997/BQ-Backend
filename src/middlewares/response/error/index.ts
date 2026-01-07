@@ -6,35 +6,23 @@ import { IS_DEV } from "../../../envs";
 
 const commonErr = { success: false, error: true };
 
-const sendDevError = (
-  err: AppError,
-  req: Request,
-  res: Response,
-  myErr: unknown
-) => {
+const sendDevError = (err: AppError, req: Request, res: Response) => {
   res.status(err.statusCode || 500).json({
     ...commonErr,
     message: err.message,
     statusCode: err.statusCode || 500,
     stack: err.stack,
     requestId: req.requestId,
-    myErr,
   });
 };
 
-const sendProdError = (
-  err: AppError,
-  req: Request,
-  res: Response,
-  myErr: unknown
-) => {
+const sendProdError = (err: AppError, req: Request, res: Response) => {
   if (err.isOperational) {
     res.status(err.statusCode || 500).json({
       ...commonErr,
       message: err.message,
       statusCode: err.statusCode || 500,
       requestId: req.requestId,
-      myErr,
     });
   } else {
     res.status(500).json({
@@ -42,7 +30,6 @@ const sendProdError = (
       message: "Something went wrong!",
       statusCode: 500,
       requestId: req.requestId,
-      myErr,
     });
   }
 };
@@ -88,8 +75,8 @@ export const error = (
   error.isOperational ??= false;
 
   if (IS_DEV === "true") {
-    return sendDevError(error, req, res, err);
+    return sendDevError(error, req, res);
   } else {
-    return sendProdError(error, req, res, err);
+    return sendProdError(error, req, res);
   }
 };
