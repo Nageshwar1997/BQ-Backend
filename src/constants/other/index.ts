@@ -87,4 +87,4 @@ export const MINUTE = 60;
 
 export const OTP_EXPIRY = 10 * MINUTE;
 
-export const MAX_RESEND_OTP = 3;
+export const MAX_RESEND = 3;

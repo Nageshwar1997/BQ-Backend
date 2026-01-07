@@ -4,7 +4,7 @@ import { AppError, mailService, redisService } from "../../../classes";
 import { MediaModule, UserModule } from "../..";
 
 import { generateOtp, generateTokenForRedis } from "../utils";
-import { MAX_RESEND_OTP, OTP_EXPIRY } from "../../../constants";
+import { MAX_RESEND, OTP_EXPIRY } from "../../../constants";
 import { generateToken } from "../services";
 import { PARSE_DATA, STRINGIFY_DATA } from "../../../utils";
 
@@ -75,7 +75,7 @@ export const registerResendOtpController = async (
 
   // Increment sendCount and check limit
   const sendCount = (parsedData.sendCount ?? 1) + 1;
-  if (sendCount > MAX_RESEND_OTP)
+  if (sendCount > MAX_RESEND)
     throw new AppError("Maximum resend attempts reached Go Back", 400); // NOTE - Don't change message anyway, In frontend we handled logic base on message
 
   // Generate new OTP
@@ -100,7 +100,7 @@ export const registerResendOtpController = async (
     throw new AppError(message, 500);
   }
 
-  res.success(200, `OTP resent successfully (${sendCount}/${MAX_RESEND_OTP})`);
+  res.success(200, `OTP resent successfully (${sendCount}/${MAX_RESEND})`);
 };
 
 // -------------------- Verify OTP --------------------
