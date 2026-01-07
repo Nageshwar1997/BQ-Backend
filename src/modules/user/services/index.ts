@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { AppError } from "../../../classes";
+import { AppError, redisService } from "../../../classes";
 import { User } from "../models";
 import { UserProps } from "../types";
 
@@ -22,6 +22,10 @@ export const updateUser = async (
   const user = await User.findByIdAndUpdate(userId, data, { new: true });
 
   if (!user) throw new AppError("User not found to update", 404);
+
+  if (user) {
+    await redisService.setCachedUser(user);
+  }
 
   return user;
 };
