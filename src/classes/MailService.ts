@@ -74,28 +74,26 @@ class MailService {
     }
   }
 
-  // Password New Password Email
-  public async sendNewPassword({
+  // Forgot Password Link Email
+  public async sendForgotPasswordLink({
     to,
-    loginLink,
-    password,
-  }: Record<"to" | "loginLink" | "password", string>) {
+    link,
+  }: Record<"to" | "link", string>) {
     try {
-      const { data } = await axios.post(`${this.baseUrl}/send-new-password`, {
-        to,
-        link: loginLink,
-        password,
-      });
+      const { data } = await axios.post(
+        `${this.baseUrl}/send-forgot-password-link`,
+        { to, link }
+      );
       return {
         success: data?.success || true,
-        message: data?.message || "New password sent on your email",
+        message: data?.message || "Forgot password link sent on your email",
       };
     } catch (error) {
       const message = this.getErrorMessage(
         error,
-        "Failed to send new password"
+        "Failed to send forgot password link"
       );
-      console.log("❌ Failed to send new password", error);
+      console.log("❌ Failed to send forgot password link", error);
       return { success: false, message };
     }
   }
