@@ -186,6 +186,8 @@ export const registerVerifyOtpController = async (
 
     const { password: _, ...restUser } = user?.toObject();
 
+    await redisService.setCachedUser(restUser);
+
     const token = generateToken(user._id);
 
     res.success(201, "User registered successfully", { token, user: restUser });
