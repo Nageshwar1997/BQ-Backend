@@ -123,7 +123,7 @@ class RedisService {
   }
 
   // Delete / logout
-  public async deleteUser(userId: string | Types.ObjectId) {
+  public async deleteCachedUser(userId: string | Types.ObjectId) {
     const client = this.getClient();
     if (!client) return;
 

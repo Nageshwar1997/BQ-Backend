@@ -10,6 +10,7 @@ import {
   linkedinAuthClient,
 } from "../../../configs";
 import { authSuccessRedirectUrl, getOAuthDbPayload } from "../utils";
+import { AuthenticatedRequest } from "../../../types";
 
 export const loginController = async (req: Request, res: Response) => {
   const { email, password, phoneNumber } = req.body ?? {};
@@ -205,4 +206,15 @@ export const githubCallback = async (
   } catch (err) {
     next(err);
   }
+};
+
+export const logoutController = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  const { userId } = req.params ?? {};
+
+  if (userId) redisService.deleteCachedUser(userId);
+
+  res.success(200, "User logged out successfully");
 };

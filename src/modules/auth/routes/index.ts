@@ -8,6 +8,7 @@ import {
   linkedinCallback,
   linkedinLogin,
   loginController,
+  logoutController,
   registerResendOtpController,
   registerSendOtpController,
   registerVerifyOtpController,
@@ -53,6 +54,13 @@ authRouter.post(
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ZodMiddleware.validateZodSchema(loginZodSchema),
   ResponseMiddleware.catchAsync(loginController)
+);
+
+// Logout
+authRouter.delete(
+  "/logout/:userId",
+  RequestMiddleware.checkEmptyRequest({ params: true }),
+  ResponseMiddleware.catchAsync(logoutController)
 );
 
 // Google Auth
