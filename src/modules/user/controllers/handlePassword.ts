@@ -1,15 +1,16 @@
 import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
-import { getUserByEmail, updateUser } from "../services";
+import { getUserByEmail, getUserById, updateUser } from "../services";
 import { TAuthProvider } from "../types";
 import { AppError, mailService, redisService } from "../../../classes";
 import { generateTokenForRedis } from "../../auth/utils";
-import { MINUTE } from "../../../constants";
+import { MAX_RESEND, MINUTE } from "../../../constants";
 import {
-  generateRandomPassword,
   getAuthorizationToken,
   getFrontendURL,
+  PARSE_DATA,
+  STRINGIFY_DATA,
 } from "../../../utils";
 
 export const changePasswordController = async (
@@ -88,7 +89,7 @@ export const resetPasswordSendLinkController = async (
   // 3️⃣ Create password reset URL
   const resetUrl = `${getFrontendURL(
     user.role
-  )}/reset-password/?token=${resetToken}`;
+  )}/reset-password?token=${resetToken}`;
 
   const { message, success } = await mailService.sendPasswordResetLink({
     to: user.email,
@@ -153,12 +154,13 @@ export const resetPasswordController = async (req: Request, res: Response) => {
   res.success(200, "Password reset successfully");
 };
 
-export const forgotPasswordController = async (req: Request, res: Response) => {
-  let { email } = req.params ?? {};
+export const forgotPasswordSendLinkController = async (
+  req: Request,
+  res: Response
+) => {
+  const { email } = req.body ?? {};
 
-  email = email?.toString()?.trim()?.toLowerCase();
-
-  const user = await getUserByEmail(email);
+  const user = await getUserByEmail(email, true);
 
   if (!user) {
     throw new AppError("User not found", 404);
@@ -176,23 +178,170 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
     );
   }
 
-  const randomPassword = generateRandomPassword();
+  const token = generateTokenForRedis(32);
 
-  const hashedPassword = await bcrypt.hash(randomPassword, 10);
+  await redisService.getClient()?.setEx(
+    `forgotPassword:${token}`,
+    MINUTE * MINUTE, // 1 hour in seconds
+    STRINGIFY_DATA({
+      userId: user._id,
+      sendCount: 1,
+    })
+  );
 
-  const link = `${getFrontendURL(user.role)}/login`;
+  const redirectUrl = `${getFrontendURL(
+    user.role
+  )}/forgot-password?token=${token}`;
 
-  const { message, success } = await mailService.sendNewPassword({
+  const { message, success } = await mailService.sendForgotPasswordLink({
     to: user.email,
-    loginLink: link,
-    password: randomPassword,
+    link: redirectUrl,
   });
 
   if (!success) {
     throw new AppError(message, 500);
   }
 
-  await updateUser(user._id, { password: hashedPassword });
+  res.success(200, "Forgot password link sent successfully on your email", {
+    token,
+  });
+};
+
+export const forgotPasswordResendLinkController = async (
+  req: Request,
+  res: Response
+) => {
+  const rawToken = req.get("Authorization");
+
+  if (!rawToken) {
+    throw new AppError("Link token is required", 401);
+  }
+
+  const token = getAuthorizationToken(rawToken);
+
+  const redisData = await redisService
+    .getClient()
+    ?.get(`forgotPassword:${token}`);
+
+  if (!redisData) throw new AppError("Link expired or invalid", 400);
+
+  const parsedData: { sendCount: number; userId: string } =
+    PARSE_DATA(redisData);
+
+  // Increment sendCount and check limit
+  const sendCount = (parsedData?.sendCount ?? 1) + 1;
+  if (sendCount > MAX_RESEND) {
+    throw new AppError("Maximum resend attempts reached, try again later", 400);
+  }
+
+  const user = await getUserById({
+    id: parsedData.userId,
+    lean: false,
+    password: false,
+  });
+
+  if (!user?.providers?.includes("MANUAL")) {
+    // Check if user has MANUAL login
+    throw new AppError(
+      `This account was created using an OAuth (${user.providers.join(
+        " / "
+      )}) login. Please login using your provider (e.g., ${user.providers.join(
+        ", "
+      )}).`,
+      400
+    );
+  }
+
+  await redisService.getClient()?.setEx(
+    `forgotPassword:${token}`,
+    MINUTE * MINUTE, // 1 hour in seconds
+    STRINGIFY_DATA({ userId: user._id, sendCount })
+  );
+
+  const redirectUrl = `${getFrontendURL(
+    user.role
+  )}/forgot-password?token=${token}`;
+
+  const { message, success } = await mailService.sendForgotPasswordLink({
+    to: user.email,
+    link: redirectUrl,
+  });
+
+  if (!success) {
+    throw new AppError(message, 500);
+  }
+
+  res.success(200, "Forgot password link resent successfully on your email", {
+    sendCount,
+  });
+};
+
+export const forgotPasswordController = async (req: Request, res: Response) => {
+  const { newPassword } = req.body ?? {};
+
+  const rawToken = req.get("Authorization");
+
+  if (!rawToken) {
+    throw new AppError("Link token is required", 401);
+  }
+
+  const token = getAuthorizationToken(rawToken);
+
+  if (!token) throw new AppError("Link token is required", 400);
+
+  const redisData = await redisService
+    .getClient()
+    ?.get(`forgotPassword:${token}`);
+
+  if (!redisData) throw new AppError("Link expired or invalid", 400);
+
+  const parsedData: { sendCount: number; userId: string } =
+    PARSE_DATA(redisData);
+
+  const user = await getUserById({
+    id: parsedData.userId,
+    lean: false,
+    password: false,
+  });
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  if (!user.providers.includes("MANUAL")) {
+    // Check if user has MANUAL login
+    throw new AppError(
+      `This account was created using an OAuth (${user.providers.join(
+        " / "
+      )}) login. Please login using your provider (e.g., ${user.providers.join(
+        ", "
+      )}).`,
+      400
+    );
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  await user.updateOne({ password: hashedPassword });
+
+  await redisService.getClient()?.del(`forgotPassword:${token}`);
 
   res.success(202, "Password sent on your email address");
+};
+
+export const checkPasswordTokenValidityController = async (
+  req: Request,
+  res: Response
+) => {
+  const rawToken = req.get("Authorization");
+
+  const token = getAuthorizationToken(rawToken ?? "");
+
+  const redisData = await redisService
+    .getClient()
+    ?.get(`forgotPassword:${token}`);
+
+  if (!redisData) throw new AppError("Invalid token", 400);
+
+  res.success(200, "Token is valid");
 };

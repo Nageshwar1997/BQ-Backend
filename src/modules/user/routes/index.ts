@@ -13,6 +13,9 @@ import {
   resetPasswordController,
   validResetPasswordTokenController,
   forgotPasswordController,
+  forgotPasswordSendLinkController,
+  forgotPasswordResendLinkController,
+  checkPasswordTokenValidityController,
 } from "../controllers";
 import {
   AuthMiddleware,
@@ -64,14 +67,30 @@ userRouter.patch(
 );
 
 userRouter.get(
-  "/user/check-token-validity",
+  "/user/reset-password-token-validity",
   ResponseMiddleware.catchAsync(validResetPasswordTokenController)
 );
 
 userRouter.post(
-  "/user/forgot-password/:email",
-  RequestMiddleware.checkEmptyRequest({ params: true }),
+  "/user/forgot-password",
+  RequestMiddleware.checkEmptyRequest({ query: true, body: true }),
   ResponseMiddleware.catchAsync(forgotPasswordController)
+);
+
+userRouter.get(
+  "/user/forgot-password-token-validity",
+  ResponseMiddleware.catchAsync(checkPasswordTokenValidityController)
+);
+
+userRouter.post(
+  "/user/forgot-password-link",
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  ResponseMiddleware.catchAsync(forgotPasswordSendLinkController)
+);
+
+userRouter.post(
+  "/user/forgot-password-resend-link",
+  ResponseMiddleware.catchAsync(forgotPasswordResendLinkController)
 );
 
 userRouter.patch(
