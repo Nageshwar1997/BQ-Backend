@@ -35,7 +35,7 @@ export const authSuccessRedirectUrl = (token: string) => {
     IS_DEV === "true"
       ? FRONTEND_LOCAL_HOST_CLIENT_URL
       : FRONTEND_PRODUCTION_CLIENT_URL
-  }/oauth-success?token=${token}`;
+  }/auth/oauth?token=${token}`;
 };
 
 const getProfilePic = async (url: string) => {
