@@ -13,9 +13,10 @@ import {
   STRINGIFY_DATA,
 } from "../../../utils";
 
+
 export const changePasswordController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const user = req.user;
   const { oldPassword, newPassword } = req.body;
@@ -23,7 +24,7 @@ export const changePasswordController = async (
   if (user?.password === newPassword || newPassword === oldPassword) {
     throw new AppError(
       "New password must be different from current password.",
-      400
+      400,
     );
   }
   const isPasswordMatch = bcrypt.compareSync(oldPassword, user?.password || "");
@@ -43,7 +44,7 @@ export const changePasswordController = async (
 
 export const updatePasswordController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const user = req.user;
   const { newPassword } = req.body;
@@ -51,7 +52,7 @@ export const updatePasswordController = async (
   if (user?.password === newPassword) {
     throw new AppError(
       "New password must be different from current password.",
-      400
+      400,
     );
   }
 
@@ -74,7 +75,7 @@ export const updatePasswordController = async (
 
 export const resetPasswordSendLinkController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const user = req.user!;
 
@@ -83,12 +84,12 @@ export const resetPasswordSendLinkController = async (
   await redisService.getClient()?.setEx(
     `resetPassword:${resetToken}`,
     MINUTE * MINUTE, // 1 hour in seconds
-    user._id.toString()
+    user._id.toString(),
   );
 
   // 3️⃣ Create password reset URL
   const resetUrl = `${getFrontendURL(
-    user.role
+    user.role,
   )}/reset-password?token=${resetToken}`;
 
   const { message, success } = await mailService.sendPasswordResetLink({
@@ -105,7 +106,7 @@ export const resetPasswordSendLinkController = async (
 
 export const validResetPasswordTokenController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const rawToken = req.get("Authorization");
 
@@ -156,7 +157,7 @@ export const resetPasswordController = async (req: Request, res: Response) => {
 
 export const forgotPasswordSendLinkController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const { email } = req.body ?? {};
 
@@ -170,11 +171,11 @@ export const forgotPasswordSendLinkController = async (
     // Check if user has MANUAL login
     throw new AppError(
       `This account was created using an OAuth (${user.providers.join(
-        " / "
+        " / ",
       )}) login. Please login using your provider (e.g., ${user.providers.join(
-        ", "
+        ", ",
       )}).`,
-      400
+      400,
     );
   }
 
@@ -186,16 +187,17 @@ export const forgotPasswordSendLinkController = async (
     STRINGIFY_DATA({
       userId: user._id,
       sendCount: 1,
-    })
+    }),
   );
 
   const redirectUrl = `${getFrontendURL(
-    user.role
+    user.role,
   )}/forgot-password?token=${token}`;
 
-  const { message, success } = await mailService.sendForgotPasswordLink({
+  const { message, success } = await mailService.sendForgotPasswordLinkAndOtp({
     to: user.email,
     link: redirectUrl,
+    otp: "123",
   });
 
   if (!success) {
@@ -209,7 +211,7 @@ export const forgotPasswordSendLinkController = async (
 
 export const forgotPasswordResendLinkController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const rawToken = req.get("Authorization");
 
@@ -244,27 +246,28 @@ export const forgotPasswordResendLinkController = async (
     // Check if user has MANUAL login
     throw new AppError(
       `This account was created using an OAuth (${user.providers.join(
-        " / "
+        " / ",
       )}) login. Please login using your provider (e.g., ${user.providers.join(
-        ", "
+        ", ",
       )}).`,
-      400
+      400,
     );
   }
 
   await redisService.getClient()?.setEx(
     `forgotPassword:${token}`,
     MINUTE * MINUTE, // 1 hour in seconds
-    STRINGIFY_DATA({ userId: user._id, sendCount })
+    STRINGIFY_DATA({ userId: user._id, sendCount }),
   );
 
   const redirectUrl = `${getFrontendURL(
-    user.role
+    user.role,
   )}/forgot-password?token=${token}`;
 
-  const { message, success } = await mailService.sendForgotPasswordLink({
+  const { message, success } = await mailService.sendForgotPasswordLinkAndOtp({
     to: user.email,
     link: redirectUrl,
+    otp: "123",
   });
 
   if (!success) {
@@ -312,11 +315,11 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
     // Check if user has MANUAL login
     throw new AppError(
       `This account was created using an OAuth (${user.providers.join(
-        " / "
+        " / ",
       )}) login. Please login using your provider (e.g., ${user.providers.join(
-        ", "
+        ", ",
       )}).`,
-      400
+      400,
     );
   }
 
@@ -331,7 +334,7 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
 
 export const checkPasswordTokenValidityController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const rawToken = req.get("Authorization");
 

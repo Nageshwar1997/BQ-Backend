@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import {
+  forgotPasswordSendLinkAndOtpController,
   githubCallback,
   githubLogin,
   googleCallback,
@@ -27,13 +28,13 @@ export const authRouter = Router();
 authRouter.post(
   "/register/send-otp",
   RequestMiddleware.checkEmptyRequest({ query: true }),
-  ResponseMiddleware.catchAsync(registerSendOtpController)
+  ResponseMiddleware.catchAsync(registerSendOtpController),
 );
 
 authRouter.post(
   "/register/resend-otp",
   RequestMiddleware.checkEmptyRequest({ query: true }),
-  ResponseMiddleware.catchAsync(registerResendOtpController)
+  ResponseMiddleware.catchAsync(registerResendOtpController),
 );
 
 authRouter.post(
@@ -45,7 +46,7 @@ authRouter.post(
     query: true,
   }),
   ZodMiddleware.validateZodSchema(registerZodSchema),
-  ResponseMiddleware.catchAsync(registerVerifyOtpController)
+  ResponseMiddleware.catchAsync(registerVerifyOtpController),
 );
 
 // Login Route
@@ -53,33 +54,39 @@ authRouter.post(
   "/login",
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ZodMiddleware.validateZodSchema(loginZodSchema),
-  ResponseMiddleware.catchAsync(loginController)
+  ResponseMiddleware.catchAsync(loginController),
 );
 
 // Logout
 authRouter.delete(
   "/logout/:userId",
   RequestMiddleware.checkEmptyRequest({ params: true }),
-  ResponseMiddleware.catchAsync(logoutController)
+  ResponseMiddleware.catchAsync(logoutController),
 );
 
 // Google Auth
 authRouter.get("/google", ResponseMiddleware.catchAsync(googleLogin));
 authRouter.get(
   "/google/callback",
-  ResponseMiddleware.catchAsync(googleCallback)
+  ResponseMiddleware.catchAsync(googleCallback),
 );
 
 // LinkedIn Auth
 authRouter.get("/linkedin", ResponseMiddleware.catchAsync(linkedinLogin));
 authRouter.get(
   "/linkedin/callback",
-  ResponseMiddleware.catchAsync(linkedinCallback)
+  ResponseMiddleware.catchAsync(linkedinCallback),
 );
 
 // GitHub Auth
 authRouter.get("/github", ResponseMiddleware.catchAsync(githubLogin));
 authRouter.get(
   "/github/callback",
-  ResponseMiddleware.catchAsync(githubCallback)
+  ResponseMiddleware.catchAsync(githubCallback),
+);
+
+// Password Route
+authRouter.post(
+  "/send-forgot-password-link-and-otp",
+  ResponseMiddleware.catchAsync(forgotPasswordSendLinkAndOtpController),
 );

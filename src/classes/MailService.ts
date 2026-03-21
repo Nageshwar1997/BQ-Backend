@@ -15,10 +15,10 @@ class MailService {
       error instanceof AxiosError
         ? error.message || error.response?.data?.message
         : error instanceof Error
-        ? error.message
-        : typeof error === "string"
-        ? error
-        : defaultMsg;
+          ? error.message
+          : typeof error === "string"
+            ? error
+            : defaultMsg;
 
     return message;
   }
@@ -58,7 +58,7 @@ class MailService {
     try {
       const { data } = await axios.post(
         `${this.baseUrl}/send-password-reset-link`,
-        { to, link: resetLink }
+        { to, link: resetLink },
       );
       return {
         success: data?.success || true,
@@ -67,7 +67,7 @@ class MailService {
     } catch (error) {
       const message = this.getErrorMessage(
         error,
-        "Failed to send password reset link"
+        "Failed to send password reset link",
       );
       console.log("❌ Failed to send password reset link", error);
       return { success: false, message };
@@ -75,14 +75,15 @@ class MailService {
   }
 
   // Forgot Password Link Email
-  public async sendForgotPasswordLink({
+  public async sendForgotPasswordLinkAndOtp({
     to,
     link,
-  }: Record<"to" | "link", string>) {
+    otp,
+  }: Record<"to" | "link" | "otp", string>) {
     try {
       const { data } = await axios.post(
-        `${this.baseUrl}/send-forgot-password-link`,
-        { to, link }
+        `${this.baseUrl}/send-forgot-password-link-and-otp`,
+        { to, link, otp },
       );
       return {
         success: data?.success || true,
@@ -91,7 +92,7 @@ class MailService {
     } catch (error) {
       const message = this.getErrorMessage(
         error,
-        "Failed to send forgot password link"
+        "Failed to send forgot password link",
       );
       console.log("❌ Failed to send forgot password link", error);
       return { success: false, message };
