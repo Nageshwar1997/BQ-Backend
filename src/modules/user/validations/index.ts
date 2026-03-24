@@ -189,11 +189,11 @@ export const updateUserZodSchema = z.object({
 
 export const updatePasswordZodSchema = z
   .object({
-    newPassword: validateZodString({
+    password: validateZodString({
       min: 6,
       max: 20,
       blockSingleSpace: true,
-      field: "newPassword",
+      field: "password",
       customRegexes: [
         {
           regex: regexes.password,
@@ -216,7 +216,7 @@ export const updatePasswordZodSchema = z
       ],
     }),
   })
-  .refine((data) => data.newPassword === data.confirmPassword, {
+  .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
     message: "Passwords don't match.",
   });
@@ -236,11 +236,11 @@ export const changePasswordZodSchema = z
         },
       ],
     }),
-    newPassword: validateZodString({
+    password: validateZodString({
       min: 6,
       max: 20,
       blockSingleSpace: true,
-      field: "newPassword",
+      field: "password",
       customRegexes: [
         {
           regex: regexes.password,
@@ -264,19 +264,19 @@ export const changePasswordZodSchema = z
     }),
   })
   .superRefine((data, ctx) => {
-    const { oldPassword, newPassword, confirmPassword } = data;
+    const { oldPassword, password, confirmPassword } = data;
 
     // Old password & new password must be different
-    if (oldPassword === newPassword) {
+    if (oldPassword === password) {
       ctx.addIssue({
-        path: ["newPassword"],
+        path: ["password"],
         code: z.ZodIssueCode.custom,
         message: "New password must be different from current password.",
       });
     }
 
     // New & confirm password must match
-    if (newPassword !== confirmPassword) {
+    if (password !== confirmPassword) {
       ctx.addIssue({
         path: ["confirmPassword"],
         code: z.ZodIssueCode.custom,

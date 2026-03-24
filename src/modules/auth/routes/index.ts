@@ -1,7 +1,9 @@
 import { Router } from "express";
 
 import {
+  forgotPasswordResendLinkAndOtpController,
   forgotPasswordSendLinkAndOtpController,
+  forgotPasswordVerifyOtpController,
   githubCallback,
   githubLogin,
   googleCallback,
@@ -89,4 +91,15 @@ authRouter.get(
 authRouter.post(
   "/send-forgot-password-link-and-otp",
   ResponseMiddleware.catchAsync(forgotPasswordSendLinkAndOtpController),
+);
+
+authRouter.post(
+  "/resend-forgot-password-link-and-otp",
+  ResponseMiddleware.catchAsync(forgotPasswordResendLinkAndOtpController),
+);
+
+authRouter.post(
+  "/verify-forgot-password-otp",
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  ResponseMiddleware.catchAsync(forgotPasswordVerifyOtpController),
 );

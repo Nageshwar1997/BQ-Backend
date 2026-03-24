@@ -19,9 +19,9 @@ export const changePasswordController = async (
   res: Response,
 ) => {
   const user = req.user;
-  const { oldPassword, newPassword } = req.body;
+  const { oldPassword, password } = req.body;
 
-  if (user?.password === newPassword || newPassword === oldPassword) {
+  if (user?.password === password || password === oldPassword) {
     throw new AppError(
       "New password must be different from current password.",
       400,
@@ -33,7 +33,7 @@ export const changePasswordController = async (
     throw new AppError("Old password is incorrect", 400);
   }
 
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   const updatedUser = await updateUser(user?._id, { password: hashedPassword });
 
@@ -47,16 +47,16 @@ export const updatePasswordController = async (
   res: Response,
 ) => {
   const user = req.user;
-  const { newPassword } = req.body;
+  const { password } = req.body;
 
-  if (user?.password === newPassword) {
+  if (user?.password === password) {
     throw new AppError(
       "New password must be different from current password.",
       400,
     );
   }
 
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   const updatedProviders: Set<TAuthProvider> = new Set([
     ...(user?.providers ?? []),
@@ -142,9 +142,9 @@ export const resetPasswordController = async (req: Request, res: Response) => {
     throw new AppError("Reset link is invalid or has expired", 400);
   }
 
-  const { newPassword } = req.body ?? {};
+  const { password } = req.body ?? {};
 
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   await updateUser(userId, {
     password: hashedPassword,
@@ -182,7 +182,7 @@ export const forgotPasswordSendLinkController = async (
   const token = generateTokenForRedis(32);
 
   await redisService.getClient()?.setEx(
-    `forgotPassword:${token}`,
+    `forgot-password:${token}`,
     MINUTE * MINUTE, // 1 hour in seconds
     STRINGIFY_DATA({
       userId: user._id,
@@ -223,7 +223,7 @@ export const forgotPasswordResendLinkController = async (
 
   const redisData = await redisService
     .getClient()
-    ?.get(`forgotPassword:${token}`);
+    ?.get(`forgot-password:${token}`);
 
   if (!redisData) throw new AppError("Link expired or invalid", 400);
 
@@ -255,7 +255,7 @@ export const forgotPasswordResendLinkController = async (
   }
 
   await redisService.getClient()?.setEx(
-    `forgotPassword:${token}`,
+    `forgot-password:${token}`,
     MINUTE * MINUTE, // 1 hour in seconds
     STRINGIFY_DATA({ userId: user._id, sendCount }),
   );
@@ -280,7 +280,7 @@ export const forgotPasswordResendLinkController = async (
 };
 
 export const forgotPasswordController = async (req: Request, res: Response) => {
-  const { newPassword } = req.body ?? {};
+  const { password } = req.body ?? {};
 
   const rawToken = req.get("Authorization");
 
@@ -294,12 +294,16 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
 
   const redisData = await redisService
     .getClient()
-    ?.get(`forgotPassword:${token}`);
+    ?.get(`forgot-password:${token}`);
 
   if (!redisData) throw new AppError("Link expired or invalid", 400);
 
-  const parsedData: { sendCount: number; userId: string } =
+  const parsedData: { sendCount: number; userId: string; otp?: string; verified?: boolean } =
     PARSE_DATA(redisData);
+
+  if (parsedData.otp && !parsedData.verified) {
+    throw new AppError("OTP not verified", 400);
+  }
 
   const user = await getUserById({
     id: parsedData.userId,
@@ -323,11 +327,11 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
     );
   }
 
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   await user.updateOne({ password: hashedPassword });
 
-  await redisService.getClient()?.del(`forgotPassword:${token}`);
+  await redisService.getClient()?.del(`forgot-password:${token}`);
 
   res.success(202, "Password sent on your email address");
 };
@@ -342,7 +346,7 @@ export const checkPasswordTokenValidityController = async (
 
   const redisData = await redisService
     .getClient()
-    ?.get(`forgotPassword:${token}`);
+    ?.get(`forgot-password:${token}`);
 
   if (!redisData) throw new AppError("Invalid token", 400);
 
