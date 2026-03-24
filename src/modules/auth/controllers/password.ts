@@ -11,6 +11,7 @@ import {
   STRINGIFY_DATA,
 } from "../../../utils";
 import { TAuthProvider } from "../../user/types";
+import { generateToken } from "../services";
 
 const checkManuallyLoggedIn = (providers: TAuthProvider[]) => {
   if (!providers?.includes("MANUAL")) {
@@ -204,9 +205,9 @@ export const validateTokenForForgotPasswordController = async (req: Request, res
   if (!redisData) {
     throw new AppError("Session expired. Please request a new OTP.", 400);
   }
-  
+
   res.success(200, "Token is valid", { valid: true });
- }
+}
 
 export const setForgotPasswordController = async (
   req: Request,
@@ -260,8 +261,15 @@ export const setForgotPasswordController = async (
 
   await redisService.getClient()?.del(`forgot-password:${token}`);
 
+  const userToken = generateToken(user._id);
+
+  const { password: _, ...restUser } = user?.toObject() ?? {};
+
+  await redisService.setCachedUser(user);
+
   res.success(
     200,
-    "Password updated successfully. You can now login with your new password.",
+    "Password updated successfully and you are now logged in.",
+    { user: restUser, token: userToken }
   );
 };

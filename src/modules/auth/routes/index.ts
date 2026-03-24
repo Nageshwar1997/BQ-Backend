@@ -108,7 +108,6 @@ authRouter.post(
 
 authRouter.get(
   "/validate-forgot-password-token",
-  RequestMiddleware.checkEmptyRequest({ body: true }),
   ResponseMiddleware.catchAsync(validateTokenForForgotPasswordController),
 );
 
