@@ -15,6 +15,8 @@ import {
   registerResendOtpController,
   registerSendOtpController,
   registerVerifyOtpController,
+  setForgotPasswordController,
+  validateTokenForForgotPasswordController,
 } from "../controllers";
 import { loginZodSchema, registerZodSchema } from "../validations";
 import {
@@ -102,4 +104,16 @@ authRouter.post(
   "/verify-forgot-password-otp",
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ResponseMiddleware.catchAsync(forgotPasswordVerifyOtpController),
+);
+
+authRouter.get(
+  "/validate-forgot-password-token",
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  ResponseMiddleware.catchAsync(validateTokenForForgotPasswordController),
+);
+
+authRouter.patch(
+  "/set-forgot-password",
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  ResponseMiddleware.catchAsync(setForgotPasswordController),
 );
