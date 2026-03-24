@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import bcrypt from "bcryptjs";
 import { AuthModule, UserModule } from "../..";
 import { AppError, mailService, redisService } from "../../../classes";
 import { generateTokenForRedis } from "../utils";
@@ -44,7 +45,7 @@ export const forgotPasswordSendLinkAndOtpController = async (
 
   const redirectUrl = `${getFrontendURL(
     user.role,
-  )}/forgot-password?token=${token}`;
+  )}/auth/forgot-password?token=${token}`;
 
   const { message, success } = await mailService.sendForgotPasswordLinkAndOtp({
     to: user.email,
@@ -172,7 +173,62 @@ export const forgotPasswordVerifyOtpController = async (
     throw new AppError("Invalid OTP", 400);
   }
 
-
-
   res.success(200, "OTP verified successfully", { verified: true });
+};
+
+export const setForgotPasswordController = async (req: Request, res: Response) => {
+  const { password } = req.body ?? {};
+
+  const rawToken = req.get("Authorization");
+
+  if (!rawToken) {
+    throw new AppError("Link token is required", 401);
+  }
+
+  const token = getAuthorizationToken(rawToken);
+
+  if (!token) throw new AppError("Link token is required", 400);
+
+  const redisData = await redisService
+    .getClient()
+    ?.get(`forgot-password:${token}`);
+
+  if (!redisData) throw new AppError("session expired or invalid", 400);
+
+  const parsedData: { sendCount: number; userId: string; otp?: string; verified?: boolean } =
+    PARSE_DATA(redisData);
+
+  if (parsedData.otp && !parsedData.verified) {
+    throw new AppError("OTP not verified", 400);
+  }
+
+  const user = await UserModule.Services.getUserById({
+    id: parsedData.userId,
+    lean: false,
+    password: false,
+  });
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  if (!user.providers.includes("MANUAL")) {
+    // Check if user has MANUAL login
+    throw new AppError(
+      `This account was created using an OAuth (${user.providers.join(
+        " / ",
+      )}) login. Please login using your provider (e.g., ${user.providers.join(
+        ", ",
+      )}).`,
+      400,
+    );
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await user.updateOne({ password: hashedPassword });
+
+  await redisService.getClient()?.del(`forgot-password:${token}`);
+
+  res.success(202, "Password set successfully, you can now login with your new password",);
 };
