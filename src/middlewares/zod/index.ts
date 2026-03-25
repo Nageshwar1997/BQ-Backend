@@ -3,22 +3,19 @@ import { ZodObject } from "zod";
 import { AppError } from "../../classes";
 
 export const validateZodSchema =
-  <T extends ZodObject>(schema: T) =>
+  <T extends ZodObject<any>>(schema: T) =>
   (req: Request, _: Response, next: NextFunction) => {
     const result = schema.safeParse(req.body ?? {});
 
     if (!result.success) {
-      const errors = result?.error?.issues;
+      const errors = result.error.issues.map((err) => ({
+        field: err.path.join("."), // nested path support
+        message: err.message,
+      }));
 
-      // To make a zod error readable
-      const errorMessage = errors
-        .map(
-          (err, ind) =>
-            `${errors.length > 1 ? `${ind + 1}) ` : ""}${err.message}`,
-        )
-        .join(" ");
-      return next(new AppError(errorMessage, 400));
+      return next(new AppError("Validation Error", 400, true, errors));
     }
+
     req.body = result.data;
     next();
   };

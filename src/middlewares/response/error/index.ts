@@ -10,6 +10,7 @@ const sendDevError = (err: AppError, req: Request, res: Response) => {
   res.status(err.statusCode || 500).json({
     ...commonErr,
     message: err.message,
+    errors: err.errors,
     statusCode: err.statusCode || 500,
     stack: err.stack,
     requestId: req.requestId,
@@ -21,6 +22,7 @@ const sendProdError = (err: AppError, req: Request, res: Response) => {
     res.status(err.statusCode || 500).json({
       ...commonErr,
       message: err.message,
+      errors: err.errors,
       statusCode: err.statusCode || 500,
       requestId: req.requestId,
     });
@@ -38,36 +40,26 @@ export const error = (
   err: Error | AppError | MongooseError,
   req: Request,
   res: Response,
-  _: NextFunction
+  _: NextFunction,
 ) => {
   let error: AppError;
 
   if (err instanceof MongooseError.ValidationError) {
-    const entries = Object.entries(err.errors);
+    const errors = Object.entries(err.errors).map(([field, errorObj]) => ({
+      field,
+      message: errorObj.message,
+    }));
 
-    let joinedMessage: string;
-
-    if (entries.length === 1) {
-      const [field, errorObj] = entries[0];
-      joinedMessage = `${field}: ${errorObj.message}`;
-    } else {
-      joinedMessage = entries
-        .map(
-          ([field, errorObj], idx) =>
-            `${idx + 1}. ${field}: ${errorObj.message}`
-        )
-        .join("\n");
-    }
-    error = new AppError(joinedMessage, 400, true);
+    error = new AppError("Validation Error", 400, true, errors);
   } else if (err instanceof AppError) {
     error = err;
   } else {
     error = new AppError(
       IS_DEV === "true"
-        ? err.message ?? "Internal Server Error!"
+        ? (err.message ?? "Internal Server Error!")
         : "Internal Server Error!",
       500,
-      false
+      false,
     );
   }
 
