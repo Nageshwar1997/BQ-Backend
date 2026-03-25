@@ -7,7 +7,7 @@ import { Review } from "../models";
 
 export const createReviewController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const { productId } = req?.params;
 
@@ -51,7 +51,7 @@ export const createReviewController = async (
   }
 
   const review = await Review.create({
-    product: productId,
+    product: productId?.toString(),
     user: user?._id,
     rating: body.rating,
     title: body.title,

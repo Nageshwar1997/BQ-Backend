@@ -65,10 +65,7 @@ export const sellerRequestZodSchema = z.object({
         customRegexes: [{ regex: regexes.gst, message: "must be valid" }],
       }),
     },
-    {
-      required_error: "businessAddress is required",
-      invalid_type_error: "businessAddress must be object",
-    }
+    { error: "businessAddress is required" },
   ),
   businessDetails: z.object(
     {
@@ -118,15 +115,9 @@ export const sellerRequestZodSchema = z.object({
         enums: ALLOWED_BUSINESSES,
       }),
     },
-    {
-      required_error: "businessDetails is required",
-      invalid_type_error: "businessDetails must be object",
-    }
+    { error: "businessDetails is required" },
   ),
-  agreeTerms: z.coerce.boolean({
-    required_error: "agreeTerms is required",
-    invalid_type_error: "agreeTerms must be boolean",
-  }),
+  agreeTerms: z.coerce.boolean({ error: "agreeTerms is required" }),
 });
 
 export const updateUserZodSchema = z.object({

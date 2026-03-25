@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Aggregate, FilterQuery, Types } from "mongoose";
+import { Aggregate, QueryFilter, Types } from "mongoose";
 
 import { isValidMongoId } from "../../../utils";
 import { Review } from "../models";
@@ -21,8 +21,8 @@ export const getReviewsByProductIdController = async (
   const hasPagination = page && limit;
   const skip = hasPagination ? (page - 1) * limit : 0;
 
-  const filters: FilterQuery<ReviewProps> = {
-    product: new Types.ObjectId(productId),
+  const filters: QueryFilter<ReviewProps> = {
+    product: new Types.ObjectId(productId?.toString()),
     ...(sortBy === "with-images" && {
       images: { $exists: true, $type: "array", $ne: [] },
     }),

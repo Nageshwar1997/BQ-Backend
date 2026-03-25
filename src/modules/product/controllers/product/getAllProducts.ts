@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Product, Category } from "../../models";
-import { FilterQuery } from "mongoose";
+import { QueryFilter } from "mongoose";
 
 import {
   PopulatedProduct,
@@ -40,13 +40,13 @@ export const getAllProductsController = async (req: Request, res: Response) => {
     if (!category_1 && (category_2 || category_3)) {
       throw new AppError(
         "category_1 is required when category_2 or category_3 is provided",
-        400
+        400,
       );
     }
     if (category_3 && !category_2) {
       throw new AppError(
         "category_2 is required when category_3 is provided",
-        400
+        400,
       );
     }
 
@@ -152,7 +152,7 @@ export const getAllProductsController = async (req: Request, res: Response) => {
   }
 
   // --- 2. Build query filters (category + title search) ---
-  const filters: FilterQuery<ProductProps> = {};
+  const filters: QueryFilter<ProductProps> = {};
 
   if (categoryFilter) {
     filters.category = { $in: categoryFilter };
@@ -235,8 +235,8 @@ export const getAllProductsController = async (req: Request, res: Response) => {
       (field): field is keyof PopulatedProduct =>
         typeof field === "string" &&
         POSSIBLE_PRODUCT_REQUIRED_FIELDS.includes(
-          field as keyof PopulatedProduct
-        )
+          field as keyof PopulatedProduct,
+        ),
     );
 
     query = query.select(safeFields.join(" "));
@@ -245,11 +245,11 @@ export const getAllProductsController = async (req: Request, res: Response) => {
   // --- 5. Populate sub-documents safely ---
   for (const [path, requestedFields] of Object.entries(populateFields) as [
     keyof ProductPopulateFieldsProps,
-    string[]
+    string[],
   ][]) {
     const allowed = PRODUCT_POPULATE_FIELDS[path];
     const safe = requestedFields.filter((f): f is (typeof allowed)[number] =>
-      isSafePopulateField(f, allowed)
+      isSafePopulateField(f, allowed),
     );
 
     if (!safe.length) continue;

@@ -19,8 +19,7 @@ export const removeSingleImageZodSchema = z.object({
 export const removeMultipleImagesZodSchema = z.object({
   cloudUrls: z
     .array(validateZodUrl({ field: "cloudUrls[some_index]" }), {
-      required_error: `'cloudUrls' are required.`,
-      invalid_type_error: `'cloudUrls' must be an array of strings.`,
+      error: `The 'cloudUrls' field must be an array of valid URLs.`,
     })
     .nonempty({ message: `The 'cloudUrls' field cannot be empty.` })
     .min(1, { message: `At least 1 'cloudUrl' is required.` }),

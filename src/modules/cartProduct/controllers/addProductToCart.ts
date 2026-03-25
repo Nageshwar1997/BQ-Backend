@@ -4,10 +4,11 @@ import { CartModule } from "../..";
 import { AppError } from "../../../classes";
 import { isValidMongoId } from "../../../utils";
 import { CartProduct } from "../models";
+import { ObjectIdQueryTypeCasting } from "mongoose";
 
 export const addProductToCartController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const userId = req.user?._id;
   const { productId } = req.params;
@@ -23,7 +24,7 @@ export const addProductToCartController = async (
   const cart = await CartModule.Models.Cart.findOneAndUpdate(
     { user: userId },
     { $setOnInsert: { user: userId, products: [], charges: 0 } },
-    { new: true, upsert: true }
+    { new: true, upsert: true },
   );
 
   if (!cart) {
@@ -44,8 +45,8 @@ export const addProductToCartController = async (
   // 3️ Create new CartProduct
   const cartProduct = await CartProduct.create({
     cart: cart._id,
-    product: productId,
-    shade: shadeId ?? null,
+    product: productId?.toString(),
+    shade: (shadeId ?? null) as ObjectIdQueryTypeCasting,
     quantity: 1,
   });
 

@@ -116,19 +116,15 @@ const addressBaseSchema = z.object({
       },
     ],
   }),
-  isDefaultAddress: z.coerce
-    .boolean({
-      errorMap: () => ({
-        message: "isDefaultAddress must be a boolean",
-      }),
-    })
+  isDefaultAddress: z
+    .boolean({ error: "isDefaultAddress must be a boolean" })
     .default(false)
     .optional(),
 });
 
 const phoneValidation = (
   data: Partial<z.infer<typeof addressBaseSchema>>,
-  ctx: z.RefinementCtx
+  ctx: z.RefinementCtx,
 ) => {
   if (data.altPhoneNumber && data.phoneNumber === data.altPhoneNumber) {
     ctx.addIssue({
@@ -148,7 +144,7 @@ export const updateAddressSchema = addressBaseSchema
         field: "[some_index]",
         parentField: "removedOptionalFields",
         enums: ["altPhoneNumber", "gst", "landmark"],
-      })
+      }),
     ),
   })
   .partial()

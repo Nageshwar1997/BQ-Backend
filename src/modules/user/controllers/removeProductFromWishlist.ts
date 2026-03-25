@@ -19,7 +19,7 @@ export const removeProductFromWishlistController = async (
   // Remove product atomically using session
   const updatedWishlist = await Wishlist.findByIdAndUpdate(
     userId,
-    { $pull: { products: new Types.ObjectId(productId) } },
+    { $pull: { products: new Types.ObjectId(productId?.toString()) } },
     { new: true, session }
   );
 

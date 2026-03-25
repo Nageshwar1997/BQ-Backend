@@ -18,7 +18,7 @@ export const loginController = async (req: Request, res: Response) => {
   const user = await UserModule.Services.getUserByEmailOrPhoneNumber(
     email,
     phoneNumber,
-    true
+    true,
   );
 
   if (!user) {
@@ -29,18 +29,18 @@ export const loginController = async (req: Request, res: Response) => {
     // Check if user has MANUAL login
     throw new AppError(
       `This account was created using an OAuth (${user.providers.join(
-        " / "
+        " / ",
       )}) login. Please login using your provider (e.g., ${user.providers.join(
-        ", "
+        ", ",
       )}).`,
-      400
+      400,
     );
   }
 
   if (!user.password) {
     throw new AppError(
       "No password set for this account. Please set a password to login manually.",
-      400
+      400,
     );
   }
 
@@ -68,7 +68,7 @@ export const googleLogin = async (_req: Request, res: Response) => {
 export const googleCallback = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { code } = req.query;
@@ -117,7 +117,7 @@ export const linkedinLogin = async (_req: Request, res: Response) => {
 export const linkedinCallback = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { code } = req.query;
@@ -165,7 +165,7 @@ export const githubLogin = async (_req: Request, res: Response) => {
 export const githubCallback = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { code } = req.query;
@@ -210,11 +210,11 @@ export const githubCallback = async (
 
 export const logoutController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const { userId } = req.params ?? {};
 
-  if (userId) redisService.deleteCachedUser(userId);
+  if (userId) redisService.deleteCachedUser(userId?.toString());
 
   res.success(200, "User logged out successfully");
 };

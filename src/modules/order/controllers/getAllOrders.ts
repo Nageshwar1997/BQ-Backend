@@ -2,12 +2,12 @@ import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { Order } from "../models";
 import { IOrder } from "../types";
-import { FilterQuery } from "mongoose";
+import { QueryFilter } from "mongoose";
 import { toArray } from "../../../utils";
 
 export const getAllOrdersController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const userId = req.user?._id;
   let { order_status, payment_status, page, limit } = req.query;
@@ -19,7 +19,7 @@ export const getAllOrdersController = async (
   const limitNum = limit ? Number(limit) : 0;
   const skip = pageNum && limitNum ? (pageNum - 1) * limitNum : 0;
 
-  const filter: FilterQuery<IOrder> = { user: userId };
+  const filter: QueryFilter<IOrder> = { user: userId };
 
   if (orderStatuses.length) {
     filter["status"] = {

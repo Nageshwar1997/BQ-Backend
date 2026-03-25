@@ -56,11 +56,13 @@ export const getImageAsBuffer = async (url: string) => {
 };
 
 export const isValidMongoId = (
-  id: string,
+  id: string | string[],
   message: string,
-  statusCode?: number
+  statusCode?: number,
 ): boolean => {
-  const isValid = Types.ObjectId.isValid(id);
+  const isValid = Array.isArray(id)
+    ? id.every((id) => Types.ObjectId.isValid(id))
+    : Types.ObjectId.isValid(id);
 
   if (!isValid) {
     console.log(`Invalid ObjectId, ${message} : `, id);
@@ -99,7 +101,7 @@ export const validateRequiredFileFields = ({
   // Helper to check if any file fieldname starts with the expected field
   const hasMatchingField = (
     field: string,
-    uploadedFieldNames: string[]
+    uploadedFieldNames: string[],
   ): boolean => {
     return uploadedFieldNames.some((uploaded) => uploaded.startsWith(field));
   };
@@ -137,7 +139,7 @@ export const validateRequiredFileFields = ({
       `Required file field${
         requiredFields.length > 1 ? "s" : ""
       }: ${requiredFields.join(", ")}`,
-      400
+      400,
     );
   }
 };
@@ -184,12 +186,7 @@ export const validateZodString = ({
         : `The '${nestedField}' field does not match the required format.`,
   };
 
-  let schema = z
-    .string({
-      required_error: messages.required,
-      invalid_type_error: messages.invalid_type,
-    })
-    .trim();
+  let schema = z.string({ error: messages.required }).trim();
 
   if (nonEmpty) {
     schema = schema.nonempty({ message: messages.non_empty });
@@ -233,7 +230,7 @@ export const validateZodUrl = ({ ...props }: ZodCommonConfigs) => {
 };
 
 export const validateZodEnums = (
-  props: ZodCommonConfigs & { enums: string[] }
+  props: ZodCommonConfigs & { enums: string[] },
 ) => {
   const { field, parentField, enums, isOptional } = props;
 
@@ -241,12 +238,8 @@ export const validateZodEnums = (
     ? `${parentField}${parentField.includes("[") ? " " : "."}${field}`
     : field;
 
-  const baseEnum = z.enum([enums[0], ...enums.slice(1)], {
-    errorMap: () => ({
-      message: `Invalid option of ${nestedField}. Must be '${enums.join(
-        ", "
-      )}'.`,
-    }),
+  const baseEnum = z.enum(enums, {
+    message: `Invalid option of ${nestedField}. Must be '${enums.join(", ")}'.`,
   });
 
   return isOptional ? baseEnum.optional() : baseEnum;
@@ -274,10 +267,7 @@ export const validateZodNumber = ({
     max: `The '${nestedField}' field must not exceed ${max}.`,
   };
 
-  let schema = z.coerce.number({
-    required_error: messages.required, // mostly this error will not be thrown because of coerce
-    invalid_type_error: messages.invalid_type,
-  });
+  let schema = z.coerce.number({ error: messages.required });
 
   if (nonNegative) {
     schema = schema.nonnegative({
@@ -320,10 +310,7 @@ export const validateZodDate = ({
   };
 
   const baseSchema = z
-    .string({
-      required_error: messages.required,
-      invalid_type_error: messages.invalid_format,
-    })
+    .string({ error: messages.required })
     .refine((val) => regexes.date.test(val), {
       message: messages.invalid_format,
     })
@@ -355,7 +342,7 @@ export const validateZodDate = ({
     },
     {
       message: mustBePastDate ? messages.past : messages.future,
-    }
+    },
   );
 
   return (isOptional
@@ -379,19 +366,19 @@ export const getFrontendURL = (role: TRole) => {
   const roleUrlMap: Record<TRole, string> = {
     ADMIN: getURL(
       FRONTEND_LOCAL_HOST_ADMIN_URL!,
-      FRONTEND_PRODUCTION_ADMIN_URL!
+      FRONTEND_PRODUCTION_ADMIN_URL!,
     ),
     SELLER: getURL(
       FRONTEND_LOCAL_HOST_ADMIN_URL!,
-      FRONTEND_PRODUCTION_ADMIN_URL!
+      FRONTEND_PRODUCTION_ADMIN_URL!,
     ),
     MASTER: getURL(
       FRONTEND_LOCAL_HOST_MASTER_URL!,
-      FRONTEND_PRODUCTION_MASTER_URL!
+      FRONTEND_PRODUCTION_MASTER_URL!,
     ),
     USER: getURL(
       FRONTEND_LOCAL_HOST_CLIENT_URL!,
-      FRONTEND_PRODUCTION_CLIENT_URL!
+      FRONTEND_PRODUCTION_CLIENT_URL!,
     ),
   };
 
@@ -403,7 +390,7 @@ export const getBackendURL = () => {
 };
 
 export const getSocialAuthRedirectURL = (
-  provider: Exclude<TAuthProvider, "MANUAL">
+  provider: Exclude<TAuthProvider, "MANUAL">,
 ) => {
   const baseURL = getBackendURL();
 

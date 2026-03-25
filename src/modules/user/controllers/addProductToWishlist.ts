@@ -7,7 +7,7 @@ import { Types } from "mongoose";
 
 export const addProductToWishlistController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const userId = req.user?._id;
   const { productId } = req.params;
@@ -19,9 +19,9 @@ export const addProductToWishlistController = async (
     { _id: userId },
     {
       $setOnInsert: { _id: userId },
-      $addToSet: { products: new Types.ObjectId(productId) },
+      $addToSet: { products: new Types.ObjectId(productId?.toString()) },
     },
-    { new: true, upsert: true }
+    { new: true, upsert: true },
   );
 
   if (!wishlist) {
