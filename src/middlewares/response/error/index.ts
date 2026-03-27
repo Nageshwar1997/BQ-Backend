@@ -2,41 +2,12 @@ import { NextFunction, Request, Response } from "express";
 import { Error as MongooseError } from "mongoose";
 
 import { AppError } from "../../../classes";
-import { IS_DEV } from "../../../envs";
+import { IS_DEV_MODE } from "../../../envs";
+import { mapToFieldErrors } from "../../../utils";
 
-const commonErr = { success: false, error: true };
+const baseResponse = { success: false, error: true };
 
-const sendDevError = (err: AppError, req: Request, res: Response) => {
-  res.status(err.statusCode || 500).json({
-    ...commonErr,
-    message: err.message,
-    errors: err.errors,
-    statusCode: err.statusCode || 500,
-    stack: err.stack,
-    requestId: req.requestId,
-  });
-};
-
-const sendProdError = (err: AppError, req: Request, res: Response) => {
-  if (err.isOperational) {
-    res.status(err.statusCode || 500).json({
-      ...commonErr,
-      message: err.message,
-      errors: err.errors,
-      statusCode: err.statusCode || 500,
-      requestId: req.requestId,
-    });
-  } else {
-    res.status(500).json({
-      ...commonErr,
-      message: "Something went wrong!",
-      statusCode: 500,
-      requestId: req.requestId,
-    });
-  }
-};
-
-export const error = (
+export const errorHandler = (
   err: Error | AppError | MongooseError,
   req: Request,
   res: Response,
@@ -45,30 +16,43 @@ export const error = (
   let error: AppError;
 
   if (err instanceof MongooseError.ValidationError) {
-    const errors = Object.entries(err.errors).map(([field, errorObj]) => ({
+    const rawErrors = Object.entries(err.errors).map(([field, errorObj]) => ({
       field,
       message: errorObj.message,
     }));
 
-    error = new AppError("Validation Error", 400, true, errors);
+    const { fieldErrors, globalErrors } = mapToFieldErrors(rawErrors);
+
+    error = new AppError({
+      message: "Validation Error",
+      statusCode: 400,
+      code: "VALIDATION_ERROR",
+      fieldErrors,
+      globalErrors,
+    });
   } else if (err instanceof AppError) {
     error = err;
   } else {
-    error = new AppError(
-      IS_DEV === "true"
-        ? (err.message ?? "Internal Server Error!")
-        : "Internal Server Error!",
-      500,
-      false,
-    );
+    error = new AppError({
+      message: IS_DEV_MODE
+        ? err.message || "Internal Server Error"
+        : "Something went wrong!",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+      isOperational: false,
+    });
   }
 
-  error.statusCode ||= 500;
-  error.isOperational ??= false;
+  const response = {
+    ...baseResponse,
+    message: error.message,
+    code: error.code,
+    fieldErrors: error.fieldErrors,
+    globalErrors: error.globalErrors,
+    statusCode: error.statusCode,
+    requestId: req.requestId,
+    ...(IS_DEV_MODE && { stack: error.stack }),
+  };
 
-  if (IS_DEV === "true") {
-    return sendDevError(error, req, res);
-  } else {
-    return sendProdError(error, req, res);
-  }
+  return res.status(error.statusCode).json(response);
 };

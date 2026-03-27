@@ -17,7 +17,7 @@ export const removeProductFromCartController = async (
 
   const cartProduct = await CartProduct.findById(id).session(session);
   if (!cartProduct) {
-    throw new AppError("Cart product not found", 404);
+    throw new AppError({ message: "Cart product not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   const cart = await CartModule.Models.Cart.findByIdAndUpdate(
@@ -27,7 +27,7 @@ export const removeProductFromCartController = async (
   );
 
   if (!cart) {
-    throw new AppError("Associated cart not found", 404);
+    throw new AppError({ message: "Associated cart not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   await CartProduct.deleteOne({ _id: cartProduct._id }).session(session);

@@ -40,7 +40,7 @@ app.use(DatabaseMiddleware.checkDbConnection);
 // ----------------- ROUTES -----------------
 // Home Route
 app.get("/", (_: Request, res: Response) =>
-  res.success(200, "Welcome to the MERN Beautinique API")
+  res.success(200, "Welcome to the MERN Beautinique API"),
 );
 
 // API Routes
@@ -49,7 +49,7 @@ app.use("/api", router);
 // ----------------- ERROR HANDLING -----------------
 app.use(ResponseMiddleware.notFound);
 app.use(LoggerMiddleware.expressErrorLogger);
-app.use(ResponseMiddleware.error);
+app.use(ResponseMiddleware.errorHandler);
 
 // ----------------- SERVER SETUP -----------------
 const server = http.createServer(app);

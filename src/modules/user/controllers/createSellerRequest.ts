@@ -20,14 +20,15 @@ export const createSellerRequestController = async (
   const existingSeller = await Seller.findOne({ user: user?._id }).lean();
 
   if (existingSeller && existingSeller?.approvalStatus !== "REJECTED") {
-    throw new AppError(
-      `You already ${
+    throw new AppError({
+      message: `You already ${
         existingSeller.approvalStatus === "PENDING"
           ? "registered as"
           : "requested for"
       } seller`,
-      401
-    );
+      statusCode: 401,
+      code: "AUTH_ERROR",
+    });
   } else if (existingSeller?.approvalStatus === "REJECTED") {
     await Seller.findByIdAndDelete(existingSeller?._id, { new: true });
   }
@@ -36,7 +37,7 @@ export const createSellerRequestController = async (
   const { businessDetails, businessAddress, agreeTerms } = req.body;
 
   if (!agreeTerms) {
-    throw new AppError("You have to agree with our terms and conditions", 401);
+    throw new AppError({ message: "You have to agree with our terms and conditions", statusCode: 401 });
   }
   const gstFile = files?.gst?.[0];
   const itrFile = files?.itr?.[0];
@@ -44,7 +45,7 @@ export const createSellerRequestController = async (
   const geoTaggingFile = files?.geoTagging?.[0];
 
   if (!gstFile || !itrFile || !addressProofFile || !geoTaggingFile) {
-    throw new AppError("All Documents are Required", 400);
+    throw new AppError({ message: "All Documents are Required", statusCode: 400 });
   }
 
   const personalDetails = {

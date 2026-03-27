@@ -64,3 +64,5 @@ export const {
   REDIS_PASSWORD,
   REDIS_USERNAME,
 }: NodeJS.ProcessEnv = process.env;
+
+export const IS_DEV_MODE = IS_DEV === "true";

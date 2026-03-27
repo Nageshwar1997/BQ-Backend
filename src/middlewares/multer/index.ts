@@ -54,7 +54,7 @@ export const validateFiles = ({
       });
 
       if (multerErrMsg) {
-        return next(new AppError(multerErrMsg, 400));
+        return next(new AppError({ message: multerErrMsg, statusCode: 400, code: "UPLOAD_ERROR" }));
       }
 
       const checkableTypes: MulterType[] = ["single", "array", "any", "fields"];
@@ -96,7 +96,7 @@ export const validateFiles = ({
         });
 
         if (customErrMsg) {
-          return next(new AppError(customErrMsg, 400));
+          return next(new AppError({ message: customErrMsg, statusCode: 400, code: "UPLOAD_ERROR" }));
         }
       }
 

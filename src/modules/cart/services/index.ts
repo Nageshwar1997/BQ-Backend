@@ -36,7 +36,7 @@ export const getUserCart = async (req: AuthenticatedRequest) => {
   }
 
   if (!cart) {
-    throw new AppError("Cart not found!", 500);
+    throw new AppError({ message: "Cart not found!", statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   return cart as unknown as IPopulatedCart;

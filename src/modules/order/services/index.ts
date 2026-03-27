@@ -27,6 +27,6 @@ export const rzp_create_order = async (
     return razorpayOrder;
   } catch (error) {
     console.log("Razorpay order creation failed:", error);
-    throw new AppError("Payment gateway error, please try again later", 502);
+    throw new AppError({ message: "Payment gateway error, please try again later", statusCode: 502, code: "INTERNAL_ERROR" });
   }
 };

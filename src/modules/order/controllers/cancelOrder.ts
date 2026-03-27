@@ -24,16 +24,16 @@ export const cancelOrderController = async (
     session,
   });
 
-  if (!order) throw new AppError("Order not found", 404);
+  if (!order) throw new AppError({ message: "Order not found", statusCode: 404, code: "NOT_FOUND" });
 
   const status = order.status;
 
   if (["DELIVERED", "RETURNED"].includes(status)) {
-    throw new AppError("Order cannot be cancelled", 400);
+    throw new AppError({ message: "Order cannot be cancelled", statusCode: 400 });
   }
 
   if (status === "CANCELLED") {
-    throw new AppError("Order already cancelled", 400);
+    throw new AppError({ message: "Order already cancelled", statusCode: 400 });
   }
 
   const isPaid = order.payment.status === "PAID";
@@ -53,11 +53,12 @@ export const cancelOrderController = async (
     } catch (err) {
       console.error("Razorpay refund failed:", err);
 
-      throw new AppError(
-        (err as INormalizeError)?.error?.description ||
+      throw new AppError({
+        message: (err as INormalizeError)?.error?.description ||
           "Refund failed. Order was not cancelled. Please try again.",
-        500
-      );
+        statusCode: 500,
+        code: "INTERNAL_ERROR",
+      });
     }
   }
 

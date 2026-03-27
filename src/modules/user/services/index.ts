@@ -17,11 +17,11 @@ export const updateUser = async (
   userId: string | Types.ObjectId | undefined,
   data: Partial<UserProps>
 ) => {
-  if (!userId) throw new AppError("UserId not provided", 400);
+  if (!userId) throw new AppError({ message: "UserId not provided", statusCode: 400 });
 
   const user = await User.findByIdAndUpdate(userId, data, { new: true });
 
-  if (!user) throw new AppError("User not found to update", 404);
+  if (!user) throw new AppError({ message: "User not found to update", statusCode: 404, code: "NOT_FOUND" });
 
   if (user) {
     await redisService.setCachedUser(user);
@@ -60,7 +60,7 @@ export const getUserByEmailOrPhoneNumber = async (
   }
 
   if (!user) {
-    throw new AppError("User not found", 404);
+    throw new AppError({ message: "User not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   return user as UserProps;
@@ -82,7 +82,7 @@ export const getUserById = async ({
 
   const user = await query;
 
-  if (!user) throw new AppError("User not found", 404);
+  if (!user) throw new AppError({ message: "User not found", statusCode: 404, code: "NOT_FOUND" });
 
   return user as UserProps;
 };

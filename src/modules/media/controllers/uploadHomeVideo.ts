@@ -25,29 +25,29 @@ export const uploadHomeVideoController = async (
   const posterFile = files?.poster?.[0];
 
   if (!videoFile) {
-    throw new AppError("No video file uploaded", 400);
+    throw new AppError({ message: "No video file uploaded", statusCode: 400 });
   }
 
   if (!posterFile) {
-    throw new AppError("Poster file is required.", 400);
+    throw new AppError({ message: "Poster file is required.", statusCode: 400 });
   }
 
   if (!ALLOWED_VIDEO_TYPES.includes(videoFile.mimetype)) {
-    throw new AppError(
-      `Invalid video format. Allowed formats: ${ALLOWED_VIDEO_TYPES.map((t) =>
+    throw new AppError({
+      message: `Invalid video format. Allowed formats: ${ALLOWED_VIDEO_TYPES.map((t) =>
         t.replace("video/", "")
       ).join(", ")}`,
-      400
-    );
+      statusCode: 400,
+    });
   }
 
   if (!ALLOWED_IMAGE_TYPES.includes(posterFile.mimetype)) {
-    throw new AppError(
-      `Invalid poster format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map((t) =>
+    throw new AppError({
+      message: `Invalid poster format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map((t) =>
         t.replace("image/", "")
       ).join(", ")}`,
-      400
-    );
+      statusCode: 400,
+    });
   }
 
   // Upload video
@@ -57,7 +57,7 @@ export const uploadHomeVideoController = async (
     cloudinaryConfigOption,
   });
   if (!video) {
-    throw new AppError("Video upload failed", 500);
+    throw new AppError({ message: "Video upload failed", statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   const poster = await singleImageUploader({
@@ -67,7 +67,7 @@ export const uploadHomeVideoController = async (
   });
   if (!poster) {
     await singleVideoRemover(video.secure_url, cloudinaryConfigOption);
-    throw new AppError("Poster upload failed", 500);
+    throw new AppError({ message: "Poster upload failed", statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   try {
@@ -87,6 +87,6 @@ export const uploadHomeVideoController = async (
       singleVideoRemover(video.secure_url, cloudinaryConfigOption),
       singleImageRemover(poster.secure_url, cloudinaryConfigOption),
     ]);
-    throw new AppError("Failed to upload video", 500);
+    throw new AppError({ message: "Failed to upload video", statusCode: 500, code: "INTERNAL_ERROR" });
   }
 };

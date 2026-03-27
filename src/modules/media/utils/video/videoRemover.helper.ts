@@ -19,10 +19,11 @@ const removeVideoFromCloudinary = async (
         if (error) {
           console.log("Failed to remove video from Cloudinary", error);
           return reject(
-            new AppError(
-              error.message || "Failed to remove video from Cloudinary",
-              500
-            )
+            new AppError({
+              message: error.message || "Failed to remove video from Cloudinary",
+              statusCode: 500,
+              code: "INTERNAL_ERROR",
+            })
           );
         }
         resolve(result);
@@ -37,7 +38,7 @@ export const singleVideoRemover = async (
   cloudinaryConfigOption: CloudinaryConfigOption = "video"
 ) => {
   if (!videoUrl) {
-    throw new AppError("Video URL is required", 400);
+    throw new AppError({ message: "Video URL is required", statusCode: 400 });
   }
 
   const cloudinaryConnectionTest = await cloudinaryConnection(
@@ -45,7 +46,7 @@ export const singleVideoRemover = async (
   );
 
   if (cloudinaryConnectionTest.error) {
-    throw new AppError(cloudinaryConnectionTest.message, 500);
+    throw new AppError({ message: cloudinaryConnectionTest.message, statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   try {
@@ -56,10 +57,11 @@ export const singleVideoRemover = async (
     );
     return result;
   } catch (error) {
-    throw new AppError(
-      error instanceof Error ? error.message : "Unexpected error during remove",
-      500
-    );
+    throw new AppError({
+      message: error instanceof Error ? error.message : "Unexpected error during remove",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 };
 
@@ -69,14 +71,14 @@ export const multipleVideosRemover = async (
   cloudinaryConfigOption: CloudinaryConfigOption = "image"
 ) => {
   if (!videoUrls || !Array.isArray(videoUrls) || videoUrls.length === 0) {
-    throw new AppError("Video URLs are required", 400);
+    throw new AppError({ message: "Video URLs are required", statusCode: 400 });
   }
 
   const cloudinaryConnectionTest = await cloudinaryConnection(
     cloudinaryConfigOption
   );
   if (cloudinaryConnectionTest.error) {
-    throw new AppError(cloudinaryConnectionTest.message, 500);
+    throw new AppError({ message: cloudinaryConnectionTest.message, statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   try {
@@ -89,11 +91,10 @@ export const multipleVideosRemover = async (
 
     return removeResults; // Array of UploadApiResponse
   } catch (error) {
-    throw new AppError(
-      error instanceof Error
-        ? error.message
-        : "Unexpected error during multiple remove",
-      500
-    );
+    throw new AppError({
+      message: error instanceof Error ? error.message : "Unexpected error during multiple remove",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 };

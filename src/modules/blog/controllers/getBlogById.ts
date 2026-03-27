@@ -15,7 +15,7 @@ export const getBlogByIdController = async (req: Request, res: Response) => {
     .lean();
 
   if (!blog) {
-    throw new AppError("Blog not found", 404);
+    throw new AppError({ message: "Blog not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   res.success(200, "Blog fetched successfully", { blog });

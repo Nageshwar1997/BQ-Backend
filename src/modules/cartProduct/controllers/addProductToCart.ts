@@ -15,7 +15,7 @@ export const addProductToCartController = async (
   const { shadeId } = req.query;
 
   if (!productId) {
-    throw new AppError("Product Id is required", 400);
+    throw new AppError({ message: "Product Id is required", statusCode: 400 });
   }
 
   isValidMongoId(productId, "Invalid Product Id provided", 404);
@@ -28,7 +28,7 @@ export const addProductToCartController = async (
   );
 
   if (!cart) {
-    throw new AppError("Failed to create or fetch cart", 500);
+    throw new AppError({ message: "Failed to create or fetch cart", statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   // 2️ Check if cartProduct already exists
@@ -39,7 +39,7 @@ export const addProductToCartController = async (
   });
 
   if (existCartProduct) {
-    throw new AppError("Product already exists in cart", 400);
+    throw new AppError({ message: "Product already exists in cart", statusCode: 400 });
   }
 
   // 3️ Create new CartProduct

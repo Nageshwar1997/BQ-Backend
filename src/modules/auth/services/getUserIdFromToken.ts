@@ -11,7 +11,7 @@ export const getUserIdFromToken = (req: Request) => {
     const token = req.get("Authorization");
 
     if (!token) {
-      throw new AppError("You are not authenticated, please login", 401);
+      throw new AppError({ message: "You are not authenticated, please login", statusCode: 401, code: "AUTH_ERROR" });
     }
 
     const tokenWithoutBearer = getAuthorizationToken(token);
@@ -22,9 +22,9 @@ export const getUserIdFromToken = (req: Request) => {
     ) as DecodedToken;
 
     if (!decoded) {
-      throw new AppError("Invalid token", 401);
+      throw new AppError({ message: "Invalid token", statusCode: 401, code: "AUTH_ERROR" });
     } else if (!decoded.userId) {
-      throw new AppError("UserId not found", 404);
+      throw new AppError({ message: "UserId not found", statusCode: 404, code: "NOT_FOUND" });
     }
 
     return decoded.userId;
@@ -50,7 +50,7 @@ export const getUserIdFromToken = (req: Request) => {
           errorMessage = `Token error: ${message}, ${comMsg}`;
           break;
       }
-      throw new AppError(errorMessage, 401);
+      throw new AppError({ message: errorMessage, statusCode: 401, code: "AUTH_ERROR" });
     }
     throw error;
   }

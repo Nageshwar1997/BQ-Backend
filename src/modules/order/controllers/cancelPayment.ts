@@ -17,10 +17,10 @@ export const cancelPaymentController = async (
 
   const order = await Order.findById(orderId);
 
-  if (!order) throw new AppError("Order not found", 404);
+  if (!order) throw new AppError({ message: "Order not found", statusCode: 404, code: "NOT_FOUND" });
 
   if (user?._id?.toString() !== order?.user?.toString()) {
-    throw new AppError("You can not cancel another user's order", 401);
+    throw new AppError({ message: "You can not cancel another user's order", statusCode: 401, code: "AUTH_ERROR" });
   }
 
   let isOrderUpdated = false;

@@ -31,7 +31,7 @@ export const uploadBlogController = async (
   }).lean();
 
   if (isExistBlog) {
-    throw new AppError("Blog already exists with Main Title OR Subtitle", 400);
+    throw new AppError({ message: "Blog already exists with Main Title OR Subtitle", statusCode: 400 });
   }
 
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -72,7 +72,7 @@ export const uploadBlogController = async (
     const blog = await Blog.create(cleanedData);
 
     if (!blog) {
-      throw new AppError("Failed to upload blog", 400);
+      throw new AppError({ message: "Failed to upload blog", statusCode: 400 });
     }
 
     res.success(201, "Blog uploaded successfully", { blog });

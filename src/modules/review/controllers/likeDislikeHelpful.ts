@@ -16,8 +16,8 @@ export const likeDislikeHelpfulController = async (
   const user = req.user;
   const review = await Review.findById(reviewId);
 
-  if (!user) throw new AppError("User not found", 404);
-  if (!review) throw new AppError("Review not found", 404);
+  if (!user) throw new AppError({ message: "User not found", statusCode: 404, code: "NOT_FOUND" });
+  if (!review) throw new AppError({ message: "Review not found", statusCode: 404, code: "NOT_FOUND" });
 
   const userId = new Types.ObjectId(user._id);
 

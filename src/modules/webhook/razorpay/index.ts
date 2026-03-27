@@ -28,7 +28,7 @@ export const razorpayWebhooksController = async (
 
   if (expectedSignature !== receivedSignature) {
     console.log("Invalid signature");
-    throw new AppError("Invalid webhook signature", 400);
+    throw new AppError({ message: "Invalid webhook signature", statusCode: 400 });
   }
 
   const event = body.event;
@@ -36,7 +36,7 @@ export const razorpayWebhooksController = async (
 
   if (!payment) {
     console.log("Payment payload missing");
-    throw new AppError("Payment payload missing", 400);
+    throw new AppError({ message: "Payment payload missing", statusCode: 400 });
   }
 
   const orderDBId = payment?.notes?.db_order_id;
@@ -48,7 +48,7 @@ export const razorpayWebhooksController = async (
   const order = await OrderModule.Models.Order.findById(orderDBId);
   if (!order) {
     console.log("Order not found");
-    throw new AppError("Order not found", 404);
+    throw new AppError({ message: "Order not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   const updatePayload = get_rzp_OrderUpdateBody(

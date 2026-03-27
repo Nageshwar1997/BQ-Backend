@@ -42,7 +42,7 @@ export const updateAddressController = async (
   );
 
   if (!updatedAddress) {
-    throw new AppError("Address not found", 404);
+    throw new AppError({ message: "Address not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   if (isDefaultAddress) {
@@ -52,7 +52,7 @@ export const updateAddressController = async (
       { new: true, session }
     );
     if (!updatedUserAddress) {
-      throw new AppError("User addresses not found", 404);
+      throw new AppError({ message: "User addresses not found", statusCode: 404, code: "NOT_FOUND" });
     }
   }
 

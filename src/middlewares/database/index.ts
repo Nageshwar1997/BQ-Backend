@@ -12,7 +12,7 @@ export const checkDbConnection = async (
       console.log("✅ DB connection is ready");
     } else {
       console.warn("⚠️ Database not ready, readyState:", connection.readyState);
-      throw new AppError("Database not ready", 500);
+      throw new AppError({ message: "Database not ready", statusCode: 500, code: "INTERNAL_ERROR" });
     }
 
     next();

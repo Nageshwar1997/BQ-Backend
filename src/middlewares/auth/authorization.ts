@@ -19,7 +19,7 @@ export const authorization =
       });
 
       if (!allowedRoles.includes(user.role)) {
-        throw new AppError("Unauthorized", 401);
+        throw new AppError({ message: "Unauthorized", statusCode: 401, code: "AUTH_ERROR" });
       }
 
       req.user = user;

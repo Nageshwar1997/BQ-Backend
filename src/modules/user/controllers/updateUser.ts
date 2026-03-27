@@ -20,7 +20,7 @@ export const updateUserController = async (
     }).lean();
 
     if (existingUser) {
-      throw new AppError("Phone number already in use", 409);
+      throw new AppError({ message: "Phone number already in use", statusCode: 409 });
     }
   }
 
@@ -40,7 +40,7 @@ export const updateUserController = async (
 
   if (!updatedUser && profilePic) {
     await MediaModule.Utils.singleImageRemover(profilePic, "image");
-    throw new AppError("User not found", 404);
+    throw new AppError({ message: "User not found", statusCode: 404, code: "NOT_FOUND" });
   } else if (updatedUser && file && user?.profilePic) {
     await MediaModule.Utils.singleImageRemover(user?.profilePic, "image");
   }

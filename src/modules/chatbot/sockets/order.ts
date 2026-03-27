@@ -8,7 +8,7 @@ import {
 } from "langchain";
 import { getEmbeddedOrders, getMinimalOrdersForAiPrompt } from "../services";
 import { getAiGeneratedSuggestedQuestion } from "../utils";
-import { IS_DEV } from "../../../envs";
+import { IS_DEV_MODE } from "../../../envs";
 
 const orderChatHistory = new Map<string, IOrderChatSession>();
 
@@ -36,7 +36,7 @@ export const initOrderSocket = (socket: Socket) => {
         session = {
           history: [
             new SystemMessage(
-              "You are a professional AI shopping assistant. Answer user queries based on order context."
+              "You are a professional AI shopping assistant. Answer user queries based on order context.",
             ),
           ],
           lastMatchedOrders: [],
@@ -64,9 +64,9 @@ export const initOrderSocket = (socket: Socket) => {
       session.history.push(
         new HumanMessage(
           `User Query: ${message}\nMatched Orders: ${JSON.stringify(
-            minimalOrders
-          )}\nGive a clear, helpful answer.`
-        )
+            minimalOrders,
+          )}\nGive a clear, helpful answer.`,
+        ),
       );
 
       // Initialize streaming AI model
@@ -101,7 +101,7 @@ export const initOrderSocket = (socket: Socket) => {
         await getAiGeneratedSuggestedQuestion(
           accumulatedResponse,
           "order",
-          session.history
+          session.history,
         );
 
       // Emit final complete response with suggested questions
@@ -114,7 +114,7 @@ export const initOrderSocket = (socket: Socket) => {
       let errMsg =
         "The AI shopping assistant is currently under heavy load. Please try again in a few moments.";
 
-      if (IS_DEV === "true") {
+      if (IS_DEV_MODE) {
         if (err?.body) {
           try {
             const parsed = JSON.parse(err.body);

@@ -24,7 +24,7 @@ export const removeProductFromWishlistController = async (
   );
 
   if (!updatedWishlist) {
-    throw new AppError("Wishlist not found", 404);
+    throw new AppError({ message: "Wishlist not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   // If wishlist is empty after removal, delete it (also within the session)
@@ -34,7 +34,7 @@ export const removeProductFromWishlistController = async (
     });
 
     if (!deletedWishlist) {
-      throw new AppError("Failed to remove wishlist product", 500);
+      throw new AppError({ message: "Failed to remove wishlist product", statusCode: 500, code: "INTERNAL_ERROR" });
     }
   }
 

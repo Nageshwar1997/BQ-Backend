@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ZodObject } from "zod";
 import { AppError } from "../../classes";
+import { mapToFieldErrors } from "../../utils";
 
 export const validateZodSchema =
   <T extends ZodObject<any>>(schema: T) =>
@@ -13,7 +14,8 @@ export const validateZodSchema =
         message: err.message,
       }));
 
-      return next(new AppError("Validation Error", 400, true, errors));
+      const { fieldErrors, globalErrors } = mapToFieldErrors(errors);
+      return next(new AppError({ message: "Validation Error", statusCode: 400, code: "VALIDATION_ERROR", fieldErrors, globalErrors }));
     }
 
     req.body = result.data;

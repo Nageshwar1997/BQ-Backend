@@ -25,7 +25,7 @@ import {
   FRONTEND_PRODUCTION_MASTER_URL,
   GITHUB_REDIRECT_ENDPOINT,
   GOOGLE_REDIRECT_ENDPOINT,
-  IS_DEV,
+  IS_DEV_MODE,
   LINKEDIN_REDIRECT_ENDPOINT,
 } from "../envs";
 import { TAuthProvider } from "../modules/user/types";
@@ -66,7 +66,7 @@ export const isValidMongoId = (
 
   if (!isValid) {
     console.log(`Invalid ObjectId, ${message} : `, id);
-    throw new AppError(message, statusCode || 400);
+    throw new AppError({ message, statusCode: statusCode || 400 });
   }
 
   return true;
@@ -135,12 +135,12 @@ export const validateRequiredFileFields = ({
   }
   // Throw error if any required fields are missing
   if (requiredFields.length > 0) {
-    throw new AppError(
-      `Required file field${
+    throw new AppError({
+      message: `Required file field${
         requiredFields.length > 1 ? "s" : ""
       }: ${requiredFields.join(", ")}`,
-      400,
-    );
+      statusCode: 400,
+    });
   }
 };
 
@@ -151,7 +151,7 @@ export const checkUserPermission = ({
   statusCode = 403,
 }: CheckUserPermission) => {
   if (userId.toString() !== checkId.toString()) {
-    throw new AppError(message, statusCode);
+    throw new AppError({ message, statusCode });
   }
   return true;
 };
@@ -357,9 +357,7 @@ export const getAuthorizationToken = (token: string) => {
 };
 
 const getURL = (devUrl: string, prodUrl: string) => {
-  const isDev = IS_DEV === "true";
-
-  return isDev ? devUrl : prodUrl;
+  return IS_DEV_MODE ? devUrl : prodUrl;
 };
 
 export const getFrontendURL = (role: TRole) => {
@@ -413,4 +411,26 @@ export const toArray = (value?: string | ParsedQs | (string | ParsedQs)[]) => {
   if (Array.isArray(value)) return value;
   if (typeof value === "string") return value.split(",").map((v) => v.trim());
   return [];
+};
+
+export const mapToFieldErrors = (
+  errors: { field: string; message: string }[],
+) => {
+  const fieldErrors: Record<string, string[]> = {};
+  const globalErrors: string[] = [];
+
+  errors.forEach(({ field, message }) => {
+    if (!field) {
+      globalErrors.push(message);
+      return;
+    }
+
+    if (!fieldErrors[field]) {
+      fieldErrors[field] = [];
+    }
+
+    fieldErrors[field].push(message);
+  });
+
+  return { fieldErrors, globalErrors };
 };

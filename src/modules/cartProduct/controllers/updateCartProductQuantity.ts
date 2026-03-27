@@ -21,7 +21,7 @@ export const updateCartProductQuantityController = async (
   );
 
   if (!cartProduct) {
-    throw new AppError("Failed to update quantity", 400);
+    throw new AppError({ message: "Failed to update quantity", statusCode: 400 });
   }
 
   res.success(201, "Quantity updated successfully");

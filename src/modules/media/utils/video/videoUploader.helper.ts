@@ -34,17 +34,18 @@ const uploadVideoToCloudinary = async (
         (error, result) => {
           if (error) {
             return reject(
-              new AppError(
-                error.message || "Failed to upload video to Cloudinary",
-                500
-              )
+              new AppError({
+                message: error.message || "Failed to upload video to Cloudinary",
+                statusCode: 500,
+                code: "INTERNAL_ERROR",
+              })
             );
           } else if (result) {
             // Always return playback_url (fallback to secure_url)
             const playback_url = result.playback_url || result.secure_url;
             resolve({ ...result, playback_url });
           } else {
-            reject(new AppError("Unknown error during video upload", 500));
+            reject(new AppError({ message: "Unknown error during video upload", statusCode: 500, code: "INTERNAL_ERROR" }));
           }
         }
       );
@@ -62,7 +63,7 @@ export const singleVideoUploader = async ({
 }: SingleFileUploaderProps) => {
   const connectionTest = await cloudinaryConnection(cloudinaryConfigOption);
   if (connectionTest.error) {
-    throw new AppError(connectionTest.message, 500);
+    throw new AppError({ message: connectionTest.message, statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   return uploadVideoToCloudinary(file, folder, cloudinaryConfigOption);
@@ -76,7 +77,7 @@ export const multipleVideosUploader = async ({
 }: MultipleFileUploaderProps) => {
   const connectionTest = await cloudinaryConnection(cloudinaryConfigOption);
   if (connectionTest.error) {
-    throw new AppError(connectionTest.message, 500);
+    throw new AppError({ message: connectionTest.message, statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   const uploadPromises = files.map((file) =>

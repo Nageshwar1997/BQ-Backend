@@ -38,16 +38,16 @@ export const getAllProductsController = async (req: Request, res: Response) => {
 
   if (category_1 || category_2 || category_3) {
     if (!category_1 && (category_2 || category_3)) {
-      throw new AppError(
-        "category_1 is required when category_2 or category_3 is provided",
-        400,
-      );
+      throw new AppError({
+        message: "category_1 is required when category_2 or category_3 is provided",
+        statusCode: 400,
+      });
     }
     if (category_3 && !category_2) {
-      throw new AppError(
-        "category_2 is required when category_3 is provided",
-        400,
-      );
+      throw new AppError({
+        message: "category_2 is required when category_3 is provided",
+        statusCode: 400,
+      });
     }
 
     let level3CategoryIds: string[] = [];

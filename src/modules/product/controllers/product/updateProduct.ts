@@ -33,7 +33,7 @@ export const updateProductController = async (
     .lean<PopulatedProduct>()
     .exec();
 
-  if (!existingProduct) throw new AppError("Product not found", 404);
+  if (!existingProduct) throw new AppError({ message: "Product not found", statusCode: 404, code: "NOT_FOUND" });
 
   if (req.user?.role !== "MASTER") {
     checkUserPermission({
@@ -93,10 +93,10 @@ export const updateProductController = async (
     const currentOrgPrice = originalPrice ?? existingProduct.originalPrice;
 
     if (currentSellPrice > currentOrgPrice) {
-      throw new AppError(
-        "Selling price cannot be greater than original price",
-        400
-      );
+      throw new AppError({
+        message: "Selling price cannot be greater than original price",
+        statusCode: 400,
+      });
     }
     updateBody.discount =
       ((currentOrgPrice - currentSellPrice) / currentOrgPrice) * 100;
@@ -112,7 +112,7 @@ export const updateProductController = async (
     : existingProduct.category?.parentCategory?.parentCategory;
 
   if (!category_1) {
-    throw new AppError("Category Level One not found", 404);
+    throw new AppError({ message: "Category Level One not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   // Find or Create Level-Two Category (Parent must be Level-One)
@@ -126,7 +126,7 @@ export const updateProductController = async (
     : existingProduct.category.parentCategory;
 
   if (!category_2) {
-    throw new AppError("Category Level Two not found", 404);
+    throw new AppError({ message: "Category Level Two not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   // Find or Create Level-Three Category (Parent must be Level-Two)
@@ -236,7 +236,7 @@ export const updateProductController = async (
               }`
           )
           .join(", ");
-        throw new AppError(errorMessage, 400);
+        throw new AppError({ message: errorMessage, statusCode: 400 });
       }
 
       // Upload shade images
@@ -263,7 +263,7 @@ export const updateProductController = async (
       );
     } catch (error) {
       await removeImages([...uploadedNewShadesImages, ...uploadedCommonImages]);
-      throw new AppError("Failed to create shades", 500);
+      throw new AppError({ message: "Failed to create shades", statusCode: 500, code: "INTERNAL_ERROR" });
     }
   }
 
@@ -284,7 +284,7 @@ export const updateProductController = async (
           );
 
           if (!currentShade) {
-            throw new AppError(`Shade not found with id: ${shade._id}`, 404);
+            throw new AppError({ message: `Shade not found with id: ${shade._id}`, statusCode: 404, code: "NOT_FOUND" });
           }
 
           const shadeName = shade.shadeName ?? currentShade?.shadeName;
@@ -303,7 +303,7 @@ export const updateProductController = async (
               }${msg}${i === missingUpdatedShadeErrors.length - 1 ? "." : ""}`
           )
           .join(", ");
-        throw new AppError(errorMessage, 400);
+        throw new AppError({ message: errorMessage, statusCode: 400 });
       }
 
       const enrichedUpdatedShades = await Promise.all(
@@ -375,7 +375,7 @@ export const updateProductController = async (
           );
 
           if (!currentShade) {
-            throw new AppError(`Shade not found with id: ${shade._id}`, 404);
+            throw new AppError({ message: `Shade not found with id: ${shade._id}`, statusCode: 404, code: "NOT_FOUND" });
           }
 
           const currentShadeRemovingImages =
@@ -458,7 +458,7 @@ export const updateProductController = async (
     ).lean();
 
     if (!product) {
-      throw new AppError("Failed to update product", 400);
+      throw new AppError({ message: "Failed to update product", statusCode: 400 });
     }
 
     if (

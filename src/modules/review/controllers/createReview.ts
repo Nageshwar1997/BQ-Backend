@@ -12,7 +12,7 @@ export const createReviewController = async (
   const { productId } = req?.params;
 
   if (!productId) {
-    throw new AppError("Product Id is required", 400);
+    throw new AppError({ message: "Product Id is required", statusCode: 400 });
   }
   isValidMongoId(productId, "Invalid Product Id provided", 404);
 
@@ -29,7 +29,7 @@ export const createReviewController = async (
   const product = await ProductModule.Models.Product.findById(productId);
 
   if (!product) {
-    throw new AppError("Product not found", 404);
+    throw new AppError({ message: "Product not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   if (images?.length) {
@@ -70,7 +70,7 @@ export const createReviewController = async (
     if (uploadedVideos?.length) {
       await MediaModule.Utils.multipleVideosRemover(uploadedVideos, "video");
     }
-    throw new AppError("Failed to create review", 500);
+    throw new AppError({ message: "Failed to create review", statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   product.reviews.push(review._id);

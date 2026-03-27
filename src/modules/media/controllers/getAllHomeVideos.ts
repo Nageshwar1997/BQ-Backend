@@ -24,7 +24,7 @@ export const getAllHomeVideosController = async (
   ]);
 
   if (!videos) {
-    throw new AppError("Videos not found", 404);
+    throw new AppError({ message: "Videos not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   res.success(200, "Videos retrieved successfully", {

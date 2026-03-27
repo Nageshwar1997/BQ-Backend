@@ -3,7 +3,7 @@ import { AppError } from "../../../classes";
 import {
   FRONTEND_LOCAL_HOST_CLIENT_URL,
   FRONTEND_PRODUCTION_CLIENT_URL,
-  IS_DEV,
+  IS_DEV_MODE,
 } from "../../../envs";
 import { getImageAsBuffer, validateZodString } from "../../../utils";
 import { TAuthProvider } from "../../user/types";
@@ -23,16 +23,17 @@ export const validateAuthField = (props: ValidateAuthFieldConfigs) => {
       return validateZodString({ ...props, nonEmpty });
     }
     default:
-      throw new AppError(
-        `Validation for field '${field}' is not implemented.`,
-        500
-      );
+      throw new AppError({
+        message: `Validation for field '${field}' is not implemented.`,
+        statusCode: 500,
+        code: "INTERNAL_ERROR",
+      });
   }
 };
 
 export const authSuccessRedirectUrl = (token: string) => {
   return `${
-    IS_DEV === "true"
+    IS_DEV_MODE
       ? FRONTEND_LOCAL_HOST_CLIENT_URL
       : FRONTEND_PRODUCTION_CLIENT_URL
   }/auth/oauth?token=${token}`;
@@ -57,7 +58,7 @@ const getProfilePic = async (url: string) => {
 
 export const getOAuthDbPayload = async (
   data: Record<string, string>,
-  provider: TAuthProvider
+  provider: TAuthProvider,
 ) => {
   const fullName = data.name?.trim() || "";
   const nameParts = fullName.split(/\s+/);

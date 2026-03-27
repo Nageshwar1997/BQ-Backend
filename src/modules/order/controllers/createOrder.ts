@@ -20,15 +20,15 @@ export const createOrderController = async (
   const cart = await CartModule.Services.getUserCart(req);
 
   if (cart.products.length === 0) {
-    throw new AppError("Cart is empty", 400);
+    throw new AppError({ message: "Cart is empty", statusCode: 400 });
   }
 
   const addressIds = [];
 
   if (shipping && !billing)
-    throw new AppError("Billing address is required", 400);
+    throw new AppError({ message: "Billing address is required", statusCode: 400 });
   if (billing && !shipping)
-    throw new AppError("Shipping address is required", 400);
+    throw new AppError({ message: "Shipping address is required", statusCode: 400 });
   if (billing && shipping) addressIds.push(shipping, billing);
   else if (both) addressIds.push(both);
 
@@ -39,7 +39,7 @@ export const createOrderController = async (
     .session(session)
     .lean();
 
-  if (!foundAddresses?.length) throw new AppError("Address not found", 404);
+  if (!foundAddresses?.length) throw new AppError({ message: "Address not found", statusCode: 404, code: "NOT_FOUND" });
 
   const totalPrice = cart.products.reduce(
     (acc, item) => acc + item.product.sellingPrice * item.quantity,
@@ -79,7 +79,7 @@ export const createOrderController = async (
 
   const order = await new Order(orderBody).save({ session });
 
-  if (!order) throw new AppError("Failed to create order", 400);
+  if (!order) throw new AppError({ message: "Failed to create order", statusCode: 400 });
 
   const razorpayOrder = await rzp_create_order(
     user!,
@@ -88,7 +88,7 @@ export const createOrderController = async (
   );
 
   if (!razorpayOrder) {
-    throw new AppError("Failed to create Razorpay order", 500);
+    throw new AppError({ message: "Failed to create Razorpay order", statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   order.payment.rzp_order_id = razorpayOrder.id;

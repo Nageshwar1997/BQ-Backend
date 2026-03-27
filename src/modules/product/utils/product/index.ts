@@ -51,10 +51,11 @@ export const validateProductField = (props: ValidateProductFieldConfigs) => {
     }
 
     default: {
-      throw new AppError(
-        `Validation for field '${nestedField}' is not implemented.`,
-        500
-      );
+      throw new AppError({
+        message: `Validation for field '${nestedField}' is not implemented.`,
+        statusCode: 500,
+        code: "INTERNAL_ERROR",
+      });
     }
   }
 };

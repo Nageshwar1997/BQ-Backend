@@ -42,7 +42,7 @@ export const clearCartController = async (
   })) as HydratedDocument<IPopulatedCart> | null;
 
   if (!cart) {
-    throw new AppError("Cart not found", 404);
+    throw new AppError({ message: "Cart not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   for (const item of cart.products) {

@@ -21,7 +21,7 @@ export const addAddressController = async (
   );
 
   if (!userAddresses) {
-    throw new AppError("User address not found", 404);
+    throw new AppError({ message: "User address not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   const address = new Address({ ...restBody, user: userId });
@@ -29,7 +29,7 @@ export const addAddressController = async (
   try {
     await address.save({ session });
   } catch {
-    throw new AppError("Failed to add address", 400);
+    throw new AppError({ message: "Failed to add address", statusCode: 400 });
   }
 
   userAddresses.addresses.push(address._id);

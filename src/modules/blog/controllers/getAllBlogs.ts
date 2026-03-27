@@ -14,7 +14,7 @@ export const getAllBlogsController = async (req: Request, res: Response) => {
     .lean();
 
   if (!blogs) {
-    throw new AppError("Blogs not found", 404);
+    throw new AppError({ message: "Blogs not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   const totalBlogs = await Blog.countDocuments();

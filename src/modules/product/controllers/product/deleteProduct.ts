@@ -29,7 +29,7 @@ export const deleteProductController = async (
 
   const product = await Product.findById(productId);
   if (!product) {
-    throw new AppError("Product not found", 404);
+    throw new AppError({ message: "Product not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   if (req.user?.role !== "MASTER") {

@@ -96,6 +96,20 @@ export interface ZodDateConfigs extends ZodCommonConfigs {
 }
 
 export interface ValidateZodFieldConfigs
-  extends ZodStringConfigs,
-    ZodNumberConfigs,
-    ZodDateConfigs {}
+  extends ZodStringConfigs, ZodNumberConfigs, ZodDateConfigs {}
+
+type TErrorCode =
+  | "VALIDATION_ERROR"
+  | "AUTH_ERROR"
+  | "NOT_FOUND"
+  | "UPLOAD_ERROR"
+  | "INTERNAL_ERROR";
+
+export type TAppError = {
+  message: string;
+  statusCode: number;
+  code?: TErrorCode;
+  isOperational?: boolean;
+  fieldErrors?: Record<string, string[]>;
+  globalErrors?: string[];
+};

@@ -57,10 +57,10 @@ export const uploadProductController = async (
   );
 
   if (sellingPrice > originalPrice) {
-    throw new AppError(
-      "Selling price cannot be higher than original price",
-      400
-    );
+    throw new AppError({
+      message: "Selling price cannot be higher than original price",
+      statusCode: 400,
+    });
   }
 
   const commonImageFiles: Express.Multer.File[] = [];
@@ -86,7 +86,7 @@ export const uploadProductController = async (
   });
 
   if (!commonImageFiles.length) {
-    throw new AppError("Common images are required", 400);
+    throw new AppError({ message: "Common images are required", statusCode: 400 });
   }
 
   // Upload common images
@@ -120,7 +120,7 @@ export const uploadProductController = async (
               }`
           )
           .join(", ");
-        throw new AppError(errorMessage, 400);
+        throw new AppError({ message: errorMessage, statusCode: 400 });
       }
 
       // Upload shade images
@@ -142,10 +142,10 @@ export const uploadProductController = async (
       );
 
       if (shadesTotalStock !== totalStock) {
-        throw new AppError(
-          "Shades total stock does not match total stock",
-          400
-        );
+        throw new AppError({
+          message: "Shades total stock does not match total stock",
+          statusCode: 400,
+        });
       }
 
       const insertedShades = await Shade.insertMany(enrichedShades);

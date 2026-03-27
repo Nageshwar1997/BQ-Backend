@@ -25,7 +25,7 @@ export const addProductToWishlistController = async (
   );
 
   if (!wishlist) {
-    throw new AppError("Failed to add product to wishlist", 500);
+    throw new AppError({ message: "Failed to add product to wishlist", statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   res.success(200, "Product added to wishlist successfully");

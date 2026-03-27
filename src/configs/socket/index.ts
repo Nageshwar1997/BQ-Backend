@@ -16,7 +16,7 @@ export const initSocket = (server: HttpServer) => {
         if (!origin || allowedOrigins.includes(origin)) {
           callback(null, true);
         } else {
-          callback(new AppError("Not allowed by CORS", 403));
+          callback(new AppError({ message: "Not allowed by CORS", statusCode: 403, code: "AUTH_ERROR" }));
         }
       },
       methods: ["GET", "POST"],

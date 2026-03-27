@@ -31,16 +31,17 @@ const uploadImageToCloudinary = async (
       (error, result) => {
         if (error) {
           return reject(
-            new AppError(
-              error.message || "Failed to upload image on Cloudinary",
-              500
-            )
+            new AppError({
+              message: error.message || "Failed to upload image on Cloudinary",
+              statusCode: 500,
+              code: "INTERNAL_ERROR",
+            })
           );
         } else if (result) {
           const optimizedUrl = getCloudinaryOptimizedUrl(result.secure_url);
           resolve({ ...result, secure_url: optimizedUrl });
         } else {
-          reject(new AppError("Failed to upload image on Cloudinary", 500));
+          reject(new AppError({ message: "Failed to upload image on Cloudinary", statusCode: 500, code: "INTERNAL_ERROR" }));
         }
       }
     );
@@ -62,7 +63,7 @@ export const singleImageUploader = async ({
     );
 
     if (cloudinaryConnectionTest.error) {
-      throw new AppError(cloudinaryConnectionTest.message, 500);
+      throw new AppError({ message: cloudinaryConnectionTest.message, statusCode: 500, code: "INTERNAL_ERROR" });
     }
 
     const result = await uploadImageToCloudinary(
@@ -72,10 +73,11 @@ export const singleImageUploader = async ({
     );
     return result;
   } catch (error) {
-    throw new AppError(
-      error instanceof Error ? error.message : "Unexpected error during upload",
-      500
-    );
+    throw new AppError({
+      message: error instanceof Error ? error.message : "Unexpected error during upload",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 };
 
@@ -91,7 +93,7 @@ export const multipleImagesUploader = async ({
     );
 
     if (cloudinaryConnectionTest.error) {
-      throw new AppError(cloudinaryConnectionTest.message, 500);
+      throw new AppError({ message: cloudinaryConnectionTest.message, statusCode: 500, code: "INTERNAL_ERROR" });
     }
 
     const uploadPromises = files.map((file) =>
@@ -102,11 +104,10 @@ export const multipleImagesUploader = async ({
 
     return uploadResults; // Array of UploadApiResponse
   } catch (error) {
-    throw new AppError(
-      error instanceof Error
-        ? error.message
-        : "Unexpected error during multiple uploads",
-      500
-    );
+    throw new AppError({
+      message: error instanceof Error ? error.message : "Unexpected error during multiple uploads",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 };

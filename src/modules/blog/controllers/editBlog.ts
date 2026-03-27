@@ -22,13 +22,13 @@ export const editBlogController = async (
   const blog = await Blog.findById(id).lean();
 
   if (!blog) {
-    throw new AppError("Blog not found for update", 404);
+    throw new AppError({ message: "Blog not found for update", statusCode: 404, code: "NOT_FOUND" });
   }
 
   const user = req.user;
 
   if (blog.publisher.toString() !== user?._id?.toString()) {
-    throw new AppError("You are not authorized to edit this blog", 403);
+    throw new AppError({ message: "You are not authorized to edit this blog", statusCode: 403, code: "AUTH_ERROR" });
   }
 
   const files = req.files as { [fieldname: string]: Express.Multer.File[] }; // Type Assertion
@@ -67,7 +67,7 @@ export const editBlogController = async (
     });
 
     if (!updatedBlog) {
-      throw new AppError("Failed to edit blog", 400);
+      throw new AppError({ message: "Failed to edit blog", statusCode: 400 });
     }
   } catch (error) {
     if (uploadedKeys.length > 0) {

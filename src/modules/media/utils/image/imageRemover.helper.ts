@@ -20,10 +20,11 @@ const removeImageFromCloudinary = async (
         if (error) {
           console.log("Failed to remove image from Cloudinary", error);
           return reject(
-            new AppError(
-              error.message || "Failed to remove image from Cloudinary",
-              500
-            )
+            new AppError({
+              message: error.message || "Failed to remove image from Cloudinary",
+              statusCode: 500,
+              code: "INTERNAL_ERROR",
+            })
           );
         }
         resolve(result);
@@ -38,7 +39,7 @@ export const singleImageRemover = async (
   cloudinaryConfigOption: CloudinaryConfigOption = "image"
 ) => {
   if (!imageUrl) {
-    throw new AppError("Image URL is required", 400);
+    throw new AppError({ message: "Image URL is required", statusCode: 400 });
   }
 
   const cloudinaryConnectionTest = await cloudinaryConnection(
@@ -46,7 +47,7 @@ export const singleImageRemover = async (
   );
 
   if (cloudinaryConnectionTest.error) {
-    throw new AppError(cloudinaryConnectionTest.message, 500);
+    throw new AppError({ message: cloudinaryConnectionTest.message, statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   try {
@@ -57,10 +58,11 @@ export const singleImageRemover = async (
     );
     return result;
   } catch (error) {
-    throw new AppError(
-      error instanceof Error ? error.message : "Unexpected error during remove",
-      500
-    );
+    throw new AppError({
+      message: error instanceof Error ? error.message : "Unexpected error during remove",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 };
 
@@ -70,14 +72,14 @@ export const multipleImagesRemover = async (
   cloudinaryConfigOption: CloudinaryConfigOption = "image"
 ) => {
   if (!imageUrls || !Array.isArray(imageUrls) || imageUrls.length === 0) {
-    throw new AppError("Image URLs are required", 400);
+    throw new AppError({ message: "Image URLs are required", statusCode: 400 });
   }
 
   const cloudinaryConnectionTest = await cloudinaryConnection(
     cloudinaryConfigOption
   );
   if (cloudinaryConnectionTest.error) {
-    throw new AppError(cloudinaryConnectionTest.message, 500);
+    throw new AppError({ message: cloudinaryConnectionTest.message, statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   try {
@@ -90,11 +92,10 @@ export const multipleImagesRemover = async (
 
     return removeResults; // Array of UploadApiResponse
   } catch (error) {
-    throw new AppError(
-      error instanceof Error
-        ? error.message
-        : "Unexpected error during multiple remove",
-      500
-    );
+    throw new AppError({
+      message: error instanceof Error ? error.message : "Unexpected error during multiple remove",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 };

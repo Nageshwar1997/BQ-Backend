@@ -13,7 +13,7 @@ export const deleteReviewController = async (
   const { productId, reviewId } = req.params;
 
   if (!productId || !reviewId) {
-    throw new AppError("Product Id and Review Id are required", 400);
+    throw new AppError({ message: "Product Id and Review Id are required", statusCode: 400 });
   }
 
   isValidMongoId(productId, "Invalid Product Id provided", 404);
@@ -21,7 +21,7 @@ export const deleteReviewController = async (
 
   const product = await ProductModule.Models.Product.findById(productId);
   if (!product) {
-    throw new AppError("Product not found", 404);
+    throw new AppError({ message: "Product not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   product.reviews = product.reviews.filter((id) => id.toString() !== reviewId);
@@ -29,7 +29,7 @@ export const deleteReviewController = async (
 
   const review = await Review.findByIdAndDelete(reviewId).lean();
   if (!review) {
-    throw new AppError("Review not found", 404);
+    throw new AppError({ message: "Review not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   if (req.user?.role !== "MASTER") {

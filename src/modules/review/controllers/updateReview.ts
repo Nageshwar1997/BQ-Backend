@@ -13,10 +13,10 @@ export const updateReviewController = async (
   const { productId, reviewId } = req?.params;
 
   if (!productId) {
-    throw new AppError("Product Id is required", 400);
+    throw new AppError({ message: "Product Id is required", statusCode: 400 });
   }
   if (!reviewId) {
-    throw new AppError("Review Id is required", 400);
+    throw new AppError({ message: "Review Id is required", statusCode: 400 });
   }
 
   isValidMongoId(productId, "Invalid Product Id provided", 404);
@@ -33,16 +33,16 @@ export const updateReviewController = async (
   const videos = files?.videos;
 
   if ((images?.length || videos?.length) && !productTitle) {
-    throw new AppError(
-      "Product Title is required when uploading images or videos",
-      400
-    );
+    throw new AppError({
+      message: "Product Title is required when uploading images or videos",
+      statusCode: 400,
+    });
   }
 
   const review = await Review.findById(reviewId);
 
   if (!review) {
-    throw new AppError("Review not found", 404);
+    throw new AppError({ message: "Review not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   if (removedImages?.length) {

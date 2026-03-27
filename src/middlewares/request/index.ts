@@ -32,43 +32,43 @@ export const checkEmptyRequest =
 
       // Case 1: If both body and files are required, and both are empty
       if (filesOrBody && !file && isBodyEmpty && isFilesEmpty) {
-        throw new AppError(
-          "Please provide some data in the body or files!",
-          400
-        );
+        throw new AppError({
+          message: "Please provide some data in the body or files!",
+          statusCode: 400,
+        });
       }
 
       // Case 2: If both body and file are required, and both are empty
       if (fileOrBody && !files && isBodyEmpty && isFileEmpty) {
-        throw new AppError(
-          "Please provide some data in the body or file!",
-          400
-        );
+        throw new AppError({
+          message: "Please provide some data in the body or file!",
+          statusCode: 400,
+        });
       }
 
       // Case 3: If only body is required and is empty
       if (!files && !file && body && isBodyEmpty) {
-        throw new AppError("Please provide some data in the body!", 400);
+        throw new AppError({ message: "Please provide some data in the body!", statusCode: 400 });
       }
 
       // Case 4: If only files are required and are empty
       if (files && !file && !body && isFilesEmpty) {
-        throw new AppError("Please provide some files!", 400);
+        throw new AppError({ message: "Please provide some files!", statusCode: 400 });
       }
 
       // Case 5: If only single file is required and is empty
       if (file && !files && !body && isFileEmpty) {
-        throw new AppError("Please provide some files!", 400);
+        throw new AppError({ message: "Please provide some files!", statusCode: 400 });
       }
 
       // Case 6: If params are required and are empty
       if (params && isParamsEmpty) {
-        throw new AppError("Please provide some params!", 400);
+        throw new AppError({ message: "Please provide some params!", statusCode: 400 });
       }
 
       // Case 7: If query is required and is empty
       if (query && isQueryEmpty) {
-        throw new AppError("Please provide some query!", 400);
+        throw new AppError({ message: "Please provide some query!", statusCode: 400 });
       }
 
       next();

@@ -16,14 +16,14 @@ import { generateToken } from "../services";
 const checkManuallyLoggedIn = (providers: TAuthProvider[]) => {
   if (!providers?.includes("MANUAL")) {
     // Check if user has MANUAL login
-    throw new AppError(
-      `This account was created using an OAuth (${providers.join(
+    throw new AppError({
+      message: `This account was created using an OAuth (${providers.join(
         " / ",
       )}) login. Please login using your provider (e.g., ${providers.join(
         ", ",
       )}).`,
-      400,
-    );
+      statusCode: 400,
+    });
   }
 }
 
@@ -34,13 +34,13 @@ export const forgotPasswordSendLinkAndOtpController = async (
   const { email } = req.body ?? {};
 
   if (!email) {
-    throw new AppError("Email is required", 400);
+    throw new AppError({ message: "Email is required", statusCode: 400 });
   }
 
   const user = await UserModule.Services.getUserByEmail(email, true);
 
   if (!user) {
-    throw new AppError("No account found with this email", 404);
+    throw new AppError({ message: "No account found with this email", statusCode: 404, code: "NOT_FOUND" });
   }
 
   checkManuallyLoggedIn(user.providers);
@@ -70,7 +70,7 @@ export const forgotPasswordSendLinkAndOtpController = async (
   });
 
   if (!success) {
-    throw new AppError(message || "Failed to send OTP email. Please try again.", 500);
+    throw new AppError({ message: message || "Failed to send OTP email. Please try again.", statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   res.success(200, "OTP and reset link sent to your email", { token });
@@ -83,7 +83,7 @@ export const forgotPasswordResendLinkAndOtpController = async (
   const rawToken = req.get("Authorization");
 
   if (!rawToken) {
-    throw new AppError("Authorization token is required", 401);
+    throw new AppError({ message: "Authorization token is required", statusCode: 401, code: "AUTH_ERROR" });
   }
 
   const token = getAuthorizationToken(rawToken);
@@ -93,7 +93,7 @@ export const forgotPasswordResendLinkAndOtpController = async (
     ?.get(`forgot-password:${token}`);
 
   if (!redisData) {
-    throw new AppError("Session expired. Please request a new OTP.", 400);
+    throw new AppError({ message: "Session expired. Please request a new OTP.", statusCode: 400 });
   }
 
   const parsedData = PARSE_DATA(redisData);
@@ -101,10 +101,10 @@ export const forgotPasswordResendLinkAndOtpController = async (
   const sendCount = (parsedData?.sendCount ?? 1) + 1;
 
   if (sendCount > MAX_RESEND) {
-    throw new AppError(
-      "Maximum resend attempts reached. Please try again later.",
-      400,
-    );
+    throw new AppError({
+      message: "Maximum resend attempts reached. Please try again later.",
+      statusCode: 400,
+    });
   }
 
   const user = await UserModule.Services.getUserById({
@@ -135,7 +135,7 @@ export const forgotPasswordResendLinkAndOtpController = async (
   });
 
   if (!success) {
-    throw new AppError("Failed to resend OTP. Please try again.", 500);
+    throw new AppError({ message: "Failed to resend OTP. Please try again.", statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
   res.success(200, "OTP resent successfully", { sendCount });
@@ -148,13 +148,13 @@ export const forgotPasswordVerifyOtpController = async (
   const { otp } = req.body ?? {};
 
   if (!otp) {
-    throw new AppError("OTP is required", 400);
+    throw new AppError({ message: "OTP is required", statusCode: 400 });
   }
 
   const rawToken = req.get("Authorization");
 
   if (!rawToken) {
-    throw new AppError("Authorization token is required", 401);
+    throw new AppError({ message: "Authorization token is required", statusCode: 401, code: "AUTH_ERROR" });
   }
 
   const token = getAuthorizationToken(rawToken);
@@ -164,17 +164,17 @@ export const forgotPasswordVerifyOtpController = async (
     ?.get(`forgot-password:${token}`);
 
   if (!redisData) {
-    throw new AppError("Session expired. Please request a new OTP.", 400);
+    throw new AppError({ message: "Session expired. Please request a new OTP.", statusCode: 400 });
   }
 
   const parsedData = PARSE_DATA(redisData);
 
   if (!parsedData.otp) {
-    throw new AppError("OTP not found. Please request a new one.", 400);
+    throw new AppError({ message: "OTP not found. Please request a new one.", statusCode: 400 });
   }
 
   if (parsedData.otp !== otp) {
-    throw new AppError("Invalid OTP. Please try again.", 400);
+    throw new AppError({ message: "Invalid OTP. Please try again.", statusCode: 400 });
   }
 
   await redisService.getClient()?.setEx(
@@ -194,7 +194,7 @@ export const validateTokenForForgotPasswordController = async (req: Request, res
   const rawToken = req.get("Authorization");
 
   if (!rawToken) {
-    throw new AppError("Authorization token is required", 401);
+    throw new AppError({ message: "Authorization token is required", statusCode: 401, code: "AUTH_ERROR" });
   }
 
   const token = getAuthorizationToken(rawToken);
@@ -203,7 +203,7 @@ export const validateTokenForForgotPasswordController = async (req: Request, res
     ?.get(`forgot-password:${token}`);
 
   if (!redisData) {
-    throw new AppError("Session expired. Please request a new OTP.", 400);
+    throw new AppError({ message: "Session expired. Please request a new OTP.", statusCode: 400 });
   }
 
   res.success(200, "Token is valid", { valid: true });
@@ -216,13 +216,13 @@ export const setForgotPasswordController = async (
   const { password } = req.body ?? {};
 
   if (!password) {
-    throw new AppError("Password is required", 400);
+    throw new AppError({ message: "Password is required", statusCode: 400 });
   }
 
   const rawToken = req.get("Authorization");
 
   if (!rawToken) {
-    throw new AppError("Authorization token is required", 401);
+    throw new AppError({ message: "Authorization token is required", statusCode: 401, code: "AUTH_ERROR" });
   }
 
   const token = getAuthorizationToken(rawToken);
@@ -232,16 +232,16 @@ export const setForgotPasswordController = async (
     ?.get(`forgot-password:${token}`);
 
   if (!redisData) {
-    throw new AppError("Session expired. Please restart the process.", 400);
+    throw new AppError({ message: "Session expired. Please restart the process.", statusCode: 400 });
   }
 
   const parsedData = PARSE_DATA(redisData);
 
   if (!parsedData.verified) {
-    throw new AppError(
-      "OTP verification required before setting password",
-      400,
-    );
+    throw new AppError({
+      message: "OTP verification required before setting password",
+      statusCode: 400,
+    });
   }
 
   const user = await UserModule.Services.getUserById({
@@ -251,7 +251,7 @@ export const setForgotPasswordController = async (
   });
 
   if (!user) {
-    throw new AppError("User not found", 404);
+    throw new AppError({ message: "User not found", statusCode: 404, code: "NOT_FOUND" });
   }
 
   checkManuallyLoggedIn(user.providers);
