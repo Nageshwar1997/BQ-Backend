@@ -1,33 +1,22 @@
 import { MulterError } from "multer";
 import { IS_DEV_MODE } from "../../../envs";
-
-type TFieldErrors = Record<string, string[]>;
+import { ErrorBuilder } from "../../../classes";
 
 export const getMulterError = ({
   err,
   fieldName = "",
   maxCount,
 }: {
-  err: MulterError | Error;
+  err?: MulterError | Error;
   fieldName?: string;
   maxCount?: number;
 }) => {
-  const fieldErrors: TFieldErrors = {};
-  const globalErrors: string[] = [];
+  const error = new ErrorBuilder();
 
-  const pushFieldError = (field: string, message: string) => {
-    if (!fieldErrors[field]) {
-      fieldErrors[field] = [];
-    }
-    fieldErrors[field].push(message);
-  };
+  if (!err) return error.build();
 
-  const pushGlobalError = (message: string) => {
-    globalErrors.push(message);
-  };
-
-  const getCause = (err: MulterError | Error) => {
-    return err?.cause && IS_DEV_MODE ? ` (cause: ${String(err.cause)})` : "";
+  const getCause = (cause?: unknown) => {
+    return cause && IS_DEV_MODE ? ` (cause: ${String(cause)})` : "";
   };
 
   if (err instanceof MulterError) {
@@ -36,7 +25,7 @@ export const getMulterError = ({
     switch (err.code) {
       case "LIMIT_UNEXPECTED_FILE": {
         const base = err.field
-          ? `Unexpected file '${err.field}'.`
+          ? `Unexpected file '${field}'.`
           : `Unexpected file upload.`;
 
         const msg =
@@ -45,60 +34,59 @@ export const getMulterError = ({
                 maxCount > 1 ? "s" : ""
               }.`
             : base;
-
-        pushFieldError(field, msg + getCause(err));
+        error.addField(field, `${msg}${getCause(err.cause)}`);
         break;
       }
 
       case "LIMIT_FILE_COUNT": {
-        pushFieldError(
+        error.addField(
           field,
-          `Too many files uploaded. Allowed: ${maxCount ?? "limited"}${getCause(err)}`,
+          `Too many files uploaded. Allowed: ${maxCount ?? "limited"}${getCause(err.cause)}`,
         );
         break;
       }
 
       case "LIMIT_FILE_SIZE": {
-        pushFieldError(
+        error.addField(
           field,
-          `File size exceeded for '${field}'.${getCause(err)}`,
+          `File too large '${field}'.` + getCause(err.cause),
         );
         break;
       }
 
       case "LIMIT_FIELD_COUNT": {
-        pushGlobalError(`Too many fields in request.${getCause(err)}`);
+        error.addField(
+          field,
+          `Too many fields in request.${getCause(err.cause)}`,
+        );
         break;
       }
 
       case "LIMIT_FIELD_KEY": {
-        pushGlobalError(`Invalid field key.${getCause(err)}`);
+        error.addField(field, `Invalid field key.${getCause(err)}`);
         break;
       }
 
       case "LIMIT_FIELD_VALUE": {
-        pushGlobalError(`Field value too large.${getCause(err)}`);
+        error.addField(field, `Field value too large.${getCause(err)}`);
         break;
       }
 
       case "LIMIT_PART_COUNT":
       case "MISSING_FIELD_NAME": {
-        pushGlobalError(`Malformed multipart request.${getCause(err)}`);
+        error.addField(field, `Malformed multipart request.${getCause(err)}`);
         break;
       }
 
-      default: {
-        pushGlobalError(
-          `Upload error (${err.code}) on field '${field}'.${getCause(err)}`,
+      default:
+        error.addField(
+          field,
+          `Upload error (${err.code}).` + getCause(err.cause),
         );
-      }
     }
-  } else if (err) {
-    pushGlobalError(`Upload failed: ${err.message}${getCause(err)}`);
+  } else {
+    error.addGlobal(`Upload failed: ${err.message}${getCause(err.cause)}`);
   }
 
-  return {
-    fieldErrors,
-    globalErrors,
-  };
+  return error.build();
 };

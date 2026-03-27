@@ -5,22 +5,15 @@ import {
   MAX_VIDEO_FILE_SIZE,
   MB,
 } from "../../../constants";
+import { ErrorBuilder } from "../../../classes";
 import { CustomFileErrorProps } from "../../../types";
 
 export const getCustomError = ({
-  files,
+  files = [],
   customLimits,
   customFileTypes,
 }: CustomFileErrorProps) => {
-  const fieldErrors: Record<string, string[]> = {};
-  const globalErrors: string[] = [];
-
-  const pushFieldError = (field: string, message: string) => {
-    if (!fieldErrors[field]) {
-      fieldErrors[field] = [];
-    }
-    fieldErrors[field].push(message);
-  };
+  const error = new ErrorBuilder();
 
   // Limits
   const imageSizeLimit = customLimits?.imageSize ?? MAX_IMAGE_FILE_SIZE;
@@ -32,74 +25,59 @@ export const getCustomError = ({
   const allowedVideoTypes = customFileTypes?.videoTypes ?? ALLOWED_VIDEO_TYPES;
   const allowedOtherTypes = customFileTypes?.otherTypes ?? [];
 
-  if (files && files.length > 0) {
-    for (const file of files) {
-      const { originalname, fieldname, size, mimetype } = file;
+  for (const file of files) {
+    const { originalname, fieldname, size, mimetype } = file;
 
-      const isImage = allowedImageTypes.includes(mimetype);
-      const isVideo = allowedVideoTypes.includes(mimetype);
-      const isOther = allowedOtherTypes.includes(mimetype);
+    const isImage = allowedImageTypes.includes(mimetype);
+    const isVideo = allowedVideoTypes.includes(mimetype);
+    const isOther = allowedOtherTypes.includes(mimetype);
 
-      const fileSizeMB = (size / MB).toFixed(2);
+    const fileSizeMB = (size / MB).toFixed(2);
 
-      let allowedSizeMB = "0";
-      let fileType = "file";
+    let allowedSizeMB = "0";
 
-      if (isImage) {
-        allowedSizeMB = (imageSizeLimit / MB).toFixed(2);
-        fileType = "image";
-      } else if (isVideo) {
-        allowedSizeMB = (videoSizeLimit / MB).toFixed(2);
-        fileType = "video";
-      } else if (isOther) {
-        allowedSizeMB = (otherSizeLimit / MB).toFixed(2);
-        fileType = "file";
-      }
+    if (isImage) allowedSizeMB = (imageSizeLimit / MB).toFixed(2);
+    else if (isVideo) allowedSizeMB = (videoSizeLimit / MB).toFixed(2);
+    else if (isOther) allowedSizeMB = (otherSizeLimit / MB).toFixed(2);
 
-      // 🔥 SIZE VALIDATION
-      if (isImage && size > imageSizeLimit) {
-        pushFieldError(
-          fieldname,
-          `Image '${originalname}' is too large (${fileSizeMB}MB). Max allowed: ${allowedSizeMB}MB.`,
-        );
-        continue;
-      }
+    // SIZE VALIDATION
+    if (isImage && size > imageSizeLimit) {
+      error.addField(
+        fieldname,
+        `Image '${originalname}' too large (${fileSizeMB}MB). Max: ${allowedSizeMB}MB.`,
+      );
+      continue;
+    }
 
-      if (isVideo && size > videoSizeLimit) {
-        pushFieldError(
-          fieldname,
-          `Video '${originalname}' is too large (${fileSizeMB}MB). Max allowed: ${allowedSizeMB}MB.`,
-        );
-        continue;
-      }
+    if (isVideo && size > videoSizeLimit) {
+      error.addField(
+        fieldname,
+        `Video '${originalname}' too large (${fileSizeMB}MB).`,
+      );
+      continue;
+    }
 
-      if (isOther && size > otherSizeLimit) {
-        pushFieldError(
-          fieldname,
-          `File '${originalname}' is too large (${fileSizeMB}MB). Max allowed: ${allowedSizeMB}MB.`,
-        );
-        continue;
-      }
+    if (isOther && size > otherSizeLimit) {
+      error.addField(fieldname, `File '${originalname}' too large.`);
+      continue;
+    }
 
-      // 🔥 TYPE VALIDATION
-      if (!isImage && !isVideo && !isOther) {
-        const allowedTypes = [
-          ...allowedImageTypes,
-          ...allowedVideoTypes,
-          ...allowedOtherTypes,
-        ]
-          .map((type) => type.split("/")[1])
-          .join(", ");
-        pushFieldError(
-          fieldname,
-          `File '${originalname}' has invalid type '${mimetype}'. Allowed: [${allowedTypes}].`,
-        );
-      }
+    // TYPE VALIDATION
+    if (!isImage && !isVideo && !isOther) {
+      const allowedTypes = [
+        ...allowedImageTypes,
+        ...allowedVideoTypes,
+        ...allowedOtherTypes,
+      ]
+        .map((t) => t.split("/")[1])
+        .join(", ");
+
+      error.addField(
+        fieldname,
+        `File '${originalname}' has invalid type '${mimetype}'. Allowed: [${allowedTypes}]`,
+      );
     }
   }
 
-  return {
-    fieldErrors,
-    globalErrors,
-  };
+  return error.build();
 };

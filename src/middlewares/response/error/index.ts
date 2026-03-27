@@ -35,7 +35,7 @@ export const errorHandler = (
   } else {
     error = new AppError({
       message: IS_DEV_MODE
-        ? err.message || "Internal Server Error"
+        ? err?.message || "Internal Server Error"
         : "Something went wrong!",
       statusCode: 500,
       code: "INTERNAL_ERROR",
@@ -43,16 +43,14 @@ export const errorHandler = (
     });
   }
 
-  const response = {
+  return res.status(error.statusCode).json({
     ...baseResponse,
     message: error.message,
     code: error.code,
-    fieldErrors: error.fieldErrors,
-    globalErrors: error.globalErrors,
+    fieldErrors: error.fieldErrors || [],
+    globalErrors: error.globalErrors || [],
     statusCode: error.statusCode,
     requestId: req.requestId,
     ...(IS_DEV_MODE && { stack: error.stack }),
-  };
-
-  return res.status(error.statusCode).json(response);
+  });
 };

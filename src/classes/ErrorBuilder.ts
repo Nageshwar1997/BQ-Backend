@@ -60,9 +60,6 @@ export class ErrorBuilder {
 
   // Throw directly
   public throw(options: ConstructorParameters<typeof AppError>[0]) {
-    if (this.hasErrors()) {
-      throw new AppError({ ...options, ...this.build() });
-    }
+    return new AppError({ ...options, ...this.build() });
   }
 }
-
