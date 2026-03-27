@@ -1,5 +1,5 @@
-import multer, { MulterError } from "multer";
-import { NextFunction, Request, Response } from "express";
+import multer from "multer";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 
 import { FileValidatorOptionsProps, MulterType } from "../../types";
 import { AppError } from "../../classes";
@@ -17,7 +17,7 @@ export const validateFiles = ({
   const storage = multer.memoryStorage();
   const upload = multer({ storage, limits });
 
-  let uploadMiddleware: any;
+  let uploadMiddleware: RequestHandler;
 
   switch (type) {
     case "single":
@@ -46,15 +46,22 @@ export const validateFiles = ({
   }
 
   return (req: Request, res: Response, next: NextFunction) => {
-    uploadMiddleware(req, res, (err: MulterError | Error | any) => {
-      const multerErrMsg = getMulterError({
+    uploadMiddleware(req, res, (err) => {
+      const multerErrors = getMulterError({
         err,
         fieldName,
         maxCount,
       });
 
-      if (multerErrMsg) {
-        return next(new AppError({ message: multerErrMsg, statusCode: 400, code: "UPLOAD_ERROR" }));
+      if (err.message) {
+        return next(
+          new AppError({
+            ...multerErrors,
+            message: err.message || "File validation failed",
+            statusCode: 400,
+            code: "UPLOAD_ERROR",
+          }),
+        );
       }
 
       const checkableTypes: MulterType[] = ["single", "array", "any", "fields"];
@@ -96,7 +103,13 @@ export const validateFiles = ({
         });
 
         if (customErrMsg) {
-          return next(new AppError({ message: customErrMsg, statusCode: 400, code: "UPLOAD_ERROR" }));
+          return next(
+            new AppError({
+              message: customErrMsg,
+              statusCode: 400,
+              code: "UPLOAD_ERROR",
+            }),
+          );
         }
       }
 

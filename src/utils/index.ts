@@ -413,7 +413,7 @@ export const toArray = (value?: string | ParsedQs | (string | ParsedQs)[]) => {
   return [];
 };
 
-export const mapToFieldErrors = (
+export const segregateErrors = (
   errors: { field: string; message: string }[],
 ) => {
   const fieldErrors: Record<string, string[]> = {};
@@ -433,4 +433,44 @@ export const mapToFieldErrors = (
   });
 
   return { fieldErrors, globalErrors };
+};
+
+// utils/errorBuilder.ts
+
+export type TFieldErrors = Record<string, string[]>;
+
+export const createErrorBuilder = () => {
+  const fieldErrors: TFieldErrors = {};
+  const globalErrors: string[] = [];
+
+  const addFieldError = (field: string, message: string) => {
+    if (!fieldErrors[field]) {
+      fieldErrors[field] = [];
+    }
+    fieldErrors[field].push(message);
+  };
+
+  const addGlobalError = (message: string) => {
+    globalErrors.push(message);
+  };
+
+  const hasErrors = () => {
+    return (
+      Object.keys(fieldErrors).length > 0 || globalErrors.length > 0
+    );
+  };
+
+  const build = () => {
+    return {
+      fieldErrors,
+      globalErrors,
+    };
+  };
+
+  return {
+    addFieldError,
+    addGlobalError,
+    hasErrors,
+    build,
+  };
 };

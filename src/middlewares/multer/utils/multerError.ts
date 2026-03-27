@@ -1,117 +1,104 @@
 import { MulterError } from "multer";
+import { IS_DEV_MODE } from "../../../envs";
+
+type TFieldErrors = Record<string, string[]>;
 
 export const getMulterError = ({
   err,
   fieldName = "",
   maxCount,
 }: {
-  err: MulterError | Error | any;
+  err: MulterError | Error;
   fieldName?: string;
   maxCount?: number;
 }) => {
-  let message = "";
+  const fieldErrors: TFieldErrors = {};
+  const globalErrors: string[] = [];
+
+  const pushFieldError = (field: string, message: string) => {
+    if (!fieldErrors[field]) {
+      fieldErrors[field] = [];
+    }
+    fieldErrors[field].push(message);
+  };
+
+  const pushGlobalError = (message: string) => {
+    globalErrors.push(message);
+  };
+
+  const getCause = (err: MulterError | Error) => {
+    return err?.cause && IS_DEV_MODE ? ` (cause: ${String(err.cause)})` : "";
+  };
 
   if (err instanceof MulterError) {
+    const field = err.field || fieldName || "";
+
     switch (err.code) {
       case "LIMIT_UNEXPECTED_FILE": {
-        const baseMessage = err.field
-          ? `Unexpected file field '${err.field}'.`
-          : `Unexpected file field`;
+        const base = err.field
+          ? `Unexpected file '${err.field}'.`
+          : `Unexpected file upload.`;
 
-        if (fieldName && maxCount) {
-          message = `${baseMessage} Expected field is '${fieldName}' and only up to ${maxCount} files can be uploaded.`;
-        } else if (fieldName) {
-          message = `${baseMessage} Expected field is '${fieldName}' and only one file can be uploaded.`;
-        } else if (maxCount) {
-          message = `${baseMessage} Only up to ${maxCount} files can be uploaded.`;
-        } else {
-          message = `${baseMessage} ${err.name ? `'${err.name}'` : ""} ${
-            err.code ? `'${err.code}'` : ""
-          } ${err.message ? `'${err.message}'` : ""}${
-            err.cause ? ` - '${err.cause}'` : ""
-          }.`;
-        }
+        const msg =
+          fieldName && maxCount
+            ? `${base} Expected '${fieldName}', max ${maxCount} file${
+                maxCount > 1 ? "s" : ""
+              }.`
+            : base;
+
+        pushFieldError(field, msg + getCause(err));
         break;
       }
 
       case "LIMIT_FILE_COUNT": {
-        const baseMessage = `Too many files uploaded for "${err.field}".`;
-
-        if (maxCount) {
-          message = `${baseMessage} Maximum allowed: ${maxCount} file${
-            maxCount > 1 ? "s" : ""
-          }.`;
-        } else {
-          message = `${baseMessage} ${err.name ? `'${err.name}'` : ""} ${
-            err.code ? `'${err.code}'` : ""
-          } ${err.message ? `'${err.message}'` : ""}${
-            err.cause ? ` - '${err.cause}'` : ""
-          }.`;
-        }
-        break;
-      }
-
-      case "LIMIT_FIELD_COUNT": {
-        const baseMessage = `${err.code}${
-          err.field ? ` on field '${err.field}'` : ""
-        }`;
-
-        message = `${baseMessage} - ${err.message ? `'${err.message}'` : ""}${
-          err.cause ? ` - '${err.cause}'` : ""
-        }.`;
-        break;
-      }
-
-      case "LIMIT_FIELD_KEY": {
-        const baseMessage = `${err.code}${
-          err.field ? ` on field '${err.field}'` : ""
-        }`;
-
-        message = `${baseMessage} - ${err.message ? `'${err.message}'` : ""}${
-          err.cause ? ` - '${err.cause}'` : ""
-        }.`;
-        break;
-      }
-
-      case "LIMIT_FIELD_VALUE": {
-        const baseMessage = `${err.code}${
-          err.field ? ` on field '${err.field}'` : ""
-        }`;
-
-        message = `${baseMessage} - ${err.message ? `'${err.message}'` : ""}${
-          err.cause ? ` - '${err.cause}'` : ""
-        }.`;
+        pushFieldError(
+          field,
+          `Too many files uploaded. Allowed: ${maxCount ?? "limited"}${getCause(err)}`,
+        );
         break;
       }
 
       case "LIMIT_FILE_SIZE": {
-        const baseMessage = err.field
-          ? `File size for '${err.field}' exceeds the limit.`
-          : `File size exceeds the limit.`;
-
-        message = `${baseMessage} ${err.message ? `'${err.message}'` : ""}${
-          err.cause ? ` - '${err.cause}'` : ""
-        }.`;
+        pushFieldError(
+          field,
+          `File size exceeded for '${field}'.${getCause(err)}`,
+        );
         break;
       }
 
-      case "LIMIT_PART_COUNT": {
-        const baseMessage = `${err.code}${
-          err.field ? ` on field '${err.field}'` : ""
-        }`;
-
-        message = `${baseMessage} - ${err.message ? `'${err.message}'` : ""}${
-          err.cause ? ` - '${err.cause}'` : ""
-        }.`;
+      case "LIMIT_FIELD_COUNT": {
+        pushGlobalError(`Too many fields in request.${getCause(err)}`);
         break;
       }
 
-      default:
-        message = `Multer error (${err.code}) on field "${err.field}".`;
+      case "LIMIT_FIELD_KEY": {
+        pushGlobalError(`Invalid field key.${getCause(err)}`);
+        break;
+      }
+
+      case "LIMIT_FIELD_VALUE": {
+        pushGlobalError(`Field value too large.${getCause(err)}`);
+        break;
+      }
+
+      case "LIMIT_PART_COUNT":
+      case "MISSING_FIELD_NAME": {
+        pushGlobalError(`Malformed multipart request.${getCause(err)}`);
+        break;
+      }
+
+      default: {
+        pushGlobalError(
+          `Upload error (${err.code}) on field '${field}'.${getCause(err)}`,
+        );
+      }
     }
   } else if (err) {
-    message = `Unknown error while uploading files: ${err.message}`;
+    pushGlobalError(`Upload failed: ${err.message}${getCause(err)}`);
   }
 
-  return message;
+  return {
+    fieldErrors,
+    globalErrors,
+  };
 };

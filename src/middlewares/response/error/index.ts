@@ -3,7 +3,7 @@ import { Error as MongooseError } from "mongoose";
 
 import { AppError } from "../../../classes";
 import { IS_DEV_MODE } from "../../../envs";
-import { mapToFieldErrors } from "../../../utils";
+import { segregateErrors } from "../../../utils";
 
 const baseResponse = { success: false, error: true };
 
@@ -21,7 +21,7 @@ export const errorHandler = (
       message: errorObj.message,
     }));
 
-    const { fieldErrors, globalErrors } = mapToFieldErrors(rawErrors);
+    const { fieldErrors, globalErrors } = segregateErrors(rawErrors);
 
     error = new AppError({
       message: "Validation Error",

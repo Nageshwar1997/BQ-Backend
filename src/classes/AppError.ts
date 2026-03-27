@@ -1,11 +1,11 @@
-import { TAppError } from "../types";
+import { IAppError } from "../types";
 
 export class AppError extends Error {
-  statusCode: TAppError["statusCode"];
-  isOperational: TAppError["isOperational"];
-  code: TAppError["code"];
-  fieldErrors: TAppError["fieldErrors"];
-  globalErrors: TAppError["globalErrors"];
+  statusCode: IAppError["statusCode"];
+  isOperational: IAppError["isOperational"];
+  code: IAppError["code"];
+  fieldErrors: IAppError["fieldErrors"];
+  globalErrors: IAppError["globalErrors"];
 
   constructor({
     message,
@@ -14,7 +14,7 @@ export class AppError extends Error {
     isOperational = true,
     fieldErrors = {},
     globalErrors = [],
-  }: TAppError) {
+  }: IAppError) {
     super(message);
 
     this.statusCode = statusCode;

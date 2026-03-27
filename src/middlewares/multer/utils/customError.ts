@@ -12,14 +12,22 @@ export const getCustomError = ({
   customLimits,
   customFileTypes,
 }: CustomFileErrorProps) => {
-  const messages: string[] = [];
+  const fieldErrors: Record<string, string[]> = {};
+  const globalErrors: string[] = [];
 
-  // Default limits for image and video sizes
+  const pushFieldError = (field: string, message: string) => {
+    if (!fieldErrors[field]) {
+      fieldErrors[field] = [];
+    }
+    fieldErrors[field].push(message);
+  };
+
+  // Limits
   const imageSizeLimit = customLimits?.imageSize ?? MAX_IMAGE_FILE_SIZE;
   const videoSizeLimit = customLimits?.videoSize ?? MAX_VIDEO_FILE_SIZE;
   const otherSizeLimit = customLimits?.otherSize ?? 2 * MB;
 
-  // Get custom allowed file types or default ones
+  // Types
   const allowedImageTypes = customFileTypes?.imageTypes ?? ALLOWED_IMAGE_TYPES;
   const allowedVideoTypes = customFileTypes?.videoTypes ?? ALLOWED_VIDEO_TYPES;
   const allowedOtherTypes = customFileTypes?.otherTypes ?? [];
@@ -35,41 +43,63 @@ export const getCustomError = ({
       const fileSizeMB = (size / MB).toFixed(2);
 
       let allowedSizeMB = "0";
+      let fileType = "file";
+
       if (isImage) {
         allowedSizeMB = (imageSizeLimit / MB).toFixed(2);
+        fileType = "image";
       } else if (isVideo) {
         allowedSizeMB = (videoSizeLimit / MB).toFixed(2);
+        fileType = "video";
       } else if (isOther) {
         allowedSizeMB = (otherSizeLimit / MB).toFixed(2);
+        fileType = "file";
       }
 
-      // Check if the file size exceeds the limit
+      // 🔥 SIZE VALIDATION
       if (isImage && size > imageSizeLimit) {
-        messages.push(
-          `Field: '${fieldname}' - File: '${originalname}' exceeds the image size limit. Max: ${allowedSizeMB}MB, got: ${fileSizeMB}MB.`
+        pushFieldError(
+          fieldname,
+          `Image '${originalname}' is too large (${fileSizeMB}MB). Max allowed: ${allowedSizeMB}MB.`,
         );
-      } else if (isVideo && size > videoSizeLimit) {
-        messages.push(
-          `Field: '${fieldname}' - File: '${originalname}' exceeds the video size limit. Max: ${allowedSizeMB}MB, got: ${fileSizeMB}MB.`
+        continue;
+      }
+
+      if (isVideo && size > videoSizeLimit) {
+        pushFieldError(
+          fieldname,
+          `Video '${originalname}' is too large (${fileSizeMB}MB). Max allowed: ${allowedSizeMB}MB.`,
         );
-      } else if (isOther && size > otherSizeLimit) {
-        messages.push(
-          `Field: '${fieldname}' - File: '${originalname}' exceeds the file size limit. Max: ${allowedSizeMB}MB, got: ${fileSizeMB}MB.`
+        continue;
+      }
+
+      if (isOther && size > otherSizeLimit) {
+        pushFieldError(
+          fieldname,
+          `File '${originalname}' is too large (${fileSizeMB}MB). Max allowed: ${allowedSizeMB}MB.`,
         );
-      } else if (!isImage && !isVideo && !isOther) {
-        // Check if file type is allowed
-        messages.push(
-          `Invalid file type for Field: '${fieldname}' - '${originalname}'. Allowed types are: [${[
-            ...allowedImageTypes,
-            ...allowedVideoTypes,
-            ...allowedOtherTypes,
-          ]
-            .map((type) => type.split("/")[1])
-            .join(", ")}]`
+        continue;
+      }
+
+      // 🔥 TYPE VALIDATION
+      if (!isImage && !isVideo && !isOther) {
+        const allowedTypes = [
+          ...allowedImageTypes,
+          ...allowedVideoTypes,
+          ...allowedOtherTypes,
+        ]
+          .map((type) => type.split("/")[1])
+          .join(", ");
+        pushFieldError(
+          fieldname,
+          `File '${originalname}' has invalid type '${mimetype}'. Allowed: [${allowedTypes}].`,
         );
       }
     }
   }
 
-  return messages.join(" & ");
+  return {
+    fieldErrors,
+    globalErrors,
+  };
 };
