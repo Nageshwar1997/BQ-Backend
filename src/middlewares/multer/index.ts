@@ -53,7 +53,7 @@ export const validateFiles = ({
         maxCount,
       });
 
-      if (err.message) {
+      if (multerErrors.globalErrors.length || multerErrors.fieldErrors) {
         return next(
           new AppError({
             ...multerErrors,
@@ -96,16 +96,17 @@ export const validateFiles = ({
             allFiles = [];
         }
 
-        const customErrMsg = getCustomError({
+        const customErrors = getCustomError({
           files: allFiles,
           customLimits,
           customFileTypes,
         });
 
-        if (customErrMsg) {
+        if (customErrors.globalErrors.length || customErrors.fieldErrors) {
           return next(
             new AppError({
-              message: customErrMsg,
+              ...customErrors,
+              message: "File validation failed",
               statusCode: 400,
               code: "UPLOAD_ERROR",
             }),
