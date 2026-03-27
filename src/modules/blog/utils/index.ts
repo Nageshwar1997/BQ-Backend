@@ -42,9 +42,6 @@ export const validateBlogField = (props: ValidateBlogFieldConfigs) => {
     }
 
     default:
-      throw new AppError(
-        `Validation for field '${field}' is not implemented.`,
-        500,
-      );
+      throw new AppError({ message: `Validation for field '${field}' is not implemented.`, statusCode: 500 });
   }
 };
