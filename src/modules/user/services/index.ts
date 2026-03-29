@@ -15,13 +15,19 @@ export const getUserByEmail = async (email: string, lean?: boolean) => {
 
 export const updateUser = async (
   userId: string | Types.ObjectId | undefined,
-  data: Partial<UserProps>
+  data: Partial<UserProps>,
 ) => {
-  if (!userId) throw new AppError({ message: "UserId not provided", statusCode: 400 });
+  if (!userId)
+    throw new AppError({ message: "UserId not provided", statusCode: 400 });
 
   const user = await User.findByIdAndUpdate(userId, data, { new: true });
 
-  if (!user) throw new AppError({ message: "User not found to update", statusCode: 404, code: "NOT_FOUND" });
+  if (!user)
+    throw new AppError({
+      message: "User not found to update",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
 
   if (user) {
     await redisService.setCachedUser(user);
@@ -32,7 +38,7 @@ export const updateUser = async (
 
 export const getUserByPhoneNumber = async (
   phoneNumber: string,
-  lean?: boolean
+  lean?: boolean,
 ) => {
   let user = null;
   if (lean) {
@@ -46,7 +52,7 @@ export const getUserByPhoneNumber = async (
 export const getUserByEmailOrPhoneNumber = async (
   email: string,
   phoneNumber: string,
-  lean?: boolean
+  lean?: boolean,
 ) => {
   let user = null;
   if (lean) {
@@ -60,7 +66,15 @@ export const getUserByEmailOrPhoneNumber = async (
   }
 
   if (!user) {
-    throw new AppError({ message: "User not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "User not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+      fieldErrors: {
+        ...(email && { email: ["User not found"] }),
+        ...(phoneNumber && { phoneNumber: ["User not found"] }),
+      },
+    });
   }
 
   return user as UserProps;
@@ -82,7 +96,12 @@ export const getUserById = async ({
 
   const user = await query;
 
-  if (!user) throw new AppError({ message: "User not found", statusCode: 404, code: "NOT_FOUND" });
+  if (!user)
+    throw new AppError({
+      message: "User not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
 
   return user as UserProps;
 };

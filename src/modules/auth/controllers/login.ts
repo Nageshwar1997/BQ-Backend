@@ -21,10 +21,6 @@ export const loginController = async (req: Request, res: Response) => {
     true,
   );
 
-  if (!user) {
-    throw new AppError({ message: "User not found", statusCode: 404, code: "NOT_FOUND" });
-  }
-
   if (!user.providers.includes("MANUAL")) {
     // Check if user has MANUAL login
     throw new AppError({
@@ -39,7 +35,8 @@ export const loginController = async (req: Request, res: Response) => {
 
   if (!user.password) {
     throw new AppError({
-      message: "No password set for this account. Please set a password to login manually.",
+      message:
+        "No password set for this account. Please set a password to login manually.",
       statusCode: 400,
     });
   }
@@ -48,7 +45,11 @@ export const loginController = async (req: Request, res: Response) => {
   const isPasswordMatch = bcrypt.compareSync(password, user.password);
 
   if (!isPasswordMatch) {
-    throw new AppError({ message: "Wrong password", statusCode: 400 });
+    throw new AppError({
+      message: "Login Failed",
+      statusCode: 400,
+      fieldErrors: { password: ["Wrong password"] },
+    });
   }
 
   const token = generateToken(user._id);
@@ -73,11 +74,16 @@ export const googleCallback = async (
   try {
     const { code } = req.query;
 
-    if (!code) throw new AppError({ message: "No code returned from Google", statusCode: 400 });
+    if (!code)
+      throw new AppError({
+        message: "No code returned from Google",
+        statusCode: 400,
+      });
 
     // Fetch user info from Google
     const profile = await googleAuthClient.decode(code);
-    if (!profile) throw new AppError({ message: "User info not found", statusCode: 400 });
+    if (!profile)
+      throw new AppError({ message: "User info not found", statusCode: 400 });
 
     // Prepare payload
     const payload = await getOAuthDbPayload(profile, "GOOGLE");
@@ -122,7 +128,11 @@ export const linkedinCallback = async (
   try {
     const { code } = req.query;
 
-    if (!code) throw new AppError({ message: "No code returned from LinkedIn", statusCode: 400 });
+    if (!code)
+      throw new AppError({
+        message: "No code returned from LinkedIn",
+        statusCode: 400,
+      });
 
     const { id_token } = await linkedinAuthClient.token_response(code);
 
@@ -170,12 +180,19 @@ export const githubCallback = async (
   try {
     const { code } = req.query;
 
-    if (!code) throw new AppError({ message: "No code returned from GitHub", statusCode: 400 });
+    if (!code)
+      throw new AppError({
+        message: "No code returned from GitHub",
+        statusCode: 400,
+      });
 
     const { access_token } = await githubAuthClient.token_response(code);
 
     if (!access_token) {
-      throw new AppError({ message: "Access token not found", statusCode: 400 });
+      throw new AppError({
+        message: "Access token not found",
+        statusCode: 400,
+      });
     }
 
     const data = await githubAuthClient.decode(access_token);
