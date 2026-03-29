@@ -22,6 +22,7 @@ export const addShadesZodSchema = ({
       }),
       shadeName: validateProductField({
         field: "shadeName",
+        label: "Shade name",
         parentField,
         blockMultipleSpaces: true,
         min: 2,
@@ -29,6 +30,7 @@ export const addShadesZodSchema = ({
       }),
       colorCode: validateProductField({
         field: "colorCode",
+        label: "Color code",
         parentField,
         blockSingleSpace: true,
         min: 4,
@@ -43,6 +45,7 @@ export const addShadesZodSchema = ({
       }),
       stock: validateProductField({
         field: "stock",
+        label: "Stock",
         parentField,
         min: 5,
         isOptional,

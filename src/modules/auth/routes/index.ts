@@ -18,7 +18,6 @@ import {
   setForgotPasswordController,
   validateTokenForForgotPasswordController,
 } from "../controllers";
-import { loginZodSchema, registerZodSchema } from "../validations";
 import {
   ZodMiddleware,
   MulterMiddleware,
@@ -52,7 +51,7 @@ authRouter.post(
     body: true,
     query: true,
   }),
-  ZodMiddleware.validateZodSchema(registerZodSchema),
+  ZodMiddleware.validateZodSchema(zodSchemas.auth.register.verify),
   ResponseMiddleware.catchAsync(registerVerifyOtpController),
 );
 
@@ -60,7 +59,7 @@ authRouter.post(
 authRouter.post(
   "/login",
   RequestMiddleware.checkEmptyRequest({ body: true }),
-  ZodMiddleware.validateZodSchema(loginZodSchema),
+  ZodMiddleware.validateZodSchema(zodSchemas.auth.login),
   ResponseMiddleware.catchAsync(loginController),
 );
 

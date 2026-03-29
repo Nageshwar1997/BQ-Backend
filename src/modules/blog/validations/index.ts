@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { validateBlogField } from "../utils";
-import { TBlogFieldOnly, ValidateBlogFieldConfigs } from "../types";
+import { ValidateBlogFieldConfigs } from "../types";
 
 const common: Record<"text" | "content", Partial<ValidateBlogFieldConfigs>> = {
   text: { min: 2, blockMultipleSpaces: true },
   content: { min: 10 },
 };
 
-const blogFieldValidations: Record<TBlogFieldOnly, ValidateBlogFieldConfigs> = {
+const blogFieldValidations = {
   mainTitle: { ...common.text, field: "mainTitle" },
   subTitle: { ...common.text, field: "subTitle" },
   content: { ...common.text, ...common.content, field: "content" },
@@ -21,9 +21,9 @@ export const blogZodSchema = z.object(
   Object.fromEntries(
     Object.entries(blogFieldValidations).map(([key, config]) => [
       key,
-      validateBlogField(config),
-    ])
-  )
+      validateBlogField(config as ValidateBlogFieldConfigs),
+    ]),
+  ),
 );
 
 export const uploadBlogZodSchema = blogZodSchema;

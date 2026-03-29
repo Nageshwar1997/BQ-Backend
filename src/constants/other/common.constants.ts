@@ -85,6 +85,6 @@ export const ALLOWED_BUSINESSES = [
 
 export const MINUTE = 60;
 
-export const OTP_EXPIRY = 10 * MINUTE;
+export const OTP_EXPIRY = 0.1 * MINUTE;
 
 export const MAX_RESEND = 3;

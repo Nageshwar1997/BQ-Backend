@@ -40,13 +40,12 @@ export const loginZodSchema = object({
   }),
   email: registerZodSchema.shape.email.optional(),
   phoneNumber: registerZodSchema.shape.phoneNumber.optional(),
-})
-  .extend(registerZodSchema.pick({ password: true }))
-  .superRefine((data, ctx) => {
-    if (data.loginMethod === "email" && !data.email) {
-      appendZodCustomIssue(ctx, "Email is required", "email");
-    }
-    if (data.loginMethod === "phoneNumber" && !data.phoneNumber) {
-      appendZodCustomIssue(ctx, "Phone number is required", "phoneNumber");
-    }
-  });
+  password: registerZodSchema.shape.password,
+}).superRefine((data, ctx) => {
+  if (data.loginMethod === "email" && !data.email) {
+    appendZodCustomIssue(ctx, "Email is required", "email");
+  }
+  if (data.loginMethod === "phoneNumber" && !data.phoneNumber) {
+    appendZodCustomIssue(ctx, "Phone number is required", "phoneNumber");
+  }
+});

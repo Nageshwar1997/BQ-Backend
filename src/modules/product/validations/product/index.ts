@@ -2,7 +2,7 @@ import { z } from "zod";
 import { validateProductField } from "../../utils";
 import { createCategoryZodSchema } from "../category";
 import { addShadesZodSchema } from "../shade";
-import { TProductFieldOnly, ValidateProductFieldConfigs } from "../../types";
+import { ValidateProductFieldConfigs } from "../../types";
 import { validateZodString, validateZodUrl } from "../../../../utils";
 
 const common: Record<
@@ -14,10 +14,7 @@ const common: Record<
   number: { min: 1, nonNegative: true },
 };
 
-const uploadProductFields: Record<
-  TProductFieldOnly,
-  ValidateProductFieldConfigs
-> = {
+const uploadProductFields = {
   title: { ...common.text, field: "title" },
   brand: { ...common.text, min: 1, field: "brand" },
   originalPrice: { ...common.number, field: "originalPrice" },
@@ -42,8 +39,8 @@ export const uploadProductZodSchema = z.object({
   ...Object.fromEntries(
     Object.entries(uploadProductFields).map(([key, props]) => [
       key,
-      validateProductField(props),
-    ])
+      validateProductField(props as ValidateProductFieldConfigs),
+    ]),
   ),
   categoryLevelOne: createCategoryZodSchema("categoryLevelOne"),
   categoryLevelTwo: createCategoryZodSchema("categoryLevelTwo"),
@@ -57,8 +54,11 @@ export const updateProductZodSchema = z.object({
   ...Object.fromEntries(
     Object.entries(uploadProductFields).map(([key, props]) => [
       key,
-      validateProductField({ ...props, isOptional: true }),
-    ])
+      validateProductField({
+        ...props,
+        isOptional: true,
+      } as ValidateProductFieldConfigs),
+    ]),
   ),
   categoryLevelOne: createCategoryZodSchema("categoryLevelOne").optional(),
   categoryLevelTwo: createCategoryZodSchema("categoryLevelTwo").optional(),
@@ -83,7 +83,7 @@ export const updateProductZodSchema = z.object({
       validateZodUrl({
         field: "urls",
         parentField: "removingCommonImageURLs[some_index]",
-      })
+      }),
     )
     .optional(),
   removingShades: z
@@ -92,7 +92,7 @@ export const updateProductZodSchema = z.object({
         field: "_id",
         parentField: "removingShades[some_index]",
         blockSingleSpace: true,
-      })
+      }),
     )
     .optional(),
   removingShadeImageUrls: z
@@ -107,9 +107,9 @@ export const updateProductZodSchema = z.object({
           validateZodUrl({
             field: "urls",
             parentField: "removingShadeImageUrls[some_index]",
-          })
+          }),
         ),
-      })
+      }),
     )
     .optional(),
   removedQuillImageURLs: z
@@ -117,7 +117,7 @@ export const updateProductZodSchema = z.object({
       validateZodUrl({
         field: "url",
         parentField: "removedQuillImageURLs[some_index]",
-      })
+      }),
     )
     .optional(),
 });

@@ -2,7 +2,12 @@ import { z } from "zod";
 import { validateZodNumber, validateZodString } from "../../../utils";
 
 export const createReviewZodSchema = z.object({
-  rating: validateZodNumber({ field: "rating", min: 1, max: 5 }),
+  rating: validateZodNumber({
+    field: "rating",
+    label: "Rating",
+    min: 1,
+    max: 5,
+  }),
   title: validateZodString({
     field: "title",
     min: 2,
