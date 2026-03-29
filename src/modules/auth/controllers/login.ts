@@ -48,6 +48,7 @@ export const loginController = async (req: Request, res: Response) => {
     throw new AppError({
       message: "Login Failed",
       statusCode: 400,
+      code: "AUTH_ERROR",
       fieldErrors: { password: ["Wrong password"] },
     });
   }
