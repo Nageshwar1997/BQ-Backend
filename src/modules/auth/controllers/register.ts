@@ -6,23 +6,26 @@ import { MediaModule, UserModule } from "../..";
 import { generateOtp, generateTokenForRedis } from "../utils";
 import { MAX_RESEND, OTP_EXPIRY } from "../../../constants";
 import { generateToken } from "../services";
-import { PARSE_DATA, STRINGIFY_DATA } from "../../../utils";
+import {
+  getAuthorizationToken,
+  PARSE_DATA,
+  STRINGIFY_DATA,
+} from "../../../utils";
 
 // -------------------- Send OTP --------------------
 export const registerSendOtpController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
-  let { email } = req.query ?? {};
-
-  email = email?.toString()?.trim()?.toLowerCase();
-
-  if (!email) throw new AppError({ message: "Email is required", statusCode: 400 });
+  let { email } = req.body ?? {};
 
   const user = await UserModule.Services.getUserByEmail(email, true);
 
   if (user && user.providers.includes("MANUAL")) {
-    throw new AppError({ message: "User already exists, please login", statusCode: 400 });
+    throw new AppError({
+      message: "User already exists, please login",
+      statusCode: 400,
+    });
   }
 
   const otp = generateOtp();
@@ -34,7 +37,7 @@ export const registerSendOtpController = async (
     ?.setEx(
       `register_data:${otpToken}`,
       OTP_EXPIRY,
-      STRINGIFY_DATA({ otp, email, sendCount: 1 })
+      STRINGIFY_DATA({ otp, email, sendCount: 1 }),
     );
 
   const { message, success } = await mailService.sendOtp({ to: email, otp });
@@ -49,34 +52,57 @@ export const registerSendOtpController = async (
 // -------------------- Resend OTP --------------------
 export const registerResendOtpController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
-  let { otpToken, email } = req.query ?? {};
+  const { email } = req.body ?? {};
 
-  email = email?.toString()?.trim()?.toLowerCase();
+  const rawToken = req.get("Authorization");
 
-  if (!otpToken) throw new AppError({ message: "OTP token is required", statusCode: 400 });
+  if (!rawToken) {
+    throw new AppError({
+      message: "Authorization token is required",
+      statusCode: 401,
+      code: "AUTH_ERROR",
+    });
+  }
+
+  const otpToken = getAuthorizationToken(rawToken);
+
+  if (!otpToken)
+    throw new AppError({ message: "OTP token is required", statusCode: 400 });
 
   const storedData = await redisService
     .getClient()
     ?.get(`register_data:${otpToken}`);
 
   if (!storedData)
-    throw new AppError({ message: "OTP session expired or invalid Go Back", statusCode: 400 }); // NOTE - Don't change message anyway, In frontend we handled logic base on message
+    throw new AppError({
+      message: "OTP session expired or invalid Go Back",
+      statusCode: 400,
+    }); // NOTE - Don't change message anyway, In frontend we handled logic base on message
 
   const parsedData = PARSE_DATA(storedData);
   if (!parsedData.otp || !parsedData.email) {
-    throw new AppError({ message: "Invalid OTP session data", statusCode: 400 });
+    throw new AppError({
+      message: "Invalid OTP session data",
+      statusCode: 400,
+    });
   }
 
   if (parsedData.email !== email) {
-    throw new AppError({ message: "OTP session expired or invalid Go Back", statusCode: 400 }); // NOTE - Don't change message anyway, In frontend we handled logic base on message
+    throw new AppError({
+      message: "OTP session expired or invalid Go Back",
+      statusCode: 400,
+    }); // NOTE - Don't change message anyway, In frontend we handled logic base on message
   }
 
   // Increment sendCount and check limit
   const sendCount = (parsedData.sendCount ?? 1) + 1;
   if (sendCount > MAX_RESEND)
-    throw new AppError({ message: "Maximum resend attempts reached Go Back", statusCode: 400 }); // NOTE - Don't change message anyway, In frontend we handled logic base on message
+    throw new AppError({
+      message: "Maximum resend attempts reached Go Back",
+      statusCode: 400,
+    }); // NOTE - Don't change message anyway, In frontend we handled logic base on message
 
   // Generate new OTP
   const newOtp = generateOtp();
@@ -87,7 +113,7 @@ export const registerResendOtpController = async (
     ?.setEx(
       `register_data:${otpToken}`,
       OTP_EXPIRY,
-      STRINGIFY_DATA({ ...parsedData, otp: newOtp, sendCount })
+      STRINGIFY_DATA({ ...parsedData, otp: newOtp, sendCount }),
     );
 
   // Send email
@@ -106,26 +132,30 @@ export const registerResendOtpController = async (
 // -------------------- Verify OTP --------------------
 export const registerVerifyOtpController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const { firstName, lastName, email, password, phoneNumber, otp } =
     req.body ?? {};
 
   const { otpToken } = req.query ?? {};
 
-  if (!otpToken) throw new AppError({ message: "OTP token is required", statusCode: 400 });
+  if (!otpToken)
+    throw new AppError({ message: "OTP token is required", statusCode: 400 });
 
   // Check Redis for stored OTP
   const storedData = await redisService
     .getClient()
     ?.get(`register_data:${otpToken}`);
-  if (!storedData) throw new AppError({ message: "OTP expired or invalid", statusCode: 400 });
+  if (!storedData)
+    throw new AppError({ message: "OTP expired or invalid", statusCode: 400 });
 
   const parsedData = PARSE_DATA(storedData);
 
-  if (parsedData.otp !== otp) throw new AppError({ message: "Invalid OTP", statusCode: 400 });
+  if (parsedData.otp !== otp)
+    throw new AppError({ message: "Invalid OTP", statusCode: 400 });
 
-  if (parsedData.email !== email) throw new AppError({ message: "Invalid email", statusCode: 400 });
+  if (parsedData.email !== email)
+    throw new AppError({ message: "Invalid email", statusCode: 400 });
 
   // Check for existing users
   let [user, existingPhoneUser] = await Promise.all([
@@ -137,7 +167,10 @@ export const registerVerifyOtpController = async (
     existingPhoneUser &&
     existingPhoneUser._id.toString() !== user?._id.toString()
   ) {
-    throw new AppError({ message: "Phone number already exists", statusCode: 400 });
+    throw new AppError({
+      message: "Phone number already exists",
+      statusCode: 400,
+    });
   }
 
   // Profile picture upload
@@ -166,7 +199,10 @@ export const registerVerifyOtpController = async (
         if (profilePic) user.profilePic = profilePic;
         await user.save();
       } else {
-        throw new AppError({ message: "Email already exists", statusCode: 400 });
+        throw new AppError({
+          message: "Email already exists",
+          statusCode: 400,
+        });
       }
     } else {
       // Completely new user → create
@@ -194,6 +230,10 @@ export const registerVerifyOtpController = async (
   } catch (error) {
     if (profilePic)
       await MediaModule.Utils.singleImageRemover(profilePic, "image");
-    throw new AppError({ message: "Failed to register user", statusCode: 500, code: "INTERNAL_ERROR" });
+    throw new AppError({
+      message: "Failed to register user",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 };

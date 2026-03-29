@@ -95,7 +95,7 @@ const addressBaseSchema = z.object({
     max: 10,
     customRegexes: [
       {
-        regex: regexes.phoneNumber,
+        regex: regexes.phone,
         message:
           "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
       },
@@ -110,7 +110,7 @@ const addressBaseSchema = z.object({
     max: 10,
     customRegexes: [
       {
-        regex: regexes.phoneNumber,
+        regex: regexes.phone,
         message:
           "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
       },

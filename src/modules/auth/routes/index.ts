@@ -25,19 +25,22 @@ import {
   ResponseMiddleware,
   RequestMiddleware,
 } from "../../../middlewares";
+import { zodSchemas } from "../../../validations";
 
 export const authRouter = Router();
 
 // Register Route
 authRouter.post(
   "/register/send-otp",
-  RequestMiddleware.checkEmptyRequest({ query: true }),
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  ZodMiddleware.validateZodSchema(zodSchemas.auth.register.email),
   ResponseMiddleware.catchAsync(registerSendOtpController),
 );
 
 authRouter.post(
   "/register/resend-otp",
-  RequestMiddleware.checkEmptyRequest({ query: true }),
+  RequestMiddleware.checkEmptyRequest({ body: true }),
+  ZodMiddleware.validateZodSchema(zodSchemas.auth.register.email),
   ResponseMiddleware.catchAsync(registerResendOtpController),
 );
 

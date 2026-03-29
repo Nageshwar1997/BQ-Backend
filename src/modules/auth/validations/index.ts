@@ -18,7 +18,7 @@ const customRegexes = {
       "can only contain letters and only one space is allowed between words",
   },
   phoneNumber: {
-    regex: regexes.phoneNumber,
+    regex: regexes.phone,
     message:
       "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
   },
@@ -109,8 +109,8 @@ export const registerZodSchema = z
       Object.entries(registerFieldValidations).map(([key, config]) => [
         key,
         validateAuthField(config),
-      ])
-    )
+      ]),
+    ),
   )
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
@@ -123,8 +123,8 @@ export const loginZodSchema = z
       Object.entries(loginFieldValidations).map(([key, config]) => [
         key,
         validateAuthField(config),
-      ])
-    )
+      ]),
+    ),
   )
   .refine((data) => data.email || data.phoneNumber, {
     message: "Either email or phone number is required.",

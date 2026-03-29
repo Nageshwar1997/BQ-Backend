@@ -455,9 +455,7 @@ export const createErrorBuilder = () => {
   };
 
   const hasErrors = () => {
-    return (
-      Object.keys(fieldErrors).length > 0 || globalErrors.length > 0
-    );
+    return Object.keys(fieldErrors).length > 0 || globalErrors.length > 0;
   };
 
   const build = () => {

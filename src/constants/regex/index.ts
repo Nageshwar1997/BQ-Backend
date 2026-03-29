@@ -1,35 +1,7 @@
-type RegexKeys =
-  | "noSpace"
-  | "date"
-  | "phoneNumber"
-  | "name"
-  | "email"
-  | "singleSpace"
-  | "password"
-  | "hexCode"
-  | "escapeSpecialChars"
-  | "gst"
-  | "url"
-  | "pinCode"
-  | "phoneStart"
-  | "phoneExactLength"
-  | "onlyDigits"
-  | "onlyLetters"
-  | "onlyUppercase"
-  | "onlyLowercase"
-  | "otp"
-  | "atLeastOneDigit"
-  | "onlyLettersAndSpaces"
-  | "atLeastOneLowercaseLetter"
-  | "atLeastOneSpecialCharacter"
-  | "atLeastOneUppercaseLetter"
-  | "onlyLettersAndSpacesAndDots"
-  | "pan";
-
-export const regexes: Record<RegexKeys, RegExp> = {
+export const regexes = {
   phoneStart: /^[6-9]/, // Starts with 6, 7, 8, or 9
   phoneExactLength: /^\d{10}$/, // Exactly 10 digits
-  phoneNumber: /^[6-9][0-9]{9}$/, // Phone number e.g. 9876543210
+  phone: /^[6-9][0-9]{9}$/, // Phone number e.g. 9876543210
   noSpace: /^\S+$/, // No spaces allowed
   singleSpace: /^(?!.* {2,}).*$/s, // Single space allowed
   date: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(?:\.\d+)?(Z|([+-]\d{2}:\d{2}))?)?$/, // Date e.g. 2022-01-01T12:00:00Z
@@ -41,7 +13,7 @@ export const regexes: Record<RegexKeys, RegExp> = {
   escapeSpecialChars: /[.*+?^${}()|[\]\\]/g,
   gst: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i, // Check valid GST number
   pinCode: /^[1-9][0-9]{5}$/, // Check valid pin code
-  otp: /^[0-9]{6}$/,
+  otp: /^[0-9]{6}$/, // OTP e.g. 123456
   url: /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/[\w\-._~:/?#[\]@!$&'()*+,;=%]*)?$/i,
   pan: /^[A-Za-z]{5}[0-9]{4}[A-Za-z]$/,
   atLeastOneUppercaseLetter: /[A-Z]/, // At least one uppercase letter

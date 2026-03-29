@@ -48,6 +48,6 @@ export const addShadesZodSchema = ({
         isOptional,
         mustBeInt: true,
       }),
-    })
+    }),
   );
 };
