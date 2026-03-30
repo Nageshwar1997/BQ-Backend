@@ -1,6 +1,5 @@
 import { AuthModule } from "./auth";
 
-export * as AuthModule from "./auth";
 export * as BlogModule from "./blog";
 export * as MediaModule from "./media";
 export * as UserModule from "./user";

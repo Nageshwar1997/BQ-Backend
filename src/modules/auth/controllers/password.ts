@@ -314,7 +314,7 @@ export const forgotPasswordSetPasswordController = async (
 
   await redisService.getClient()?.del(`forgot-password:${token}`);
 
-  const userToken = authServices.GenerateToken(user._id);
+  const userToken = authServices.generateToken(user._id);
 
   const { password: _, ...restUser } = user?.toObject() ?? {};
 

@@ -53,7 +53,7 @@ export const manualLoginController = async (req: Request, res: Response) => {
     });
   }
 
-  const token = authServices.GenerateToken(user._id);
+  const token = authServices.generateToken(user._id);
 
   const { password: _, ...restUser } = user;
 
@@ -108,7 +108,7 @@ export const googleCallbackController = async (
       user = await UserModule.Models.User.create(payload);
     }
 
-    const token = authServices.GenerateToken(user._id);
+    const token = authServices.generateToken(user._id);
 
     await redisService.setCachedUser(user);
 
@@ -163,7 +163,7 @@ export const linkedinCallbackController = async (
       user = await UserModule.Models.User.create(payload);
     }
 
-    const token = authServices.GenerateToken(user._id);
+    const token = authServices.generateToken(user._id);
 
     await redisService.setCachedUser(user);
 
@@ -225,7 +225,7 @@ export const githubCallbackController = async (
       user = await UserModule.Models.User.create(payload);
     }
 
-    const token = authServices.GenerateToken(user._id);
+    const token = authServices.generateToken(user._id);
 
     await redisService.setCachedUser(user);
 

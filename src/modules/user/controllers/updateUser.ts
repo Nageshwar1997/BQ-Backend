@@ -4,7 +4,6 @@ import { updateUser } from "../services";
 import { MediaModule } from "../..";
 import { AppError } from "../../../classes";
 import { User } from "../models";
-import { AuthTypes } from "../../auth";
 
 export const updateUserController = async (
   req: AuthenticatedRequest,

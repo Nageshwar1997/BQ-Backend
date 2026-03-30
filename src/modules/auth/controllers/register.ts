@@ -25,6 +25,8 @@ export const registerSendOtpController = async (
     throw new AppError({
       message: "User already exists, please login",
       statusCode: 400,
+      code: "AUTH_ERROR",
+      fieldErrors: { email: ["Email already exists"] },
     });
   }
 
@@ -77,8 +79,9 @@ export const registerResendOtpController = async (
 
   if (!storedData)
     throw new AppError({
-      message: "OTP session expired or invalid Go Back",
-      statusCode: 400,
+      message: "OTP session expired or invalid",
+      statusCode: 410,
+      code: "AUTH_ERROR",
     }); // NOTE - Don't change message anyway, In frontend we handled logic base on message
 
   const parsedData = PARSE_DATA(storedData);
@@ -86,13 +89,15 @@ export const registerResendOtpController = async (
     throw new AppError({
       message: "Invalid OTP session data",
       statusCode: 400,
+      code: "AUTH_ERROR",
     });
   }
 
   if (parsedData.email !== email) {
     throw new AppError({
-      message: "OTP session expired or invalid Go Back",
-      statusCode: 400,
+      message: "OTP session expired or invalid",
+      statusCode: 410,
+      code: "AUTH_ERROR",
     }); // NOTE - Don't change message anyway, In frontend we handled logic base on message
   }
 
@@ -100,8 +105,9 @@ export const registerResendOtpController = async (
   const sendCount = (parsedData.sendCount ?? 1) + 1;
   if (sendCount > MAX_RESEND)
     throw new AppError({
-      message: "Maximum resend attempts reached Go Back",
-      statusCode: 400,
+      message: "Maximum resend attempts reached",
+      statusCode: 410,
+      code: "AUTH_ERROR",
     }); // NOTE - Don't change message anyway, In frontend we handled logic base on message
 
   // Generate new OTP
@@ -224,7 +230,7 @@ export const registerVerifyOtpController = async (
 
     await redisService.setCachedUser(restUser);
 
-    const token = authServices.GenerateToken(user._id);
+    const token = authServices.generateToken(user._id);
 
     res.success(201, "User registered successfully", { token, user: restUser });
   } catch (error) {

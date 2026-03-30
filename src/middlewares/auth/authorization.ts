@@ -1,5 +1,5 @@
 import { NextFunction, Response } from "express";
-import { AuthModule, UserModule } from "../../modules";
+import { Modules, UserModule } from "../../modules";
 import { AuthorizedRequest, TRole } from "../../types";
 import { isValidMongoId } from "../../utils";
 import { AppError } from "../../classes";
@@ -8,7 +8,7 @@ export const authorization =
   (allowedRoles: TRole[], needPassword?: boolean) =>
   async (req: AuthorizedRequest, _: Response, next: NextFunction) => {
     try {
-      const userId = AuthModule.Services.getUserIdFromToken(req);
+      const userId = Modules.Auth.Services.getUserIdFromToken(req);
 
       isValidMongoId(userId, "Invalid userId", 400);
 
@@ -19,7 +19,11 @@ export const authorization =
       });
 
       if (!allowedRoles.includes(user.role)) {
-        throw new AppError({ message: "Unauthorized", statusCode: 401, code: "AUTH_ERROR" });
+        throw new AppError({
+          message: "Unauthorized",
+          statusCode: 401,
+          code: "AUTH_ERROR",
+        });
       }
 
       req.user = user;
