@@ -8,8 +8,13 @@ import {
   logoutController,
   manualLoginController,
 } from "./login";
+import { forgotPasswordResendLinkAndOtpController, forgotPasswordSendLinkAndOtpController, forgotPasswordSetPasswordController, forgotPasswordValidateTokenController, forgotPasswordVerifyOtpController } from "./password";
+import {
+  registerResendOtpController,
+  registerSendOtpController,
+  registerVerifyOtpController,
+} from "./register";
 
-export * from "./register";
 export * from "./password";
 
 export const authControllers = {
@@ -29,4 +34,18 @@ export const authControllers = {
     },
   },
   logout: logoutController,
+  register: {
+    sendOtp: registerSendOtpController,
+    resendOtp: registerResendOtpController,
+    verifyOtp: registerVerifyOtpController,
+  },
+  password: {
+    forgotPassword: {
+      sendLinkAndOtp: forgotPasswordSendLinkAndOtpController,
+      resendLinkAndOtp: forgotPasswordResendLinkAndOtpController,
+      verifyOtp: forgotPasswordVerifyOtpController,
+      validateToken: forgotPasswordValidateTokenController,
+      setPassword: forgotPasswordSetPasswordController,
+    },
+  },
 };

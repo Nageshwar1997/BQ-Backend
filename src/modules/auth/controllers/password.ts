@@ -11,7 +11,7 @@ import {
   STRINGIFY_DATA,
 } from "../../../utils";
 import { TAuthProvider } from "../../user/types";
-import { authServices } from "../services";
+import {authServices } from "../services";
 
 const checkManuallyLoggedIn = (providers: TAuthProvider[]) => {
   if (!providers?.includes("MANUAL")) {
@@ -222,7 +222,7 @@ export const forgotPasswordVerifyOtpController = async (
   res.success(200, "OTP verified successfully", { verified: true });
 };
 
-export const validateTokenForForgotPasswordController = async (
+export const forgotPasswordValidateTokenController = async (
   req: Request,
   res: Response,
 ) => {
@@ -251,7 +251,7 @@ export const validateTokenForForgotPasswordController = async (
   res.success(200, "Token is valid", { valid: true });
 };
 
-export const setForgotPasswordController = async (
+export const forgotPasswordSetPasswordController = async (
   req: Request,
   res: Response,
 ) => {
@@ -314,7 +314,7 @@ export const setForgotPasswordController = async (
 
   await redisService.getClient()?.del(`forgot-password:${token}`);
 
-  const userToken = authServices.GenerateToken(user._id);
+  const userToken =authServices.GenerateToken(user._id);
 
   const { password: _, ...restUser } = user?.toObject() ?? {};
 

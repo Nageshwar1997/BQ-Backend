@@ -1,16 +1,6 @@
 import { Router } from "express";
 
-import {
-  authControllers,
-  forgotPasswordResendLinkAndOtpController,
-  forgotPasswordSendLinkAndOtpController,
-  forgotPasswordVerifyOtpController,
-  registerResendOtpController,
-  registerSendOtpController,
-  registerVerifyOtpController,
-  setForgotPasswordController,
-  validateTokenForForgotPasswordController,
-} from "../controllers";
+import { authControllers } from "../controllers";
 import {
   ZodMiddleware,
   MulterMiddleware,
@@ -26,14 +16,14 @@ authRouter.post(
   "/register/send-otp",
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ZodMiddleware.validateZodSchema(zodSchemas.auth.register.email),
-  ResponseMiddleware.catchAsync(registerSendOtpController),
+  ResponseMiddleware.catchAsync(authControllers.register.sendOtp),
 );
 
 authRouter.post(
   "/register/resend-otp",
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ZodMiddleware.validateZodSchema(zodSchemas.auth.register.email),
-  ResponseMiddleware.catchAsync(registerResendOtpController),
+  ResponseMiddleware.catchAsync(authControllers.register.resendOtp),
 );
 
 authRouter.post(
@@ -45,7 +35,7 @@ authRouter.post(
     query: true,
   }),
   ZodMiddleware.validateZodSchema(zodSchemas.auth.register.verify),
-  ResponseMiddleware.catchAsync(registerVerifyOtpController),
+  ResponseMiddleware.catchAsync(authControllers.register.verifyOtp),
 );
 
 // Login Route
@@ -95,28 +85,38 @@ authRouter.get(
 
 // Password Route
 authRouter.post(
-  "/send-forgot-password-link-and-otp",
-  ResponseMiddleware.catchAsync(forgotPasswordSendLinkAndOtpController),
+  "/forgot-password-send-link-and-otp",
+  ResponseMiddleware.catchAsync(
+    authControllers.password.forgotPassword.sendLinkAndOtp,
+  ),
 );
 
 authRouter.post(
-  "/resend-forgot-password-link-and-otp",
-  ResponseMiddleware.catchAsync(forgotPasswordResendLinkAndOtpController),
+  "/forgot-password-resend-link-and-otp",
+  ResponseMiddleware.catchAsync(
+    authControllers.password.forgotPassword.resendLinkAndOtp,
+  ),
 );
 
 authRouter.post(
-  "/verify-forgot-password-otp",
+  "/forgot-password-verify-otp",
   RequestMiddleware.checkEmptyRequest({ body: true }),
-  ResponseMiddleware.catchAsync(forgotPasswordVerifyOtpController),
+  ResponseMiddleware.catchAsync(
+    authControllers.password.forgotPassword.verifyOtp,
+  ),
 );
 
 authRouter.get(
-  "/validate-forgot-password-token",
-  ResponseMiddleware.catchAsync(validateTokenForForgotPasswordController),
+  "/forgot-password-validate-token",
+  ResponseMiddleware.catchAsync(
+    authControllers.password.forgotPassword.validateToken,
+  ),
 );
 
 authRouter.patch(
-  "/set-forgot-password",
+  "/forgot-password-set-password",
   RequestMiddleware.checkEmptyRequest({ body: true }),
-  ResponseMiddleware.catchAsync(setForgotPasswordController),
+  ResponseMiddleware.catchAsync(
+    authControllers.password.forgotPassword.setPassword,
+  ),
 );
