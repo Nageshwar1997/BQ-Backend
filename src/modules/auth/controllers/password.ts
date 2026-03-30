@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import { AuthModule, UserModule } from "../..";
+import { UserModule } from "../..";
 import { AppError, mailService, redisService } from "../../../classes";
-import { generateTokenForRedis } from "../utils";
+import { authUtils } from "../utils";
 import { MAX_RESEND, MINUTE } from "../../../constants";
 import {
   getAuthorizationToken,
@@ -11,7 +11,7 @@ import {
   STRINGIFY_DATA,
 } from "../../../utils";
 import { TAuthProvider } from "../../user/types";
-import {authServices } from "../services";
+import { authServices } from "../services";
 
 const checkManuallyLoggedIn = (providers: TAuthProvider[]) => {
   if (!providers?.includes("MANUAL")) {
@@ -49,8 +49,8 @@ export const forgotPasswordSendLinkAndOtpController = async (
 
   checkManuallyLoggedIn(user.providers);
 
-  const token = generateTokenForRedis(32);
-  const otp = AuthModule.Utils.generateOtp();
+  const token = authUtils.generateTokenForRedis(32);
+  const otp = authUtils.generateOtp();
 
   await redisService.getClient()?.setEx(
     `forgot-password:${token}`,
@@ -130,7 +130,7 @@ export const forgotPasswordResendLinkAndOtpController = async (
 
   checkManuallyLoggedIn(user.providers);
 
-  const otp = AuthModule.Utils.generateOtp();
+  const otp = authUtils.generateOtp();
 
   await redisService.getClient()?.setEx(
     `forgot-password:${token}`,
@@ -314,7 +314,7 @@ export const forgotPasswordSetPasswordController = async (
 
   await redisService.getClient()?.del(`forgot-password:${token}`);
 
-  const userToken =authServices.GenerateToken(user._id);
+  const userToken = authServices.GenerateToken(user._id);
 
   const { password: _, ...restUser } = user?.toObject() ?? {};
 

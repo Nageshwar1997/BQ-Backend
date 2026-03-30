@@ -4,10 +4,11 @@ import { updateUser } from "../services";
 import { MediaModule } from "../..";
 import { AppError } from "../../../classes";
 import { User } from "../models";
+import { AuthTypes } from "../../auth";
 
 export const updateUserController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const { file, user, body } = req ?? {};
 
@@ -20,7 +21,10 @@ export const updateUserController = async (
     }).lean();
 
     if (existingUser) {
-      throw new AppError({ message: "Phone number already in use", statusCode: 409 });
+      throw new AppError({
+        message: "Phone number already in use",
+        statusCode: 409,
+      });
     }
   }
 
@@ -40,7 +44,11 @@ export const updateUserController = async (
 
   if (!updatedUser && profilePic) {
     await MediaModule.Utils.singleImageRemover(profilePic, "image");
-    throw new AppError({ message: "User not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "User not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   } else if (updatedUser && file && user?.profilePic) {
     await MediaModule.Utils.singleImageRemover(user?.profilePic, "image");
   }

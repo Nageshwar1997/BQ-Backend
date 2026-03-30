@@ -1,35 +1,12 @@
 import { randomBytes } from "crypto";
-import { AppError } from "../../../classes";
 import {
   FRONTEND_LOCAL_HOST_CLIENT_URL,
   FRONTEND_PRODUCTION_CLIENT_URL,
   IS_DEV_MODE,
 } from "../../../envs";
-import { getImageAsBuffer, validateZodString } from "../../../utils";
+import { getImageAsBuffer } from "../../../utils";
 import { TAuthProvider } from "../../user/types";
-import { ValidateAuthFieldConfigs } from "../types";
 import { MediaModule } from "../..";
-
-export const validateAuthField = (props: ValidateAuthFieldConfigs) => {
-  const { field, nonEmpty = true } = props;
-  switch (field) {
-    case "firstName":
-    case "otp":
-    case "lastName":
-    case "email":
-    case "password":
-    case "phoneNumber":
-    case "confirmPassword": {
-      return validateZodString({ ...props, nonEmpty });
-    }
-    default:
-      throw new AppError({
-        message: `Validation for field '${field}' is not implemented.`,
-        statusCode: 500,
-        code: "INTERNAL_ERROR",
-      });
-  }
-};
 
 export const authSuccessRedirectUrl = (token: string) => {
   return `${
@@ -88,3 +65,10 @@ export const generateOtp = () =>
 
 export const generateTokenForRedis = (bytes: number) =>
   randomBytes(bytes).toString("hex");
+
+export const authUtils = {
+  authSuccessRedirectUrl,
+  getOAuthDbPayload,
+  generateOtp,
+  generateTokenForRedis,
+};

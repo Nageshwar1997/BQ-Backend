@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { AppError, mailService, redisService } from "../../../classes";
 import { MediaModule, UserModule } from "../..";
 
-import { generateOtp, generateTokenForRedis } from "../utils";
+import { authUtils } from "../utils";
 import { MAX_RESEND, OTP_EXPIRY } from "../../../constants";
 import { authServices } from "../services";
 import {
@@ -28,8 +28,8 @@ export const registerSendOtpController = async (
     });
   }
 
-  const otp = generateOtp();
-  const otpToken = generateTokenForRedis(20);
+  const otp = authUtils.generateOtp();
+  const otpToken = authUtils.generateTokenForRedis(20);
 
   // Store OTP + email + sendCount in Redis
   await redisService
@@ -105,7 +105,7 @@ export const registerResendOtpController = async (
     }); // NOTE - Don't change message anyway, In frontend we handled logic base on message
 
   // Generate new OTP
-  const newOtp = generateOtp();
+  const newOtp = authUtils.generateOtp();
 
   // Update Redis
   await redisService
