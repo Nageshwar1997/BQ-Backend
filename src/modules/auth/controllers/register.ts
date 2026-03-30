@@ -5,7 +5,7 @@ import { MediaModule, UserModule } from "../..";
 
 import { generateOtp, generateTokenForRedis } from "../utils";
 import { MAX_RESEND, OTP_EXPIRY } from "../../../constants";
-import { generateToken } from "../services";
+import { authServices } from "../services";
 import {
   getAuthorizationToken,
   PARSE_DATA,
@@ -224,7 +224,7 @@ export const registerVerifyOtpController = async (
 
     await redisService.setCachedUser(restUser);
 
-    const token = generateToken(user._id);
+    const token = authServices.GenerateToken(user._id);
 
     res.success(201, "User registered successfully", { token, user: restUser });
   } catch (error) {

@@ -1,17 +1,10 @@
 import { Router } from "express";
 
 import {
+  AuthControllers,
   forgotPasswordResendLinkAndOtpController,
   forgotPasswordSendLinkAndOtpController,
   forgotPasswordVerifyOtpController,
-  githubCallback,
-  githubLogin,
-  googleCallback,
-  googleLogin,
-  linkedinCallback,
-  linkedinLogin,
-  loginController,
-  logoutController,
   registerResendOtpController,
   registerSendOtpController,
   registerVerifyOtpController,
@@ -60,35 +53,44 @@ authRouter.post(
   "/login",
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ZodMiddleware.validateZodSchema(zodSchemas.auth.login),
-  ResponseMiddleware.catchAsync(loginController),
+  ResponseMiddleware.catchAsync(AuthControllers.login.manual),
 );
 
 // Logout
 authRouter.delete(
   "/logout/:userId",
   RequestMiddleware.checkEmptyRequest({ params: true }),
-  ResponseMiddleware.catchAsync(logoutController),
+  ResponseMiddleware.catchAsync(AuthControllers.logout),
 );
 
 // Google Auth
-authRouter.get("/google", ResponseMiddleware.catchAsync(googleLogin));
+authRouter.get(
+  "/google",
+  ResponseMiddleware.catchAsync(AuthControllers.login.google.redirect),
+);
 authRouter.get(
   "/google/callback",
-  ResponseMiddleware.catchAsync(googleCallback),
+  ResponseMiddleware.catchAsync(AuthControllers.login.google.callback),
 );
 
 // LinkedIn Auth
-authRouter.get("/linkedin", ResponseMiddleware.catchAsync(linkedinLogin));
+authRouter.get(
+  "/linkedin",
+  ResponseMiddleware.catchAsync(AuthControllers.login.linkedin.redirect),
+);
 authRouter.get(
   "/linkedin/callback",
-  ResponseMiddleware.catchAsync(linkedinCallback),
+  ResponseMiddleware.catchAsync(AuthControllers.login.linkedin.callback),
 );
 
 // GitHub Auth
-authRouter.get("/github", ResponseMiddleware.catchAsync(githubLogin));
+authRouter.get(
+  "/github",
+  ResponseMiddleware.catchAsync(AuthControllers.login.github.redirect),
+);
 authRouter.get(
   "/github/callback",
-  ResponseMiddleware.catchAsync(githubCallback),
+  ResponseMiddleware.catchAsync(AuthControllers.login.github.callback),
 );
 
 // Password Route

@@ -1,11 +1,11 @@
 import { Router } from "express";
 import {
   AddressModule,
-  AuthModule,
   BlogModule,
   CartModule,
   CartProductModule,
   MediaModule,
+  Modules,
   OrderModule,
   ProductModule,
   ReviewModule,
@@ -16,7 +16,7 @@ import {
 const router = Router();
 
 // Auth routes
-router.use("/auth", AuthModule.Routes.authRouter);
+router.use("/auth", Modules.Auth.Router);
 
 // User routes
 router.use("/users", UserModule.Routes.userRouter);

@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 import { AppError, redisService } from "../../../classes";
 import { UserModule } from "../..";
-import { generateToken } from "../services";
+import { authServices } from "../services";
 import {
   githubAuthClient,
   googleAuthClient,
@@ -12,7 +12,7 @@ import {
 import { authSuccessRedirectUrl, getOAuthDbPayload } from "../utils";
 import { AuthenticatedRequest } from "../../../types";
 
-export const loginController = async (req: Request, res: Response) => {
+export const manualLoginController = async (req: Request, res: Response) => {
   const { email, password, phoneNumber } = req.body ?? {};
 
   const user = await UserModule.Services.getUserByEmailOrPhoneNumber(
@@ -53,7 +53,7 @@ export const loginController = async (req: Request, res: Response) => {
     });
   }
 
-  const token = generateToken(user._id);
+  const token = authServices.GenerateToken(user._id);
 
   const { password: _, ...restUser } = user;
 
@@ -62,12 +62,15 @@ export const loginController = async (req: Request, res: Response) => {
   res.success(200, "User logged in successfully", { token, user: restUser });
 };
 
-export const googleLogin = async (_req: Request, res: Response) => {
+export const googleRedirectController = async (
+  _req: Request,
+  res: Response,
+) => {
   const url = googleAuthClient.url;
   res.redirect(url);
 };
 
-export const googleCallback = async (
+export const googleCallbackController = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -105,7 +108,7 @@ export const googleCallback = async (
       user = await UserModule.Models.User.create(payload);
     }
 
-    const token = generateToken(user._id);
+    const token = authServices.GenerateToken(user._id);
 
     await redisService.setCachedUser(user);
 
@@ -115,13 +118,16 @@ export const googleCallback = async (
   }
 };
 
-export const linkedinLogin = async (_req: Request, res: Response) => {
+export const linkedinRedirectController = async (
+  _req: Request,
+  res: Response,
+) => {
   const url = linkedinAuthClient.url;
 
   res.redirect(url);
 };
 
-export const linkedinCallback = async (
+export const linkedinCallbackController = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -157,7 +163,7 @@ export const linkedinCallback = async (
       user = await UserModule.Models.User.create(payload);
     }
 
-    const token = generateToken(user._id);
+    const token = authServices.GenerateToken(user._id);
 
     await redisService.setCachedUser(user);
 
@@ -167,13 +173,16 @@ export const linkedinCallback = async (
   }
 };
 
-export const githubLogin = async (_req: Request, res: Response) => {
+export const githubRedirectController = async (
+  _req: Request,
+  res: Response,
+) => {
   const url = githubAuthClient.url;
 
   res.redirect(url);
 };
 
-export const githubCallback = async (
+export const githubCallbackController = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -216,7 +225,7 @@ export const githubCallback = async (
       user = await UserModule.Models.User.create(payload);
     }
 
-    const token = generateToken(user._id);
+    const token = authServices.GenerateToken(user._id);
 
     await redisService.setCachedUser(user);
 

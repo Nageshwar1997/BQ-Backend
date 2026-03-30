@@ -1,3 +1,5 @@
+import { AuthModule } from "./auth";
+
 export * as AuthModule from "./auth";
 export * as BlogModule from "./blog";
 export * as MediaModule from "./media";
@@ -10,3 +12,7 @@ export * as AddressModule from "./address";
 export * as OrderModule from "./order";
 export * as ChatbotModule from "./chatbot";
 export * as WebhookModule from "./webhook";
+
+export const Modules = {
+  Auth: AuthModule,
+};
