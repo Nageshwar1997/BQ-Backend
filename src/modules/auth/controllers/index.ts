@@ -12,7 +12,7 @@ import {
 export * from "./register";
 export * from "./password";
 
-export const AuthControllers = {
+export const authControllers = {
   login: {
     manual: manualLoginController,
     google: {

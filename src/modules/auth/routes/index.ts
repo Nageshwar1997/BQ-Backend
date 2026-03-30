@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import {
-  AuthControllers,
+  authControllers,
   forgotPasswordResendLinkAndOtpController,
   forgotPasswordSendLinkAndOtpController,
   forgotPasswordVerifyOtpController,
@@ -53,44 +53,44 @@ authRouter.post(
   "/login",
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ZodMiddleware.validateZodSchema(zodSchemas.auth.login),
-  ResponseMiddleware.catchAsync(AuthControllers.login.manual),
+  ResponseMiddleware.catchAsync(authControllers.login.manual),
 );
 
 // Logout
 authRouter.delete(
   "/logout/:userId",
   RequestMiddleware.checkEmptyRequest({ params: true }),
-  ResponseMiddleware.catchAsync(AuthControllers.logout),
+  ResponseMiddleware.catchAsync(authControllers.logout),
 );
 
 // Google Auth
 authRouter.get(
   "/google",
-  ResponseMiddleware.catchAsync(AuthControllers.login.google.redirect),
+  ResponseMiddleware.catchAsync(authControllers.login.google.redirect),
 );
 authRouter.get(
   "/google/callback",
-  ResponseMiddleware.catchAsync(AuthControllers.login.google.callback),
+  ResponseMiddleware.catchAsync(authControllers.login.google.callback),
 );
 
 // LinkedIn Auth
 authRouter.get(
   "/linkedin",
-  ResponseMiddleware.catchAsync(AuthControllers.login.linkedin.redirect),
+  ResponseMiddleware.catchAsync(authControllers.login.linkedin.redirect),
 );
 authRouter.get(
   "/linkedin/callback",
-  ResponseMiddleware.catchAsync(AuthControllers.login.linkedin.callback),
+  ResponseMiddleware.catchAsync(authControllers.login.linkedin.callback),
 );
 
 // GitHub Auth
 authRouter.get(
   "/github",
-  ResponseMiddleware.catchAsync(AuthControllers.login.github.redirect),
+  ResponseMiddleware.catchAsync(authControllers.login.github.redirect),
 );
 authRouter.get(
   "/github/callback",
-  ResponseMiddleware.catchAsync(AuthControllers.login.github.callback),
+  ResponseMiddleware.catchAsync(authControllers.login.github.callback),
 );
 
 // Password Route
