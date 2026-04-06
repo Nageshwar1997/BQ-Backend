@@ -5,7 +5,7 @@ import { FileValidatorOptionsProps, MulterType } from "../../types";
 import { ErrorBuilder } from "../../classes";
 import { MulterUtils } from "./utils";
 
-export const ValidateFiles = ({
+export const Multer = ({
   type,
   fieldName,
   maxCount,

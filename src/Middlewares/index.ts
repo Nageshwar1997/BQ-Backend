@@ -3,7 +3,7 @@ import { Cors } from "./Cors.Middleware";
 import { Database } from "./Database.Middleware";
 import { JSONParser } from "./JSONParser.Middleware";
 import { Logger } from "./Logger.Middleware";
-import { ValidateFiles } from "./Multer.Middleware";
+import { Multer } from "./Multer.Middleware";
 import { Request } from "./Request.Middleware";
 import { Response } from "./Response.Middleware";
 import { ValidateZodSchema } from "./Zod.Middleware";
@@ -17,5 +17,5 @@ export const Middlewares = {
   Request,
   Response,
   Zod: ValidateZodSchema,
-  Multer: ValidateFiles,
+  Multer,
 };
