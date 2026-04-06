@@ -27,7 +27,7 @@ import {
   GOOGLE_REDIRECT_ENDPOINT,
   IS_DEV_MODE,
   LINKEDIN_REDIRECT_ENDPOINT,
-} from "../envs";
+} from "../Envs";
 import { TAuthProvider } from "../modules/user/types";
 
 export const STRINGIFY_DATA = (data: unknown): string => {
@@ -201,7 +201,10 @@ export const validateZodString = ({
   }
 
   if (blockMultipleSpaces) {
-    schema = schema.regex(Constants.Regex.singleSpace, messages.multiple_spaces);
+    schema = schema.regex(
+      Constants.Regex.singleSpace,
+      messages.multiple_spaces,
+    );
   }
 
   if (blockSingleSpace) {

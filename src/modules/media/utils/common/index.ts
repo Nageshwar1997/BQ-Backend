@@ -1,4 +1,4 @@
-import { CLOUDINARY_MAIN_FOLDER } from "../../../../envs";
+import { CLOUDINARY_MAIN_FOLDER } from "../../../../Envs";
 
 export const getSafeFileOriginalName = (originalname?: string) => {
   if (!originalname) return "file";
@@ -29,7 +29,7 @@ export const getSafePublicId = (name: string) => {
 
 export const extractPublicId = (
   imageUrl: string,
-  mediaType: "image" | "video"
+  mediaType: "image" | "video",
 ): string => {
   const regex = (() => {
     switch (mediaType) {

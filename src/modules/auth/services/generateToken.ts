@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
 
 import { AppError } from "../../../Classes";
-import { JWT_SECRET } from "../../../envs";
+import { JWT_SECRET } from "../../../Envs";
 
 export const generateToken = (userId: Types.ObjectId | string): string => {
   if (!JWT_SECRET) {

@@ -3,7 +3,7 @@ import {
   FRONTEND_LOCAL_HOST_CLIENT_URL,
   FRONTEND_PRODUCTION_CLIENT_URL,
   IS_DEV_MODE,
-} from "../../../envs";
+} from "../../../Envs";
 import { getImageAsBuffer } from "../../../utils";
 import { TAuthProvider } from "../../user/types";
 import { MediaModule } from "../..";

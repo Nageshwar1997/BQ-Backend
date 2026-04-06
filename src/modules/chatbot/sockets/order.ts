@@ -8,7 +8,7 @@ import {
 } from "langchain";
 import { getEmbeddedOrders, getMinimalOrdersForAiPrompt } from "../services";
 import { getAiGeneratedSuggestedQuestion } from "../utils";
-import { IS_DEV_MODE } from "../../../envs";
+import { IS_DEV_MODE } from "../../../Envs";
 
 const orderChatHistory = new Map<string, IOrderChatSession>();
 

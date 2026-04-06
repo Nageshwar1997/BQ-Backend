@@ -1,5 +1,5 @@
 import { MulterError } from "multer";
-import { IS_DEV_MODE } from "../../../envs";
+import { IS_DEV_MODE } from "../../../Envs";
 import { ErrorBuilder } from "../../../Classes";
 
 export const MulterErrorUtil = ({

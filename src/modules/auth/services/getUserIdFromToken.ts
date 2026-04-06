@@ -2,7 +2,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request } from "express";
 
 import { AppError } from "../../../Classes";
-import { JWT_SECRET } from "../../../envs";
+import { JWT_SECRET } from "../../../Envs";
 import { getAuthorizationToken } from "../../../utils";
 
 export const getUserIdFromToken = (req: Request) => {

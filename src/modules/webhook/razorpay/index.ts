@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import crypto from "crypto";
-import { RAZORPAY_WEBHOOK_SECRET } from "../../../envs";
+import { RAZORPAY_WEBHOOK_SECRET } from "../../../Envs";
 import { AppError } from "../../../Classes";
 import { ChatbotModule, OrderModule } from "../..";
 import { isValidMongoId } from "../../../utils";

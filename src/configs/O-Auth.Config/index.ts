@@ -8,7 +8,7 @@ import {
   GOOGLE_CLIENT_SECRET,
   LINKEDIN_CLIENT_ID,
   LINKEDIN_CLIENT_SECRET,
-} from "../../envs";
+} from "../../Envs";
 import { getSocialAuthRedirectURL } from "../../utils";
 
 const googleAuthConfig = new google.auth.OAuth2(

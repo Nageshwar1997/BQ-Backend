@@ -7,7 +7,7 @@ import {
   FRONTEND_PRODUCTION_CLIENT_URL,
   FRONTEND_PRODUCTION_ADMIN_URL,
   FRONTEND_PRODUCTION_MASTER_URL,
-} from "../../envs";
+} from "../../Envs";
 import { TAuthProvider } from "../../modules/user/types";
 import { TRole } from "../../types";
 

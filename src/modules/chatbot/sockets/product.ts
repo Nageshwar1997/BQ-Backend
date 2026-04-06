@@ -10,7 +10,7 @@ import {
   getMinimalProductsForAiPrompt,
 } from "../services/product";
 import { IProductChatSession } from "../types";
-import { IS_DEV_MODE } from "../../../envs";
+import { IS_DEV_MODE } from "../../../Envs";
 import { getAiGeneratedSuggestedQuestion } from "../utils";
 
 const productChatHistory = new Map<string, IProductChatSession>();
@@ -32,7 +32,7 @@ export const initProductSocket = (socket: Socket) => {
         session = {
           history: [
             new SystemMessage(
-              "You are a professional AI shopping assistant. Answer user queries based on product context."
+              "You are a professional AI shopping assistant. Answer user queries based on product context.",
             ),
           ],
           lastMatchedProducts: [],
@@ -58,9 +58,9 @@ export const initProductSocket = (socket: Socket) => {
       session.history.push(
         new HumanMessage(
           `User Query: ${message}\nMatched Products: ${JSON.stringify(
-            minimalProducts
-          )}\nGive a clear, helpful answer.`
-        )
+            minimalProducts,
+          )}\nGive a clear, helpful answer.`,
+        ),
       );
 
       // Initialize AI model for streaming
@@ -91,7 +91,7 @@ export const initProductSocket = (socket: Socket) => {
         await getAiGeneratedSuggestedQuestion(
           accumulatedResponse,
           "product",
-          session.history
+          session.history,
         );
 
       socket.emit("receive_message_complete", {

@@ -10,10 +10,10 @@ import {
   CLOUDINARY_VIDEO_API_KEY,
   CLOUDINARY_VIDEO_API_SECRET,
   CLOUDINARY_VIDEO_CLOUD_NAME,
-} from "../../../envs";
+} from "../../../Envs";
 
 export const myCloudinary = (
-  isImageOrVideoOrProduct: CloudinaryConfigOption
+  isImageOrVideoOrProduct: CloudinaryConfigOption,
 ) => {
   if (isImageOrVideoOrProduct === "image") {
     cloudinary.config({

@@ -7,7 +7,7 @@ import http from "http";
 import router from "./routes";
 import { Configs } from "./Configs";
 import { Middlewares } from "./Middlewares";
-import { PORT } from "./envs";
+import { PORT } from "./Envs";
 import { mailService, redisService } from "./Classes";
 
 const app = express();

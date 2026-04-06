@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { MONGODB_URI, IS_DEV_MODE } from "../../envs";
+import { MONGODB_URI, IS_DEV_MODE } from "../../Envs";
 
 // TypeScript global augmentation
 declare global {

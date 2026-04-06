@@ -3,7 +3,7 @@ import {
   IS_DEV_MODE,
   MAIL_SERVICE_DEVELOPMENT_BASE_URL,
   MAIL_SERVICE_PRODUCTION_BASE_URL,
-} from "../envs";
+} from "../Envs";
 
 class MailService {
   private baseUrl = IS_DEV_MODE
