@@ -12,7 +12,7 @@ import {
   PRODUCT_POPULATE_FIELDS,
 } from "../../constants";
 import { isSafePopulateField } from "../../utils";
-import { AppError } from "../../../../classes";
+import { AppError } from "../../../../Classes";
 import { escapeRegexSpecialChars } from "../../../../utils";
 
 export const getAllProductsController = async (req: Request, res: Response) => {
@@ -39,7 +39,8 @@ export const getAllProductsController = async (req: Request, res: Response) => {
   if (category_1 || category_2 || category_3) {
     if (!category_1 && (category_2 || category_3)) {
       throw new AppError({
-        message: "category_1 is required when category_2 or category_3 is provided",
+        message:
+          "category_1 is required when category_2 or category_3 is provided",
         statusCode: 400,
       });
     }

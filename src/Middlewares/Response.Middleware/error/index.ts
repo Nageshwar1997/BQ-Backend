@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Error as MongooseError } from "mongoose";
 
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { IS_DEV_MODE } from "../../../envs";
 import { segregateErrors } from "../../../utils";
 

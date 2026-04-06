@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import crypto from "crypto";
 import { RAZORPAY_WEBHOOK_SECRET } from "../../../envs";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { ChatbotModule, OrderModule } from "../..";
 import { isValidMongoId } from "../../../utils";
 import { IRazorPayPayment } from "../types";
@@ -13,7 +13,7 @@ import {
 
 export const razorpayWebhooksController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const { body } = req;
   const secret = RAZORPAY_WEBHOOK_SECRET!;
@@ -28,7 +28,10 @@ export const razorpayWebhooksController = async (
 
   if (expectedSignature !== receivedSignature) {
     console.log("Invalid signature");
-    throw new AppError({ message: "Invalid webhook signature", statusCode: 400 });
+    throw new AppError({
+      message: "Invalid webhook signature",
+      statusCode: 400,
+    });
   }
 
   const event = body.event;
@@ -48,14 +51,18 @@ export const razorpayWebhooksController = async (
   const order = await OrderModule.Models.Order.findById(orderDBId);
   if (!order) {
     console.log("Order not found");
-    throw new AppError({ message: "Order not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Order not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   const updatePayload = get_rzp_OrderUpdateBody(
     event,
     payment,
     receivedSignature,
-    order
+    order,
   );
 
   // Safe update: only if not terminal states
@@ -63,7 +70,7 @@ export const razorpayWebhooksController = async (
     const updatedOrder = await OrderModule.Models.Order.findOneAndUpdate(
       { _id: orderDBId },
       { $set: updatePayload },
-      { new: true }
+      { new: true },
     );
 
     res.success(200, "Webhook processed successfully");
@@ -72,11 +79,11 @@ export const razorpayWebhooksController = async (
       // Only notify AI model if status changed
       const paymentChanged = canUpdatePaymentStatus(
         order.payment.status,
-        updatedOrder.payment.status
+        updatedOrder.payment.status,
       );
       const orderChanged = canUpdateOrderStatus(
         order.status,
-        updatedOrder.status
+        updatedOrder.status,
       );
 
       if (paymentChanged || orderChanged) {

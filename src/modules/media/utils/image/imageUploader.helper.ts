@@ -1,6 +1,6 @@
 import { UploadApiResponse } from "cloudinary";
 
-import { AppError } from "../../../../classes";
+import { AppError } from "../../../../Classes";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
 import {
   CloudinaryConfigOption,
@@ -14,7 +14,7 @@ import { getSafeFolderName, getSafePublicId } from "../common";
 const uploadImageToCloudinary = async (
   file: Express.Multer.File,
   folder: string,
-  cloudinaryConfigOption: CloudinaryConfigOption
+  cloudinaryConfigOption: CloudinaryConfigOption,
 ): Promise<UploadApiResponse> => {
   const cloudinary = myCloudinary(cloudinaryConfigOption);
 
@@ -35,15 +35,21 @@ const uploadImageToCloudinary = async (
               message: error.message || "Failed to upload image on Cloudinary",
               statusCode: 500,
               code: "INTERNAL_ERROR",
-            })
+            }),
           );
         } else if (result) {
           const optimizedUrl = getCloudinaryOptimizedUrl(result.secure_url);
           resolve({ ...result, secure_url: optimizedUrl });
         } else {
-          reject(new AppError({ message: "Failed to upload image on Cloudinary", statusCode: 500, code: "INTERNAL_ERROR" }));
+          reject(
+            new AppError({
+              message: "Failed to upload image on Cloudinary",
+              statusCode: 500,
+              code: "INTERNAL_ERROR",
+            }),
+          );
         }
-      }
+      },
     );
 
     // End the stream with buffer
@@ -59,22 +65,29 @@ export const singleImageUploader = async ({
 }: SingleFileUploaderProps) => {
   try {
     const cloudinaryConnectionTest = await cloudinaryConnection(
-      cloudinaryConfigOption
+      cloudinaryConfigOption,
     );
 
     if (cloudinaryConnectionTest.error) {
-      throw new AppError({ message: cloudinaryConnectionTest.message, statusCode: 500, code: "INTERNAL_ERROR" });
+      throw new AppError({
+        message: cloudinaryConnectionTest.message,
+        statusCode: 500,
+        code: "INTERNAL_ERROR",
+      });
     }
 
     const result = await uploadImageToCloudinary(
       file,
       folder,
-      cloudinaryConfigOption
+      cloudinaryConfigOption,
     );
     return result;
   } catch (error) {
     throw new AppError({
-      message: error instanceof Error ? error.message : "Unexpected error during upload",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Unexpected error during upload",
       statusCode: 500,
       code: "INTERNAL_ERROR",
     });
@@ -89,15 +102,19 @@ export const multipleImagesUploader = async ({
 }: MultipleFileUploaderProps) => {
   try {
     const cloudinaryConnectionTest = await cloudinaryConnection(
-      cloudinaryConfigOption
+      cloudinaryConfigOption,
     );
 
     if (cloudinaryConnectionTest.error) {
-      throw new AppError({ message: cloudinaryConnectionTest.message, statusCode: 500, code: "INTERNAL_ERROR" });
+      throw new AppError({
+        message: cloudinaryConnectionTest.message,
+        statusCode: 500,
+        code: "INTERNAL_ERROR",
+      });
     }
 
     const uploadPromises = files.map((file) =>
-      uploadImageToCloudinary(file, folder, cloudinaryConfigOption)
+      uploadImageToCloudinary(file, folder, cloudinaryConfigOption),
     );
 
     const uploadResults = await Promise.all(uploadPromises);
@@ -105,7 +122,10 @@ export const multipleImagesUploader = async ({
     return uploadResults; // Array of UploadApiResponse
   } catch (error) {
     throw new AppError({
-      message: error instanceof Error ? error.message : "Unexpected error during multiple uploads",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Unexpected error during multiple uploads",
       statusCode: 500,
       code: "INTERNAL_ERROR",
     });

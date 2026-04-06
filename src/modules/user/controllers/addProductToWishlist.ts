@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { Wishlist } from "../models";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { isValidMongoId } from "../../../utils";
 import { Types } from "mongoose";
 
@@ -25,7 +25,11 @@ export const addProductToWishlistController = async (
   );
 
   if (!wishlist) {
-    throw new AppError({ message: "Failed to add product to wishlist", statusCode: 500, code: "INTERNAL_ERROR" });
+    throw new AppError({
+      message: "Failed to add product to wishlist",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 
   res.success(200, "Product added to wishlist successfully");

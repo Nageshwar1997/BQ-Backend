@@ -3,12 +3,12 @@ import { ClientSession, HydratedDocument } from "mongoose";
 import { getUserCart } from "../services";
 import { AuthenticatedRequest } from "../../../types";
 import { CartModule, CartProductModule, ProductModule } from "../..";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { IPopulatedCart } from "../types";
 
 export const getCartController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const cart = await getUserCart(req);
 
@@ -19,7 +19,7 @@ export const clearCartController = async (
   req: AuthenticatedRequest,
   res: Response,
   _next: NextFunction,
-  session: ClientSession
+  session: ClientSession,
 ) => {
   const user = req.user;
 
@@ -42,28 +42,32 @@ export const clearCartController = async (
   })) as HydratedDocument<IPopulatedCart> | null;
 
   if (!cart) {
-    throw new AppError({ message: "Cart not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Cart not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   for (const item of cart.products) {
     await ProductModule.Models.Product.updateOne(
       { _id: item.product._id },
       { $inc: { totalStock: -item.quantity } },
-      { session }
+      { session },
     );
 
     if (item.shade?._id) {
       await ProductModule.Models.Shade.updateOne(
         { _id: item.shade._id },
         { $inc: { stock: -item.quantity } },
-        { session }
+        { session },
       );
     }
   }
 
   await CartProductModule.Models.CartProduct.deleteMany(
     { _id: { $in: cart.products.map((p) => p._id) } },
-    { session }
+    { session },
   );
 
   await cart.updateOne({ $set: { products: [], charges: 0 } }, { session });

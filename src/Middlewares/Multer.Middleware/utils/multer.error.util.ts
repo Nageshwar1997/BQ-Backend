@@ -1,6 +1,6 @@
 import { MulterError } from "multer";
 import { IS_DEV_MODE } from "../../../envs";
-import { ErrorBuilder } from "../../../classes";
+import { ErrorBuilder } from "../../../Classes";
 
 export const MulterErrorUtil = ({
   err,

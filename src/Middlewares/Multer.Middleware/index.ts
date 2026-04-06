@@ -2,7 +2,7 @@ import multer from "multer";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 
 import { FileValidatorOptionsProps, MulterType } from "../../types";
-import { ErrorBuilder } from "../../classes";
+import { ErrorBuilder } from "../../Classes";
 import { MulterUtils } from "./utils";
 
 export const Multer = ({

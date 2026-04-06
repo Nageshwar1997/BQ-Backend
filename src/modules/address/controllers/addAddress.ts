@@ -1,14 +1,14 @@
 import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { Address, UserAddress } from "../models";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { ClientSession } from "mongoose";
 
 export const addAddressController = async (
   req: AuthenticatedRequest,
   res: Response,
   _: NextFunction,
-  session: ClientSession
+  session: ClientSession,
 ) => {
   const userId = req.user?._id;
 
@@ -17,11 +17,15 @@ export const addAddressController = async (
   const userAddresses = await UserAddress.findOneAndUpdate(
     { user: userId },
     { $setOnInsert: { user: userId, addresses: [], defaultAddress: null } },
-    { new: true, upsert: true, session }
+    { new: true, upsert: true, session },
   );
 
   if (!userAddresses) {
-    throw new AppError({ message: "User address not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "User address not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   const address = new Address({ ...restBody, user: userId });

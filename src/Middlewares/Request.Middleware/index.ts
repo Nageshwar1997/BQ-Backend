@@ -1,6 +1,6 @@
 import { NextFunction, Request as ExpressRequest, Response } from "express";
 import { randomUUID } from "crypto";
-import { AppError } from "../../classes";
+import { AppError } from "../../Classes";
 
 type CheckOptions = {
   body?: boolean;

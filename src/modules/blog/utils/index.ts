@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { ValidateBlogFieldConfigs } from "../types";
 import { validateZodDate, validateZodString } from "../../../utils";
 
@@ -42,6 +42,9 @@ export const validateBlogField = (props: ValidateBlogFieldConfigs) => {
     }
 
     default:
-      throw new AppError({ message: `Validation for field '${field}' is not implemented.`, statusCode: 500 });
+      throw new AppError({
+        message: `Validation for field '${field}' is not implemented.`,
+        statusCode: 500,
+      });
   }
 };

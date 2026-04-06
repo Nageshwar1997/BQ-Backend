@@ -5,7 +5,7 @@ import {
   MAX_VIDEO_FILE_SIZE,
   MB,
 } from "../../../constants";
-import { ErrorBuilder } from "../../../classes";
+import { ErrorBuilder } from "../../../Classes";
 import { CustomFileErrorProps } from "../../../types";
 
 export const CustomErrorUtil = ({

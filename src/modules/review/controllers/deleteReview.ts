@@ -2,18 +2,21 @@ import { Response } from "express";
 import { Types } from "mongoose";
 import { MediaModule, ProductModule } from "../..";
 import { AuthenticatedRequest } from "../../../types";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { checkUserPermission, isValidMongoId } from "../../../utils";
 import { Review } from "../models";
 
 export const deleteReviewController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const { productId, reviewId } = req.params;
 
   if (!productId || !reviewId) {
-    throw new AppError({ message: "Product Id and Review Id are required", statusCode: 400 });
+    throw new AppError({
+      message: "Product Id and Review Id are required",
+      statusCode: 400,
+    });
   }
 
   isValidMongoId(productId, "Invalid Product Id provided", 404);
@@ -21,7 +24,11 @@ export const deleteReviewController = async (
 
   const product = await ProductModule.Models.Product.findById(productId);
   if (!product) {
-    throw new AppError({ message: "Product not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Product not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   product.reviews = product.reviews.filter((id) => id.toString() !== reviewId);
@@ -29,7 +36,11 @@ export const deleteReviewController = async (
 
   const review = await Review.findByIdAndDelete(reviewId).lean();
   if (!review) {
-    throw new AppError({ message: "Review not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Review not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   if (req.user?.role !== "MASTER") {

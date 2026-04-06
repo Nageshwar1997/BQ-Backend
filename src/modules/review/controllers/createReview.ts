@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { isValidMongoId } from "../../../utils";
 import { MediaModule, ProductModule } from "../..";
 import { Review } from "../models";
@@ -29,7 +29,11 @@ export const createReviewController = async (
   const product = await ProductModule.Models.Product.findById(productId);
 
   if (!product) {
-    throw new AppError({ message: "Product not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Product not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   if (images?.length) {
@@ -70,7 +74,11 @@ export const createReviewController = async (
     if (uploadedVideos?.length) {
       await MediaModule.Utils.multipleVideosRemover(uploadedVideos, "video");
     }
-    throw new AppError({ message: "Failed to create review", statusCode: 500, code: "INTERNAL_ERROR" });
+    throw new AppError({
+      message: "Failed to create review",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 
   product.reviews.push(review._id);

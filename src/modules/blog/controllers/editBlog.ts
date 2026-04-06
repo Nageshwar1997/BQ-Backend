@@ -1,7 +1,7 @@
 import { Response } from "express";
 
 import { isValidMongoId } from "../../../utils";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { BlogThumbnailType } from "../types";
 import { Blog } from "../models";
 import { BLOGS_THUMBNAILS, possibleEditBlogFields } from "../constants";
@@ -10,7 +10,7 @@ import { MediaModule } from "../..";
 
 export const editBlogController = async (
   req: AuthorizedRequest,
-  res: Response
+  res: Response,
 ) => {
   const { id } = req.params;
 
@@ -22,13 +22,21 @@ export const editBlogController = async (
   const blog = await Blog.findById(id).lean();
 
   if (!blog) {
-    throw new AppError({ message: "Blog not found for update", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Blog not found for update",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   const user = req.user;
 
   if (blog.publisher.toString() !== user?._id?.toString()) {
-    throw new AppError({ message: "You are not authorized to edit this blog", statusCode: 403, code: "AUTH_ERROR" });
+    throw new AppError({
+      message: "You are not authorized to edit this blog",
+      statusCode: 403,
+      code: "AUTH_ERROR",
+    });
   }
 
   const files = req.files as { [fieldname: string]: Express.Multer.File[] }; // Type Assertion
@@ -46,7 +54,7 @@ export const editBlogController = async (
         });
         updateBody[item] = uploadResult.secure_url;
         uploadedKeys.push(item); // Store uploaded key
-      })
+      }),
     );
   }
 
@@ -73,8 +81,8 @@ export const editBlogController = async (
     if (uploadedKeys.length > 0) {
       await Promise.all(
         uploadedKeys.map((key) =>
-          MediaModule.Utils.singleImageRemover(blog[key], "image")
-        )
+          MediaModule.Utils.singleImageRemover(blog[key], "image"),
+        ),
       ); // Removed old images
     }
     throw error;

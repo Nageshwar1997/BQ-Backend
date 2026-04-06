@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express";
 import { AuthenticatedRequest, AuthorizedRequest, TRole } from "../../types";
 import { Modules, UserModule } from "../../modules";
 import { isValidMongoId } from "../../utils";
-import { AppError } from "../../classes";
+import { AppError } from "../../Classes";
 
 const Authenticated =
   (needPassword?: boolean) =>

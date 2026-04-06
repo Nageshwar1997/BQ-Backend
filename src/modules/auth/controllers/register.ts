@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
-import { AppError, mailService, redisService } from "../../../classes";
+import { AppError, mailService, redisService } from "../../../Classes";
 import { MediaModule, UserModule } from "../..";
 
 import { authUtils } from "../utils";

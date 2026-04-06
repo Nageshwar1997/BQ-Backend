@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 
 import { HomeVideo } from "../models";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 
 export const getAllHomeVideosController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const page = Number(req.query.page);
   const limit = Number(req.query.limit);
@@ -24,7 +24,11 @@ export const getAllHomeVideosController = async (
   ]);
 
   if (!videos) {
-    throw new AppError({ message: "Videos not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Videos not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   res.success(200, "Videos retrieved successfully", {

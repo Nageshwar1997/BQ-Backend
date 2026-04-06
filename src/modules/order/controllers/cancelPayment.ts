@@ -1,13 +1,13 @@
 import { Response } from "express";
 import { Order } from "../models";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { AuthenticatedRequest } from "../../../types";
 import { isValidMongoId } from "../../../utils";
 import { ChatbotModule } from "../..";
 
 export const cancelPaymentController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const user = req.user;
   const { orderId } = req.params;
@@ -17,10 +17,19 @@ export const cancelPaymentController = async (
 
   const order = await Order.findById(orderId);
 
-  if (!order) throw new AppError({ message: "Order not found", statusCode: 404, code: "NOT_FOUND" });
+  if (!order)
+    throw new AppError({
+      message: "Order not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
 
   if (user?._id?.toString() !== order?.user?.toString()) {
-    throw new AppError({ message: "You can not cancel another user's order", statusCode: 401, code: "AUTH_ERROR" });
+    throw new AppError({
+      message: "You can not cancel another user's order",
+      statusCode: 401,
+      code: "AUTH_ERROR",
+    });
   }
 
   let isOrderUpdated = false;
@@ -32,8 +41,8 @@ export const cancelPaymentController = async (
       flag === "tab_closed"
         ? "Payment failed: tab closed by user"
         : flag === "modal_closed"
-        ? "Payment failed: modal closed by user"
-        : "Payment failed: cancelled by user";
+          ? "Payment failed: modal closed by user"
+          : "Payment failed: cancelled by user";
 
     await order.save();
 

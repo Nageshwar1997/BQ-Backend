@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { Response } from "express";
 import { AuthorizedRequest } from "../../../../types";
 import { Product, Shade } from "../../models";
-import { AppError } from "../../../../classes";
+import { AppError } from "../../../../Classes";
 import { PopulatedProduct, ProductProps, ShadeProps } from "../../types";
 import { findOrCreateCategory } from "../../services";
 import { checkUserPermission, isValidMongoId } from "../../../../utils";
@@ -12,7 +12,7 @@ import { ChatbotModule } from "../../..";
 
 export const updateProductController = async (
   req: AuthorizedRequest,
-  res: Response
+  res: Response,
 ) => {
   const { productId } = req.params;
   isValidMongoId(productId, "Invalid Product Id", 400);
@@ -33,7 +33,12 @@ export const updateProductController = async (
     .lean<PopulatedProduct>()
     .exec();
 
-  if (!existingProduct) throw new AppError({ message: "Product not found", statusCode: 404, code: "NOT_FOUND" });
+  if (!existingProduct)
+    throw new AppError({
+      message: "Product not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
 
   if (req.user?.role !== "MASTER") {
     checkUserPermission({
@@ -107,12 +112,16 @@ export const updateProductController = async (
         categoryLevelOne.name,
         categoryLevelOne.category,
         null,
-        1
+        1,
       )
     : existingProduct.category?.parentCategory?.parentCategory;
 
   if (!category_1) {
-    throw new AppError({ message: "Category Level One not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Category Level One not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   // Find or Create Level-Two Category (Parent must be Level-One)
@@ -121,12 +130,16 @@ export const updateProductController = async (
         categoryLevelTwo.name,
         categoryLevelTwo.category,
         category_1._id,
-        2
+        2,
       )
     : existingProduct.category.parentCategory;
 
   if (!category_2) {
-    throw new AppError({ message: "Category Level Two not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Category Level Two not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   // Find or Create Level-Three Category (Parent must be Level-Two)
@@ -135,7 +148,7 @@ export const updateProductController = async (
         categoryLevelThree.name,
         categoryLevelThree.category,
         category_2._id,
-        3
+        3,
       )
     : existingProduct.category;
 
@@ -162,10 +175,10 @@ export const updateProductController = async (
       updatedCommonImageFiles.push(file);
     } else {
       const newShadeMatch = file?.fieldname.match(
-        /^newAddedShades\[(\d+)\]\[images\]/
+        /^newAddedShades\[(\d+)\]\[images\]/,
       );
       const updatedShadeMatch = file?.fieldname.match(
-        /^updatedShadeWithFiles\[(\d+)\]\[images\]/
+        /^updatedShadeWithFiles\[(\d+)\]\[images\]/,
       );
 
       if (newShadeMatch) {
@@ -190,7 +203,7 @@ export const updateProductController = async (
 
   if (existingShades?.length) {
     oldShadesIds = existingShades.map(
-      (shade) => shade._id?.toString() as string
+      (shade) => shade._id?.toString() as string,
     );
   }
 
@@ -198,13 +211,13 @@ export const updateProductController = async (
   if (updatedCommonImageFiles?.length) {
     uploadedCommonImages = await uploadImages(
       updatedCommonImageFiles,
-      `Products/${title ?? existingProduct.title}/Common_Images`
+      `Products/${title ?? existingProduct.title}/Common_Images`,
     );
 
     updateBody.commonImages = [
       ...uploadedCommonImages,
       ...(existingProduct.commonImages.filter(
-        (img) => !removingCommonImageURLs.includes(img)
+        (img) => !removingCommonImageURLs.includes(img),
       ) || []),
     ];
   }
@@ -222,7 +235,7 @@ export const updateProductController = async (
         if (!(newShadeImagesMap[idx] && newShadeImagesMap[idx].length > 0)) {
           const shadeName = shade.shadeName || `Unknown Shade at index ${idx}`;
           missingShadeErrors.push(
-            `Shade: '${shadeName}' At least 1 image is required`
+            `Shade: '${shadeName}' At least 1 image is required`,
           );
         }
       });
@@ -233,7 +246,7 @@ export const updateProductController = async (
             (msg, i) =>
               `${missingShadeErrors.length > 1 ? `${i + 1}). ` : ""}${msg}${
                 i === missingShadeErrors.length - 1 ? "." : ""
-              }`
+              }`,
           )
           .join(", ");
         throw new AppError({ message: errorMessage, statusCode: 400 });
@@ -247,23 +260,27 @@ export const updateProductController = async (
             shadeFiles,
             `Products/${title ?? existingProduct.title}/Shades/${
               shade.shadeName
-            }`
+            }`,
           );
           uploadedNewShadesImages.push(...images);
 
           return { ...shade, images };
-        })
+        }),
       );
 
       newShadeIds = await Promise.all(
         enrichedShades?.map(async (shade) => {
           const newShade = await Shade.create(shade);
           return newShade._id.toString();
-        })
+        }),
       );
     } catch (error) {
       await removeImages([...uploadedNewShadesImages, ...uploadedCommonImages]);
-      throw new AppError({ message: "Failed to create shades", statusCode: 500, code: "INTERNAL_ERROR" });
+      throw new AppError({
+        message: "Failed to create shades",
+        statusCode: 500,
+        code: "INTERNAL_ERROR",
+      });
     }
   }
 
@@ -280,16 +297,20 @@ export const updateProductController = async (
           !(updatedShadeImagesMap[idx] && updatedShadeImagesMap[idx].length > 0)
         ) {
           const currentShade = existingShades.find(
-            (sh) => sh?._id?.toString() === shade._id?.toString()
+            (sh) => sh?._id?.toString() === shade._id?.toString(),
           );
 
           if (!currentShade) {
-            throw new AppError({ message: `Shade not found with id: ${shade._id}`, statusCode: 404, code: "NOT_FOUND" });
+            throw new AppError({
+              message: `Shade not found with id: ${shade._id}`,
+              statusCode: 404,
+              code: "NOT_FOUND",
+            });
           }
 
           const shadeName = shade.shadeName ?? currentShade?.shadeName;
           missingUpdatedShadeErrors.push(
-            `Shade: '${shadeName}' At least 1 image is required`
+            `Shade: '${shadeName}' At least 1 image is required`,
           );
         }
       });
@@ -300,7 +321,7 @@ export const updateProductController = async (
             (msg, i) =>
               `${
                 missingUpdatedShadeErrors.length > 1 ? `${i + 1}). ` : ""
-              }${msg}${i === missingUpdatedShadeErrors.length - 1 ? "." : ""}`
+              }${msg}${i === missingUpdatedShadeErrors.length - 1 ? "." : ""}`,
           )
           .join(", ");
         throw new AppError({ message: errorMessage, statusCode: 400 });
@@ -310,44 +331,44 @@ export const updateProductController = async (
         updatedShadesData?.map(async (shade, idx) => {
           const shadeFiles = updatedShadeImagesMap[idx] || [];
           const currentShade = existingShades.find(
-            (sh) => sh?._id?.toString() === shade._id?.toString()
+            (sh) => sh?._id?.toString() === shade._id?.toString(),
           );
           if (!currentShade) return;
           const images = await uploadImages(
             shadeFiles,
             `Products/${title || existingProduct.title}/Shades/${
               shade.shadeName || currentShade.shadeName
-            }`
+            }`,
           );
           uploadedUpdatedShadesImages.push(...images);
 
           const currentShadeRemovingImages =
             removingShadeImageUrls?.find(
               (sh: { _id: string; urls: string[] }) =>
-                sh._id.toString() === shade._id.toString()
+                sh._id.toString() === shade._id.toString(),
             )?.urls || [];
 
           removedExistingShadesWithFileImages.push(
-            ...currentShadeRemovingImages
+            ...currentShadeRemovingImages,
           );
 
           const existingShadeImgUrls =
             currentShade.images.filter(
-              (img) => !currentShadeRemovingImages.includes(img)
+              (img) => !currentShadeRemovingImages.includes(img),
             ) || [];
           return {
             ...shade,
             images: [...existingShadeImgUrls, ...images],
           };
-        })
+        }),
       );
       await Promise.all(
         enrichedUpdatedShades.map(async (shade) => {
           await Shade.findByIdAndUpdate(
             { _id: shade._id },
-            { $set: { ...shade } }
+            { $set: { ...shade } },
           ).lean();
-        })
+        }),
       );
 
       await removeImages(removedExistingShadesWithFileImages);
@@ -371,28 +392,32 @@ export const updateProductController = async (
       await Promise.all(
         updatedShadeWithoutFiles.map(async (shade: Partial<ShadeProps>) => {
           const currentShade = existingShades.find(
-            (sh) => sh?._id?.toString() === shade._id?.toString()
+            (sh) => sh?._id?.toString() === shade._id?.toString(),
           );
 
           if (!currentShade) {
-            throw new AppError({ message: `Shade not found with id: ${shade._id}`, statusCode: 404, code: "NOT_FOUND" });
+            throw new AppError({
+              message: `Shade not found with id: ${shade._id}`,
+              statusCode: 404,
+              code: "NOT_FOUND",
+            });
           }
 
           const currentShadeRemovingImages =
             removingShadeImageUrls?.find(
               (sh: { _id: string; urls: string[] }) =>
-                sh._id.toString() === shade._id?.toString()
+                sh._id.toString() === shade._id?.toString(),
             )?.urls || [];
 
           removedExistingShadesWithOutFileImages.push(
-            ...currentShadeRemovingImages
+            ...currentShadeRemovingImages,
           );
 
           await Shade.findByIdAndUpdate(
             { _id: shade._id },
-            { $set: { ...shade } }
+            { $set: { ...shade } },
           ).lean();
-        })
+        }),
       );
 
       await removeImages(removedExistingShadesWithOutFileImages);
@@ -412,7 +437,7 @@ export const updateProductController = async (
 
   if (removingShadeImageUrls?.length) {
     const onlyRemovedShadeImages = removingShadeImageUrls.flatMap(
-      (sh: { urls: string[] }) => sh.urls
+      (sh: { urls: string[] }) => sh.urls,
     );
     await removeImages(onlyRemovedShadeImages);
   }
@@ -436,7 +461,7 @@ export const updateProductController = async (
     }
 
     const finalShadeIds: string[] = oldShadesIds.filter(
-      (id) => id && !removingIds.includes(id)
+      (id) => id && !removingIds.includes(id),
     );
 
     if (newShadeIds.length) {
@@ -454,11 +479,14 @@ export const updateProductController = async (
     const product = await Product.findByIdAndUpdate(
       { _id: productId },
       updateBody,
-      { new: true }
+      { new: true },
     ).lean();
 
     if (!product) {
-      throw new AppError({ message: "Failed to update product", statusCode: 400 });
+      throw new AppError({
+        message: "Failed to update product",
+        statusCode: 400,
+      });
     }
 
     if (

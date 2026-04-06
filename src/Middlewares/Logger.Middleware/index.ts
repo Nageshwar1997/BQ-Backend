@@ -1,6 +1,6 @@
 import winston from "winston";
 import expressWinston from "express-winston";
-import { AppError } from "../../classes";
+import { AppError } from "../../Classes";
 
 const { combine, timestamp, printf, colorize } = winston.format;
 

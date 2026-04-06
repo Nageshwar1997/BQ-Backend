@@ -1,7 +1,7 @@
 import { Response } from "express";
 
 import { BLOGS_THUMBNAILS } from "../constants";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { Blog } from "../models";
 import { AuthorizedRequest } from "../../../types";
 import { validateRequiredFileFields } from "../../../utils";
@@ -9,7 +9,7 @@ import { MediaModule } from "../..";
 
 export const uploadBlogController = async (
   req: AuthorizedRequest,
-  res: Response
+  res: Response,
 ) => {
   validateRequiredFileFields({ req, fields: BLOGS_THUMBNAILS });
 
@@ -31,7 +31,10 @@ export const uploadBlogController = async (
   }).lean();
 
   if (isExistBlog) {
-    throw new AppError({ message: "Blog already exists with Main Title OR Subtitle", statusCode: 400 });
+    throw new AppError({
+      message: "Blog already exists with Main Title OR Subtitle",
+      statusCode: 400,
+    });
   }
 
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -51,7 +54,7 @@ export const uploadBlogController = async (
 
         thumbnails[item] = uploadResult.secure_url;
       }
-    })
+    }),
   );
 
   const user = req.user;
@@ -83,7 +86,7 @@ export const uploadBlogController = async (
         if (thumbnail) {
           await MediaModule.Utils.singleImageRemover(thumbnail, "image");
         }
-      })
+      }),
     );
 
     throw error;

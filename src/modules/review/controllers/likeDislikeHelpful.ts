@@ -2,12 +2,12 @@ import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { isValidMongoId } from "../../../utils";
 import { Review } from "../models";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { Types } from "mongoose";
 
 export const likeDislikeHelpfulController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const { reviewId } = req.params;
   isValidMongoId(reviewId, "Invalid Review Id provided", 404);
@@ -16,8 +16,18 @@ export const likeDislikeHelpfulController = async (
   const user = req.user;
   const review = await Review.findById(reviewId);
 
-  if (!user) throw new AppError({ message: "User not found", statusCode: 404, code: "NOT_FOUND" });
-  if (!review) throw new AppError({ message: "Review not found", statusCode: 404, code: "NOT_FOUND" });
+  if (!user)
+    throw new AppError({
+      message: "User not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
+  if (!review)
+    throw new AppError({
+      message: "Review not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
 
   const userId = new Types.ObjectId(user._id);
 

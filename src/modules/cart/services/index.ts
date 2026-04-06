@@ -1,5 +1,5 @@
 import { AuthenticatedRequest } from "../../../types";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { Cart } from "../models";
 import { IPopulatedCart } from "../types";
 
@@ -31,12 +31,16 @@ export const getUserCart = async (req: AuthenticatedRequest) => {
     cart = await Cart.findOneAndUpdate(
       { user: userId },
       { $setOnInsert: { user: userId, products: [], charges: 0 } },
-      { new: true, upsert: true }
+      { new: true, upsert: true },
     );
   }
 
   if (!cart) {
-    throw new AppError({ message: "Cart not found!", statusCode: 500, code: "INTERNAL_ERROR" });
+    throw new AppError({
+      message: "Cart not found!",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 
   return cart as unknown as IPopulatedCart;

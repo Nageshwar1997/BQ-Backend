@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { UserModule } from "../..";
-import { AppError, mailService, redisService } from "../../../classes";
+import { AppError, mailService, redisService } from "../../../Classes";
 import { authUtils } from "../utils";
 import { MAX_RESEND, MINUTE } from "../../../constants";
 import {

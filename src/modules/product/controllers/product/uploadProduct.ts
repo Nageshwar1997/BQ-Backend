@@ -2,7 +2,7 @@ import { Response } from "express";
 import { Types } from "mongoose";
 
 import { AuthorizedRequest } from "../../../../types";
-import { AppError } from "../../../../classes";
+import { AppError } from "../../../../Classes";
 import { Product, Shade } from "../../models";
 import { findOrCreateCategory } from "../../services";
 import { removeImages, uploadImages } from "../../utils";
@@ -10,7 +10,7 @@ import { ChatbotModule } from "../../..";
 
 export const uploadProductController = async (
   req: AuthorizedRequest,
-  res: Response
+  res: Response,
 ) => {
   const user = req.user;
 
@@ -37,7 +37,7 @@ export const uploadProductController = async (
     categoryLevelOne.name,
     categoryLevelOne.category,
     null,
-    1
+    1,
   );
 
   // Find or Create Level-Two Category (Parent must be Level-One)
@@ -45,7 +45,7 @@ export const uploadProductController = async (
     categoryLevelTwo.name,
     categoryLevelTwo.category,
     category_1._id,
-    2
+    2,
   );
 
   // Find or Create Level-Three Category (Parent must be Level-Two)
@@ -53,7 +53,7 @@ export const uploadProductController = async (
     categoryLevelThree.name,
     categoryLevelThree.category,
     category_2._id,
-    3
+    3,
   );
 
   if (sellingPrice > originalPrice) {
@@ -86,13 +86,16 @@ export const uploadProductController = async (
   });
 
   if (!commonImageFiles.length) {
-    throw new AppError({ message: "Common images are required", statusCode: 400 });
+    throw new AppError({
+      message: "Common images are required",
+      statusCode: 400,
+    });
   }
 
   // Upload common images
   uploadedCommonImages = await uploadImages(
     commonImageFiles,
-    `Products/${title}/Common_Images`
+    `Products/${title}/Common_Images`,
   );
 
   try {
@@ -106,7 +109,7 @@ export const uploadProductController = async (
         if (!(shadeImagesMap[idx] && shadeImagesMap[idx].length > 0)) {
           const shadeName = shade.shadeName || `Unknown Shade at index ${idx}`;
           missingShadeErrors.push(
-            `Shade: '${shadeName}' At least 1 image is required`
+            `Shade: '${shadeName}' At least 1 image is required`,
           );
         }
       });
@@ -117,7 +120,7 @@ export const uploadProductController = async (
             (msg, i) =>
               `${missingShadeErrors.length > 1 ? `${i + 1}). ` : ""}${msg}${
                 i === missingShadeErrors.length - 1 ? "." : ""
-              }`
+              }`,
           )
           .join(", ");
         throw new AppError({ message: errorMessage, statusCode: 400 });
@@ -132,13 +135,13 @@ export const uploadProductController = async (
 
           const images = await uploadImages(
             shadeFiles,
-            `Products/${title}/Shades/${shade.shadeName}`
+            `Products/${title}/Shades/${shade.shadeName}`,
           );
 
           uploadedAllShadesImages.push(...images);
 
           return { ...shade, images };
-        })
+        }),
       );
 
       if (shadesTotalStock !== totalStock) {

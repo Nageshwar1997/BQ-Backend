@@ -8,7 +8,7 @@ import router from "./routes";
 import { connectDB, handleNamespace, initSocket } from "./configs";
 import { Middlewares } from "./Middlewares";
 import { PORT } from "./envs";
-import { mailService, redisService } from "./classes";
+import { mailService, redisService } from "./Classes";
 
 const app = express();
 

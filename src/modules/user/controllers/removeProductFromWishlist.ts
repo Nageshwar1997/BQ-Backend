@@ -2,14 +2,14 @@ import { NextFunction, Response } from "express";
 import { ClientSession, Types } from "mongoose";
 import { AuthenticatedRequest } from "../../../types";
 import { Wishlist } from "../models";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { isValidMongoId } from "../../../utils";
 
 export const removeProductFromWishlistController = async (
   req: AuthenticatedRequest,
   res: Response,
   _next: NextFunction,
-  session: ClientSession
+  session: ClientSession,
 ) => {
   const userId = req.user?._id;
   const { productId } = req.params;
@@ -20,11 +20,15 @@ export const removeProductFromWishlistController = async (
   const updatedWishlist = await Wishlist.findByIdAndUpdate(
     userId,
     { $pull: { products: new Types.ObjectId(productId?.toString()) } },
-    { new: true, session }
+    { new: true, session },
   );
 
   if (!updatedWishlist) {
-    throw new AppError({ message: "Wishlist not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Wishlist not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   // If wishlist is empty after removal, delete it (also within the session)
@@ -34,7 +38,11 @@ export const removeProductFromWishlistController = async (
     });
 
     if (!deletedWishlist) {
-      throw new AppError({ message: "Failed to remove wishlist product", statusCode: 500, code: "INTERNAL_ERROR" });
+      throw new AppError({
+        message: "Failed to remove wishlist product",
+        statusCode: 500,
+        code: "INTERNAL_ERROR",
+      });
     }
   }
 

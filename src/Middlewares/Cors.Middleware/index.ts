@@ -1,13 +1,19 @@
 import cors from "cors";
 import { allowedOrigins } from "../../constants";
-import { AppError } from "../../classes";
+import { AppError } from "../../Classes";
 
 export const Cors = cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new AppError({ message: "Not allowed by CORS", statusCode: 403, code: "AUTH_ERROR" }));
+      callback(
+        new AppError({
+          message: "Not allowed by CORS",
+          statusCode: 403,
+          code: "AUTH_ERROR",
+        }),
+      );
     }
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],

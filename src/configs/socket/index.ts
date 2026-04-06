@@ -2,7 +2,7 @@ import { Server as HttpServer } from "http";
 import { Server as SocketIOServer, Socket, Namespace } from "socket.io";
 
 import { allowedOrigins } from "../../constants";
-import { AppError } from "../../classes";
+import { AppError } from "../../Classes";
 import { ChatbotModule } from "../../modules";
 
 let io: SocketIOServer | null = null;
@@ -16,7 +16,13 @@ export const initSocket = (server: HttpServer) => {
         if (!origin || allowedOrigins.includes(origin)) {
           callback(null, true);
         } else {
-          callback(new AppError({ message: "Not allowed by CORS", statusCode: 403, code: "AUTH_ERROR" }));
+          callback(
+            new AppError({
+              message: "Not allowed by CORS",
+              statusCode: 403,
+              code: "AUTH_ERROR",
+            }),
+          );
         }
       },
       methods: ["GET", "POST"],

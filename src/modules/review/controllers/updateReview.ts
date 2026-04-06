@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { isValidMongoId } from "../../../utils";
 import { MediaModule } from "../..";
 import { Review } from "../models";
@@ -8,7 +8,7 @@ import { possibleUpdateReviewFields } from "../constants";
 
 export const updateReviewController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const { productId, reviewId } = req?.params;
 
@@ -42,7 +42,11 @@ export const updateReviewController = async (
   const review = await Review.findById(reviewId);
 
   if (!review) {
-    throw new AppError({ message: "Review not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Review not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   if (removedImages?.length) {

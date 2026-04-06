@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { isValidMongoId } from "../../../utils";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { Blog } from "../models";
 
 export const getBlogByIdController = async (req: Request, res: Response) => {
@@ -15,7 +15,11 @@ export const getBlogByIdController = async (req: Request, res: Response) => {
     .lean();
 
   if (!blog) {
-    throw new AppError({ message: "Blog not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Blog not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   res.success(200, "Blog fetched successfully", { blog });

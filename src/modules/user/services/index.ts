@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { AppError, redisService } from "../../../classes";
+import { AppError, redisService } from "../../../Classes";
 import { User } from "../models";
 import { UserProps } from "../types";
 

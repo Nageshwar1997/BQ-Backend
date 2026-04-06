@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { isValidMongoId } from "../../../utils";
-import { redisService } from "../../../classes";
+import { redisService } from "../../../Classes";
 import { Modules } from "../..";
 
 export const getUserController = async (req: Request, res: Response) => {

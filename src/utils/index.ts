@@ -12,7 +12,7 @@ import {
   ZodCommonConfigs,
   TRole,
 } from "../types";
-import { AppError } from "../classes";
+import { AppError } from "../Classes";
 import { regexes } from "../constants";
 import {
   BACKEND_LOCALHOST_URL,

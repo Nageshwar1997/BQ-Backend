@@ -2,11 +2,11 @@ import { Response } from "express";
 import { AuthorizedRequest } from "../../../types";
 import { CartProduct } from "../models";
 import { isValidMongoId } from "../../../utils";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 
 export const updateCartProductQuantityController = async (
   req: AuthorizedRequest,
-  res: Response
+  res: Response,
 ) => {
   const { id } = req.params;
 
@@ -17,11 +17,14 @@ export const updateCartProductQuantityController = async (
   const cartProduct = await CartProduct.findByIdAndUpdate(
     id,
     { $set: { quantity } },
-    { new: true }
+    { new: true },
   );
 
   if (!cartProduct) {
-    throw new AppError({ message: "Failed to update quantity", statusCode: 400 });
+    throw new AppError({
+      message: "Failed to update quantity",
+      statusCode: 400,
+    });
   }
 
   res.success(201, "Quantity updated successfully");

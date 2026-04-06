@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Blog } from "../models";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 
 export const getAllBlogsController = async (req: Request, res: Response) => {
   const page = Number(req.query.page);
@@ -14,7 +14,11 @@ export const getAllBlogsController = async (req: Request, res: Response) => {
     .lean();
 
   if (!blogs) {
-    throw new AppError({ message: "Blogs not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Blogs not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   const totalBlogs = await Blog.countDocuments();

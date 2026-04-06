@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcryptjs";
 
-import { AppError, redisService } from "../../../classes";
+import { AppError, redisService } from "../../../Classes";
 import { UserModule } from "../..";
 import { authServices } from "../services";
 import {

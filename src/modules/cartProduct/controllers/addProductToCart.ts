@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { CartModule } from "../..";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { isValidMongoId } from "../../../utils";
 import { CartProduct } from "../models";
 import { ObjectIdQueryTypeCasting } from "mongoose";

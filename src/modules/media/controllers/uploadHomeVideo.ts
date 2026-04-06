@@ -1,7 +1,7 @@
 import { Response } from "express";
 
 import { AuthorizedRequest } from "../../../types";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { ALLOWED_IMAGE_TYPES, ALLOWED_VIDEO_TYPES } from "../../../constants";
 import {
   singleImageRemover,
@@ -13,7 +13,7 @@ import { HomeVideo } from "../models";
 
 export const uploadHomeVideoController = async (
   req: AuthorizedRequest,
-  res: Response
+  res: Response,
 ) => {
   const { title, cloudinaryConfigOption } = req.body;
   const userId = req.user?._id;
@@ -29,13 +29,16 @@ export const uploadHomeVideoController = async (
   }
 
   if (!posterFile) {
-    throw new AppError({ message: "Poster file is required.", statusCode: 400 });
+    throw new AppError({
+      message: "Poster file is required.",
+      statusCode: 400,
+    });
   }
 
   if (!ALLOWED_VIDEO_TYPES.includes(videoFile.mimetype)) {
     throw new AppError({
-      message: `Invalid video format. Allowed formats: ${ALLOWED_VIDEO_TYPES.map((t) =>
-        t.replace("video/", "")
+      message: `Invalid video format. Allowed formats: ${ALLOWED_VIDEO_TYPES.map(
+        (t) => t.replace("video/", ""),
       ).join(", ")}`,
       statusCode: 400,
     });
@@ -43,8 +46,8 @@ export const uploadHomeVideoController = async (
 
   if (!ALLOWED_IMAGE_TYPES.includes(posterFile.mimetype)) {
     throw new AppError({
-      message: `Invalid poster format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map((t) =>
-        t.replace("image/", "")
+      message: `Invalid poster format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map(
+        (t) => t.replace("image/", ""),
       ).join(", ")}`,
       statusCode: 400,
     });
@@ -57,7 +60,11 @@ export const uploadHomeVideoController = async (
     cloudinaryConfigOption,
   });
   if (!video) {
-    throw new AppError({ message: "Video upload failed", statusCode: 500, code: "INTERNAL_ERROR" });
+    throw new AppError({
+      message: "Video upload failed",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 
   const poster = await singleImageUploader({
@@ -67,7 +74,11 @@ export const uploadHomeVideoController = async (
   });
   if (!poster) {
     await singleVideoRemover(video.secure_url, cloudinaryConfigOption);
-    throw new AppError({ message: "Poster upload failed", statusCode: 500, code: "INTERNAL_ERROR" });
+    throw new AppError({
+      message: "Poster upload failed",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 
   try {
@@ -87,6 +98,10 @@ export const uploadHomeVideoController = async (
       singleVideoRemover(video.secure_url, cloudinaryConfigOption),
       singleImageRemover(poster.secure_url, cloudinaryConfigOption),
     ]);
-    throw new AppError({ message: "Failed to upload video", statusCode: 500, code: "INTERNAL_ERROR" });
+    throw new AppError({
+      message: "Failed to upload video",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 };

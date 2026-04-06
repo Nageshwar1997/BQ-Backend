@@ -1,7 +1,7 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request } from "express";
 
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { JWT_SECRET } from "../../../envs";
 import { getAuthorizationToken } from "../../../utils";
 

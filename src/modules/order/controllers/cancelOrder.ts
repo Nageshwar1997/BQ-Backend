@@ -3,7 +3,7 @@ import { ClientSession } from "mongoose";
 import { INormalizeError } from "razorpay/dist/types/api";
 import { AuthenticatedRequest } from "../../../types";
 import { Order } from "../models";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { isValidMongoId } from "../../../utils";
 import { ChatbotModule } from "../..";
 import { razorpay } from "../../../configs";
@@ -12,7 +12,7 @@ export const cancelOrderController = async (
   req: AuthenticatedRequest,
   res: Response,
   _next: NextFunction,
-  session: ClientSession
+  session: ClientSession,
 ) => {
   const { orderId } = req.params;
   const { reason } = req.body ?? {};
@@ -24,12 +24,20 @@ export const cancelOrderController = async (
     session,
   });
 
-  if (!order) throw new AppError({ message: "Order not found", statusCode: 404, code: "NOT_FOUND" });
+  if (!order)
+    throw new AppError({
+      message: "Order not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
 
   const status = order.status;
 
   if (["DELIVERED", "RETURNED"].includes(status)) {
-    throw new AppError({ message: "Order cannot be cancelled", statusCode: 400 });
+    throw new AppError({
+      message: "Order cannot be cancelled",
+      statusCode: 400,
+    });
   }
 
   if (status === "CANCELLED") {
@@ -54,7 +62,8 @@ export const cancelOrderController = async (
       console.error("Razorpay refund failed:", err);
 
       throw new AppError({
-        message: (err as INormalizeError)?.error?.description ||
+        message:
+          (err as INormalizeError)?.error?.description ||
           "Refund failed. Order was not cancelled. Please try again.",
         statusCode: 500,
         code: "INTERNAL_ERROR",

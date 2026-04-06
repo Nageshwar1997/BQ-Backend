@@ -3,7 +3,7 @@ import { ClientSession, Types } from "mongoose";
 import { AuthenticatedRequest } from "../../../types";
 import { Order } from "../models";
 import { AddressModule, CartModule, ChatbotModule } from "../..";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { IOrder } from "../types";
 import { IAddress } from "../../address/types";
 import { rzp_create_order } from "../services";
@@ -12,7 +12,7 @@ export const createOrderController = async (
   req: AuthenticatedRequest,
   res: Response,
   _next: NextFunction,
-  session: ClientSession
+  session: ClientSession,
 ) => {
   const user = req.user;
   const { billing, shipping, both } = req.query;
@@ -26,9 +26,15 @@ export const createOrderController = async (
   const addressIds = [];
 
   if (shipping && !billing)
-    throw new AppError({ message: "Billing address is required", statusCode: 400 });
+    throw new AppError({
+      message: "Billing address is required",
+      statusCode: 400,
+    });
   if (billing && !shipping)
-    throw new AppError({ message: "Shipping address is required", statusCode: 400 });
+    throw new AppError({
+      message: "Shipping address is required",
+      statusCode: 400,
+    });
   if (billing && shipping) addressIds.push(shipping, billing);
   else if (both) addressIds.push(both);
 
@@ -39,16 +45,21 @@ export const createOrderController = async (
     .session(session)
     .lean();
 
-  if (!foundAddresses?.length) throw new AppError({ message: "Address not found", statusCode: 404, code: "NOT_FOUND" });
+  if (!foundAddresses?.length)
+    throw new AppError({
+      message: "Address not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
 
   const totalPrice = cart.products.reduce(
     (acc, item) => acc + item.product.sellingPrice * item.quantity,
-    0
+    0,
   );
 
   const discount = cart.products.reduce(
     (acc, item) => acc + item.product.discount,
-    0
+    0,
   );
   const charges = totalPrice < 499 ? 40 : 0;
 
@@ -79,16 +90,21 @@ export const createOrderController = async (
 
   const order = await new Order(orderBody).save({ session });
 
-  if (!order) throw new AppError({ message: "Failed to create order", statusCode: 400 });
+  if (!order)
+    throw new AppError({ message: "Failed to create order", statusCode: 400 });
 
   const razorpayOrder = await rzp_create_order(
     user!,
     totalPrice + charges,
-    order._id.toString()
+    order._id.toString(),
   );
 
   if (!razorpayOrder) {
-    throw new AppError({ message: "Failed to create Razorpay order", statusCode: 500, code: "INTERNAL_ERROR" });
+    throw new AppError({
+      message: "Failed to create Razorpay order",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 
   order.payment.rzp_order_id = razorpayOrder.id;

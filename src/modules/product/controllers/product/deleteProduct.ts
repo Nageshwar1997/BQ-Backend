@@ -2,7 +2,7 @@ import { Response } from "express";
 import { AuthorizedRequest } from "../../../../types";
 import { Product, Shade } from "../../models";
 import { checkUserPermission, isValidMongoId } from "../../../../utils";
-import { AppError } from "../../../../classes";
+import { AppError } from "../../../../Classes";
 import { MediaModule } from "../../..";
 import { Types } from "mongoose";
 
@@ -20,7 +20,7 @@ const extractImageUrls = (html: string): string[] => {
 
 export const deleteProductController = async (
   req: AuthorizedRequest,
-  res: Response
+  res: Response,
 ) => {
   const { productId } = req.params;
   const userId = req.user?._id;
@@ -29,7 +29,11 @@ export const deleteProductController = async (
 
   const product = await Product.findById(productId);
   if (!product) {
-    throw new AppError({ message: "Product not found", statusCode: 404, code: "NOT_FOUND" });
+    throw new AppError({
+      message: "Product not found",
+      statusCode: 404,
+      code: "NOT_FOUND",
+    });
   }
 
   if (req.user?.role !== "MASTER") {
@@ -46,7 +50,7 @@ export const deleteProductController = async (
   const removingImages: string[] = [
     ...product.commonImages,
     ...extractImageUrls(
-      `${product.description} ${product.howToUse} ${product.ingredients} ${product.additionalDetails}`
+      `${product.description} ${product.howToUse} ${product.ingredients} ${product.additionalDetails}`,
     ),
   ];
 

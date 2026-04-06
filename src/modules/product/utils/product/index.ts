@@ -1,17 +1,17 @@
 import { MediaModule } from "../../..";
-import { AppError } from "../../../../classes";
+import { AppError } from "../../../../Classes";
 import { validateZodNumber, validateZodString } from "../../../../utils";
 import { ValidateProductFieldConfigs } from "../../types";
 
 export const isSafePopulateField = <T extends readonly string[]>(
   field: string,
-  allowedFields: T
+  allowedFields: T,
 ): field is T[number] => {
   return allowedFields.includes(field as T[number]);
 };
 
 export function typedObjectEntries<T extends object>(
-  obj: T
+  obj: T,
 ): [keyof T, T[keyof T]][] {
   return Object.entries(obj) as [keyof T, T[keyof T]][];
 }
@@ -68,7 +68,7 @@ export const removeImages = async (imageUrls: string[]): Promise<void> => {
 
 export const uploadImages = async (
   files: Express.Multer.File[],
-  folder: string
+  folder: string,
 ): Promise<string[]> => {
   if (files?.length) {
     const result = await MediaModule.Utils.multipleImagesUploader({

@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
-import { AppError } from "../../../classes";
+import { AppError } from "../../../Classes";
 import { Seller } from "../models";
 import { multipleImagesUploader } from "../../media/utils";
 
@@ -13,7 +13,7 @@ interface SellerDocumentFiles {
 
 export const createSellerRequestController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const user = req.user;
 
@@ -37,7 +37,10 @@ export const createSellerRequestController = async (
   const { businessDetails, businessAddress, agreeTerms } = req.body;
 
   if (!agreeTerms) {
-    throw new AppError({ message: "You have to agree with our terms and conditions", statusCode: 401 });
+    throw new AppError({
+      message: "You have to agree with our terms and conditions",
+      statusCode: 401,
+    });
   }
   const gstFile = files?.gst?.[0];
   const itrFile = files?.itr?.[0];
@@ -45,7 +48,10 @@ export const createSellerRequestController = async (
   const geoTaggingFile = files?.geoTagging?.[0];
 
   if (!gstFile || !itrFile || !addressProofFile || !geoTaggingFile) {
-    throw new AppError({ message: "All Documents are Required", statusCode: 400 });
+    throw new AppError({
+      message: "All Documents are Required",
+      statusCode: 400,
+    });
   }
 
   const personalDetails = {
@@ -76,6 +82,6 @@ export const createSellerRequestController = async (
   res.success(
     201,
     "Request sent successfully, Our team will reach out to you very soon.",
-    { seller }
+    { seller },
   );
 };
