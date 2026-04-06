@@ -1,9 +1,9 @@
 import { Schema } from "mongoose";
-import { IAddress, IUserAddresses } from "../types";
-import { ADDRESS_TYPES } from "../constants";
+import { IAddress, IUserAddresses } from "../Address.Types";
+import { AddressConstants } from "../Address.Constants";
 import { Constants } from "../../../Constants";
 
-export const addressBaseFields = {
+const AddressBaseFields = {
   address: { type: String, required: true },
   landmark: { type: String },
   city: { type: String, required: true },
@@ -25,7 +25,7 @@ export const addressBaseFields = {
   type: {
     type: String,
     required: true,
-    enum: ADDRESS_TYPES,
+    enum: AddressConstants.ADDRESS_TYPES,
     default: "both",
   },
   firstName: { type: String, required: true },
@@ -33,15 +33,15 @@ export const addressBaseFields = {
   email: { type: String, required: true, lowercase: true },
 };
 
-export const addressSchema = new Schema<IAddress>(
+const AddressSchema = new Schema<IAddress>(
   {
-    ...addressBaseFields,
+    ...AddressBaseFields,
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true, versionKey: false },
 );
 
-export const userAddressesSchema = new Schema<IUserAddresses>(
+const UserAddressSchema = new Schema<IUserAddresses>(
   {
     addresses: {
       type: [{ type: Schema.Types.ObjectId, ref: "Address" }],
@@ -59,3 +59,9 @@ export const userAddressesSchema = new Schema<IUserAddresses>(
   },
   { timestamps: true, versionKey: false },
 );
+
+export const AddressSchemas = {
+  Address: AddressSchema,
+  UserAddress: UserAddressSchema,
+  BaseFields: AddressBaseFields,
+};

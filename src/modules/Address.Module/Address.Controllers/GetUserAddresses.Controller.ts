@@ -1,16 +1,16 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
-import { UserAddress } from "../models";
+import { AddressModels } from "../Address.Models";
 
-export const getUserAddressesController = async (
+export const GetUserAddressesController = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => {
   const userId = req.user?._id;
 
-  const userAddresses = await UserAddress.findOne({ user: userId }).populate(
-    "addresses"
-  );
+  const userAddresses = await AddressModels.UserAddress.findOne({
+    user: userId,
+  }).populate("addresses");
 
   res.success(200, "User address fetched successfully", { userAddresses });
 };

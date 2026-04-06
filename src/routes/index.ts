@@ -1,6 +1,5 @@
 import { Router } from "express";
 import {
-  AddressModule,
   BlogModule,
   CartModule,
   CartProductModule,
@@ -40,7 +39,7 @@ router.use("/carts", CartModule.Routes.cartRouter);
 router.use("/cart-products", CartProductModule.Routes.cartProductRouter);
 
 // Address routes
-router.use("/addresses", AddressModule.Routes.addressRouter);
+router.use("/addresses", Modules.Address.Router);
 
 // Order routes
 router.use("/orders", OrderModule.Routes.orderRouter);

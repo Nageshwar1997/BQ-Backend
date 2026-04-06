@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import { UserModule } from "../..";
-import { ADDRESS_TYPES } from "../constants";
+import { AddressConstants } from "../Address.Constants";
 import { Constants } from "../../../Constants";
 
 export interface IAddress extends Pick<
@@ -16,7 +16,7 @@ export interface IAddress extends Pick<
   pinCode: string;
   country: (typeof Constants.Common.ALLOWED_COUNTRIES)[number];
   gst?: string;
-  type: (typeof ADDRESS_TYPES)[number];
+  type: (typeof AddressConstants.ADDRESS_TYPES)[number];
 }
 
 // Store all address references for a user

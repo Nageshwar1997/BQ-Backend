@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { validateZodEnums, validateZodString } from "../../../utils";
 import { Constants } from "../../../Constants";
-import { ADDRESS_TYPES } from "../constants";
+import { AddressConstants } from "../Address.Constants";
 
 const addressBaseSchema = z.object({
   address: validateZodString({
@@ -50,7 +50,7 @@ const addressBaseSchema = z.object({
   }).default("India"),
   type: validateZodEnums({
     field: "type",
-    enums: ADDRESS_TYPES,
+    enums: AddressConstants.ADDRESS_TYPES,
   }).default("both"),
   firstName: validateZodString({
     field: "firstName",

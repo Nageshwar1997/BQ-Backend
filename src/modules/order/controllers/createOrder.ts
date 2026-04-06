@@ -5,7 +5,7 @@ import { Order } from "../models";
 import { AddressModule, CartModule, ChatbotModule } from "../..";
 import { AppError } from "../../../Classes";
 import { IOrder } from "../types";
-import { IAddress } from "../../address/types";
+import { IAddress } from "../../Address.Module/Address.Types";
 import { rzp_create_order } from "../services";
 
 export const createOrderController = async (

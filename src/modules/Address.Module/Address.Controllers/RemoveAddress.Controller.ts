@@ -1,11 +1,11 @@
 import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
-import { Address, UserAddress } from "../models";
+import { AddressModels } from "../Address.Models";
 import { AppError } from "../../../Classes";
 import { ClientSession } from "mongoose";
 import { isValidMongoId } from "../../../utils";
 
-export const removeAddressController = async (
+export const RemoveAddressController = async (
   req: AuthenticatedRequest,
   res: Response,
   _: NextFunction,
@@ -17,7 +17,7 @@ export const removeAddressController = async (
   isValidMongoId(addressId, "Invalid Address Id provided", 404);
 
   // Find the address first
-  const address = await Address.findOne({
+  const address = await AddressModels.Address.findOne({
     _id: addressId,
     user: userId,
   }).session(session);
@@ -31,17 +31,20 @@ export const removeAddressController = async (
   }
 
   // Check if this is the user's default address
-  const userAddress = await UserAddress.findOne({ user: userId }).session(
-    session,
-  );
+  const userAddress = await AddressModels.UserAddress.findOne({
+    user: userId,
+  }).session(session);
   const isDefaultAddress =
     userAddress?.defaultAddress?.toString() === addressId;
 
   // Delete address and update UserAddress in parallel
   const [deletedAddress, updatedUserAddress] = await Promise.all([
-    Address.findOneAndDelete({ _id: addressId, user: userId }).session(session),
+    AddressModels.Address.findOneAndDelete({
+      _id: addressId,
+      user: userId,
+    }).session(session),
     isDefaultAddress
-      ? UserAddress.findOneAndUpdate(
+      ? AddressModels.UserAddress.findOneAndUpdate(
           { user: userId },
           { $set: { defaultAddress: null }, $pull: { addresses: addressId } },
           { new: true, session },

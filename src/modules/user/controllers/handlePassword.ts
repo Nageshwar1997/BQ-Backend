@@ -4,7 +4,7 @@ import { AuthenticatedRequest } from "../../../types";
 import { getUserByEmail, getUserById, updateUser } from "../services";
 import { TAuthProvider } from "../types";
 import { AppError, mailService, redisService } from "../../../Classes";
-import { generateTokenForRedis } from "../../auth/utils";
+import { generateTokenForRedis } from "../../Auth.Module/Auth.Utils";
 import { Constants } from "../../../Constants";
 import {
   getAuthorizationToken,

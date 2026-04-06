@@ -1,10 +1,10 @@
 import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
-import { Address, UserAddress } from "../models";
+import { AddressModels } from "../Address.Models";
 import { AppError } from "../../../Classes";
 import { ClientSession } from "mongoose";
 
-export const addAddressController = async (
+export const AddAddressController = async (
   req: AuthenticatedRequest,
   res: Response,
   _: NextFunction,
@@ -14,7 +14,7 @@ export const addAddressController = async (
 
   const { isDefaultAddress, ...restBody } = req.body ?? {};
 
-  const userAddresses = await UserAddress.findOneAndUpdate(
+  const userAddresses = await AddressModels.UserAddress.findOneAndUpdate(
     { user: userId },
     { $setOnInsert: { user: userId, addresses: [], defaultAddress: null } },
     { new: true, upsert: true, session },
@@ -28,7 +28,7 @@ export const addAddressController = async (
     });
   }
 
-  const address = new Address({ ...restBody, user: userId });
+  const address = new AddressModels.Address({ ...restBody, user: userId });
 
   try {
     await address.save({ session });

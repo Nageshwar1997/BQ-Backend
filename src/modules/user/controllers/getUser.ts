@@ -5,7 +5,7 @@ import { redisService } from "../../../Classes";
 import { Modules } from "../..";
 
 export const getUserController = async (req: Request, res: Response) => {
-  const userId = Modules.Auth.Services.getUserIdFromToken(req);
+  const userId = Modules.Auth.Services.GetUserIdFromToken(req);
   isValidMongoId(userId, "Invalid userId", 400);
 
   const user = await redisService.getCachedUser(userId);

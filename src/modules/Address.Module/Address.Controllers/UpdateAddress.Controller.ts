@@ -1,12 +1,12 @@
 import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
-import { Address, UserAddress } from "../models";
+import { AddressModels } from "../Address.Models";
 import { AppError } from "../../../Classes";
 import { ClientSession } from "mongoose";
 import { isValidMongoId } from "../../../utils";
-import { IAddress } from "../types";
+import { IAddress } from "../Address.Types";
 
-export const updateAddressController = async (
+export const UpdateAddressController = async (
   req: AuthenticatedRequest,
   res: Response,
   _: NextFunction,
@@ -35,7 +35,7 @@ export const updateAddressController = async (
     );
   }
 
-  const updatedAddress = await Address.findOneAndUpdate(
+  const updatedAddress = await AddressModels.Address.findOneAndUpdate(
     { _id: addressId, user: userId },
     { $set: updateBody },
     { new: true, session },
@@ -50,7 +50,7 @@ export const updateAddressController = async (
   }
 
   if (isDefaultAddress) {
-    const updatedUserAddress = await UserAddress.findOneAndUpdate(
+    const updatedUserAddress = await AddressModels.UserAddress.findOneAndUpdate(
       { user: userId },
       { $set: { defaultAddress: addressId } },
       { new: true, session },
