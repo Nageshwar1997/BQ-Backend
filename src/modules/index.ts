@@ -1,4 +1,4 @@
-export * as BlogModule from "./blog";
+export * as BlogModule from "./Blog.Module";
 export * as MediaModule from "./media";
 export * as UserModule from "./user";
 export * as ProductModule from "./product";

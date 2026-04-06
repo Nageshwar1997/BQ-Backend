@@ -5,7 +5,7 @@ import { Order } from "../models";
 import { CartModule, ChatbotModule } from "../..";
 import { AppError } from "../../../Classes";
 import { IOrder } from "../types";
-import { AddressModule, AddressTypes } from "../../Address.Module";
+import { AddressModule, TAddressModule } from "../../Address.Module";
 import { rzp_create_order } from "../services";
 
 export const createOrderController = async (
@@ -38,7 +38,7 @@ export const createOrderController = async (
   if (billing && shipping) addressIds.push(shipping, billing);
   else if (both) addressIds.push(both);
 
-  const foundAddresses: AddressTypes.IAddress[] =
+  const foundAddresses: TAddressModule.IAddress[] =
     await AddressModule.Models.Address.find({
       user: user?._id,
       _id: { $in: addressIds },
