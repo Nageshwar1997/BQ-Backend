@@ -43,7 +43,7 @@ app.use("/api", router);
 // ----------------- ERROR HANDLING -----------------
 app.use(ResponseMiddleware.notFound);
 app.use(Middlewares.Logger.Error);
-app.use(ResponseMiddleware.errorHandler);
+app.use(Middlewares.Response.Error);
 
 // ----------------- SERVER SETUP -----------------
 const server = http.createServer(app);
