@@ -28,7 +28,7 @@ import {
   IS_DEV_MODE,
   LINKEDIN_REDIRECT_ENDPOINT,
 } from "../Envs";
-import { TAuthProvider } from "../modules/user/types";
+import { TAuthProvider } from "../Modules/user/types";
 
 export const STRINGIFY_DATA = (data: unknown): string => {
   try {

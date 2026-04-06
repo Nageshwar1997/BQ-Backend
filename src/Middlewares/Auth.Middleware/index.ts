@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthenticatedRequest, AuthorizedRequest, TRole } from "../../types";
-import { Modules, UserModule } from "../../modules";
+import { Modules, UserModule } from "../../Modules";
 import { isValidMongoId } from "../../utils";
 import { AppError } from "../../Classes";
 

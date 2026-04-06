@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import { RedisClientType } from "redis";
-import { UserModule } from "../modules";
+import { UserModule } from "../Modules";
 import { Constants } from "../Constants";
 import { PARSE_DATA, STRINGIFY_DATA } from "../utils";
 import { Configs } from "../Configs";

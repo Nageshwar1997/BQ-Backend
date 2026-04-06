@@ -11,7 +11,7 @@ import {
   ReviewModule,
   UserModule,
   WebhookModule,
-} from "../modules";
+} from "../Modules";
 
 const router = Router();
 

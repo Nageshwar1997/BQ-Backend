@@ -6,7 +6,7 @@ import {
 } from "socket.io";
 
 import { AppError } from "../../Classes";
-import { ChatbotModule } from "../../modules";
+import { ChatbotModule } from "../../Modules";
 import { Constants } from "../../Constants";
 
 let io: SocketIOServer | null = null;

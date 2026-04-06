@@ -11,7 +11,7 @@ export interface AuthorizedRequest extends Request {
 }
 
 import multer from "multer";
-import { UserModule } from "../modules";
+import { UserModule } from "../Modules";
 import { Types } from "mongoose";
 
 export type TRole = "USER" | "SELLER" | "ADMIN" | "MASTER";

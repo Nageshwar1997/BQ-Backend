@@ -8,7 +8,7 @@ import {
   FRONTEND_PRODUCTION_ADMIN_URL,
   FRONTEND_PRODUCTION_MASTER_URL,
 } from "../../Envs";
-import { TAuthProvider } from "../../modules/user/types";
+import { TAuthProvider } from "../../Modules/user/types";
 import { TRole } from "../../types";
 
 const AUTH_PROVIDERS: TAuthProvider[] = [
