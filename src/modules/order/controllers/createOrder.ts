@@ -2,10 +2,10 @@ import { NextFunction, Response } from "express";
 import { ClientSession, Types } from "mongoose";
 import { AuthenticatedRequest } from "../../../types";
 import { Order } from "../models";
-import { AddressModule, CartModule, ChatbotModule } from "../..";
+import { CartModule, ChatbotModule } from "../..";
 import { AppError } from "../../../Classes";
 import { IOrder } from "../types";
-import { IAddress } from "../../Address.Module/Address.Types";
+import { AddressModule, AddressTypes } from "../../Address.Module";
 import { rzp_create_order } from "../services";
 
 export const createOrderController = async (
@@ -38,12 +38,13 @@ export const createOrderController = async (
   if (billing && shipping) addressIds.push(shipping, billing);
   else if (both) addressIds.push(both);
 
-  const foundAddresses: IAddress[] = await AddressModule.Models.Address.find({
-    user: user?._id,
-    _id: { $in: addressIds },
-  })
-    .session(session)
-    .lean();
+  const foundAddresses: AddressTypes.IAddress[] =
+    await AddressModule.Models.Address.find({
+      user: user?._id,
+      _id: { $in: addressIds },
+    })
+      .session(session)
+      .lean();
 
   if (!foundAddresses?.length)
     throw new AppError({

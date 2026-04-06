@@ -4,18 +4,19 @@ import {
   CartModule,
   CartProductModule,
   MediaModule,
-  Modules,
   OrderModule,
   ProductModule,
   ReviewModule,
   UserModule,
   WebhookModule,
 } from "../Modules";
+import { AuthModule } from "../Modules/Auth.Module";
+import { AddressModule } from "../Modules/Address.Module";
 
 const router = Router();
 
 // Auth routes
-router.use("/auth", Modules.Auth.Router);
+router.use("/auth", AuthModule.Router);
 
 // User routes
 router.use("/users", UserModule.Routes.userRouter);
@@ -39,7 +40,7 @@ router.use("/carts", CartModule.Routes.cartRouter);
 router.use("/cart-products", CartProductModule.Routes.cartProductRouter);
 
 // Address routes
-router.use("/addresses", Modules.Address.Router);
+router.use("/addresses", AddressModule.Router);
 
 // Order routes
 router.use("/orders", OrderModule.Routes.orderRouter);

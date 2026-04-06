@@ -1,14 +1,15 @@
 import { NextFunction, Response } from "express";
 import { AuthenticatedRequest, AuthorizedRequest, TRole } from "../../types";
-import { Modules, UserModule } from "../../Modules";
+import { UserModule } from "../../Modules";
 import { isValidMongoId } from "../../utils";
 import { AppError } from "../../Classes";
+import { AuthModule } from "../../Modules/Auth.Module";
 
 const Authenticated =
   (needPassword?: boolean) =>
   async (req: AuthenticatedRequest, _: Response, next: NextFunction) => {
     try {
-      const userId = Modules.Auth.Services.GetUserIdFromToken(req);
+      const userId = AuthModule.Services.GetUserIdFromToken(req);
 
       isValidMongoId(userId, "Invalid userId", 400);
 
@@ -30,7 +31,7 @@ const Authorization =
   (allowedRoles: TRole[], needPassword?: boolean) =>
   async (req: AuthorizedRequest, _: Response, next: NextFunction) => {
     try {
-      const userId = Modules.Auth.Services.GetUserIdFromToken(req);
+      const userId = AuthModule.Services.GetUserIdFromToken(req);
 
       isValidMongoId(userId, "Invalid userId", 400);
 

@@ -4,7 +4,7 @@ import { AddressModels } from "../Address.Models";
 import { AppError } from "../../../Classes";
 import { ClientSession } from "mongoose";
 import { isValidMongoId } from "../../../utils";
-import { IAddress } from "../Address.Types";
+import { AddressTypes } from "../Address.Types";
 
 export const UpdateAddressController = async (
   req: AuthenticatedRequest,
@@ -26,7 +26,7 @@ export const UpdateAddressController = async (
     removedOptionalFields.forEach(
       (
         field: keyof Partial<
-          Pick<IAddress, "altPhoneNumber" | "gst" | "landmark">
+          Pick<AddressTypes.IAddress, "altPhoneNumber" | "gst" | "landmark">
         >,
       ) => {
         // if the optional fields removed then make them empty
