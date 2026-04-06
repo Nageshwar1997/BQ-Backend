@@ -1,28 +1,28 @@
 import { object } from "zod";
 import { commonZodSchemas } from "./common.validation";
 import { appendZodCustomIssue, ZodValidator } from "../utils/zod.utils";
-import { zodStringOptions } from "../Constants";
+import { Constants } from "../Constants";
 
 export const registerOtpZodSchema = object({ otp: commonZodSchemas.otp });
 export const registerEmailZodSchema = object({ email: commonZodSchemas.email });
 
 export const registerZodSchema = object({
   firstName: ZodValidator.string({
-    ...zodStringOptions.name,
+    ...Constants.Zod.StringOptions.name,
     field: "firstName",
     label: "First name",
   }),
   lastName: ZodValidator.string({
-    ...zodStringOptions.name,
+    ...Constants.Zod.StringOptions.name,
     field: "lastName",
     label: "Last name",
   }),
   otp: registerOtpZodSchema.shape.otp,
   email: registerEmailZodSchema.shape.email,
   phoneNumber: commonZodSchemas.phoneNumber,
-  password: ZodValidator.string(zodStringOptions.password),
+  password: ZodValidator.string(Constants.Zod.StringOptions.password),
   confirmPassword: ZodValidator.string({
-    ...zodStringOptions.password,
+    ...Constants.Zod.StringOptions.password,
     field: "confirmPassword",
     label: "Confirm Password",
   }),

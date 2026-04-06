@@ -1,7 +1,7 @@
 import { IZodStringConfigs } from "../../types";
 import { Regex } from "../Regex.Constant.ts";
 
-export const zodStringOptions: Record<
+const zodStringOptions: Record<
   "email" | "phoneNumber" | "password" | "name" | "otp",
   IZodStringConfigs
 > = {
@@ -74,4 +74,8 @@ export const zodStringOptions: Record<
     allowSpace: "noSpace",
     customRegex: { regex: Regex.otp, message: "must be 6 digits" },
   },
+};
+
+export const ZodConstants = {
+  StringOptions: zodStringOptions,
 };
