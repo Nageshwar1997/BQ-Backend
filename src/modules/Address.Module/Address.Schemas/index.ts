@@ -1,6 +1,5 @@
 import { Schema } from "mongoose";
-import { IAddress, IUserAddresses } from "../Address.Types";
-import { AddressConstants } from "../Address.Constants";
+import { AddressTypes } from "../Address.Types";
 import { Constants } from "../../../Constants";
 
 const AddressBaseFields = {
@@ -25,7 +24,7 @@ const AddressBaseFields = {
   type: {
     type: String,
     required: true,
-    enum: AddressConstants.ADDRESS_TYPES,
+    enum: Constants.Common.ADDRESS_TYPES,
     default: "both",
   },
   firstName: { type: String, required: true },
@@ -33,7 +32,7 @@ const AddressBaseFields = {
   email: { type: String, required: true, lowercase: true },
 };
 
-const AddressSchema = new Schema<IAddress>(
+const AddressSchema = new Schema<AddressTypes.IAddress>(
   {
     ...AddressBaseFields,
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -41,7 +40,7 @@ const AddressSchema = new Schema<IAddress>(
   { timestamps: true, versionKey: false },
 );
 
-const UserAddressSchema = new Schema<IUserAddresses>(
+const UserAddressSchema = new Schema<AddressTypes.IUserAddresses>(
   {
     addresses: {
       type: [{ type: Schema.Types.ObjectId, ref: "Address" }],

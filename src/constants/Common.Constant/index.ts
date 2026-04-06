@@ -31,6 +31,8 @@ const ALLOWED_ORIGINS = [
 
 const ROLES: TRole[] = ["USER", "SELLER", "ADMIN", "MASTER"] as const;
 
+const ADDRESS_TYPES = ["shipping", "billing", "both"];
+
 const STATES_AND_UNION_TERRITORIES = [
   "Andhra Pradesh",
   "Arunachal Pradesh",
@@ -93,6 +95,7 @@ export const CommonConstants = {
   AUTH_PROVIDERS,
   ALLOWED_ORIGINS,
   ROLES,
+  ADDRESS_TYPES,
   STATES_AND_UNION_TERRITORIES,
   ALLOWED_COUNTRIES,
   ALLOWED_BUSINESSES,
