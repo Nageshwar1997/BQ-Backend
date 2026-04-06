@@ -8,7 +8,6 @@ import {
   uploadBlogController,
 } from "../controllers";
 import {
-  ResponseMiddleware,
   MulterMiddleware,
   ZodMiddleware,
   Middlewares,
@@ -18,13 +17,16 @@ import { editBlogZodSchema, uploadBlogZodSchema } from "../validations";
 export const blogRouter = Router();
 
 // All Blogs Route
-blogRouter.get("/all", ResponseMiddleware.catchAsync(getAllBlogsController));
+blogRouter.get(
+  "/all",
+  Middlewares.Response.Async.TryCatch(getAllBlogsController),
+);
 
 // Get Blog By Id Route
 blogRouter.get(
   "/blog/:id",
   Middlewares.Request.Empty({ params: true }),
-  ResponseMiddleware.catchAsync(getBlogByIdController),
+  Middlewares.Response.Async.TryCatch(getBlogByIdController),
 );
 
 // Blog Upload Route
@@ -41,7 +43,7 @@ blogRouter.post(
   Middlewares.Request.Empty({ body: true, files: true }),
   Middlewares.JSONParser({ fieldsToParse: ["tags"] }),
   ZodMiddleware.validateZodSchema(uploadBlogZodSchema),
-  ResponseMiddleware.catchAsync(uploadBlogController),
+  Middlewares.Response.Async.TryCatch(uploadBlogController),
 );
 
 // Blog Edit Route
@@ -57,7 +59,7 @@ blogRouter.patch(
   }),
   Middlewares.Request.Empty({ fileOrBody: true, params: true }),
   ZodMiddleware.validateZodSchema(editBlogZodSchema),
-  ResponseMiddleware.catchAsync(editBlogController),
+  Middlewares.Response.Async.TryCatch(editBlogController),
 );
 
 // Blog Delete Route

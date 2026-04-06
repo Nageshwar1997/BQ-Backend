@@ -6,7 +6,7 @@ import {
   getAllOrdersController,
   getOrderByIdController,
 } from "../controllers";
-import { Middlewares, ResponseMiddleware } from "../../../Middlewares";
+import { Middlewares } from "../../../Middlewares";
 
 export const orderRouter = Router();
 
@@ -14,32 +14,32 @@ orderRouter.post(
   "/create",
   Middlewares.Request.Empty({ query: true }),
   Middlewares.Auth.Authenticated(false),
-  ResponseMiddleware.catchAsyncWithTransaction(createOrderController),
+  Middlewares.Response.Async.TryCatchWithSession(createOrderController),
 );
 
 orderRouter.patch(
   "/cancel-payment/:orderId",
   Middlewares.Request.Empty({ params: true }),
   Middlewares.Auth.Authenticated(false),
-  ResponseMiddleware.catchAsync(cancelPaymentController),
+  Middlewares.Response.Async.TryCatch(cancelPaymentController),
 );
 
 orderRouter.get(
   "/",
   Middlewares.Request.Empty({ query: false }), //LINK - Optional
   Middlewares.Auth.Authenticated(false),
-  ResponseMiddleware.catchAsync(getAllOrdersController),
+  Middlewares.Response.Async.TryCatch(getAllOrdersController),
 );
 
 orderRouter.get(
   "/:orderId",
   Middlewares.Request.Empty({ params: true }),
   Middlewares.Auth.Authenticated(false),
-  ResponseMiddleware.catchAsync(getOrderByIdController),
+  Middlewares.Response.Async.TryCatch(getOrderByIdController),
 );
 orderRouter.patch(
   "/cancel/:orderId",
   Middlewares.Request.Empty({ params: true, body: false }),
   Middlewares.Auth.Authenticated(false),
-  ResponseMiddleware.catchAsyncWithTransaction(cancelOrderController),
+  Middlewares.Response.Async.TryCatchWithSession(cancelOrderController),
 );

@@ -7,7 +7,7 @@ import { segregateErrors } from "../../../utils";
 
 const baseResponse = { success: false, error: true };
 
-export const errorHandler = (
+export const ErrorHandler = (
   err: Error | AppError | MongooseError,
   req: Request,
   res: Response,

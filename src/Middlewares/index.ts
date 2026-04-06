@@ -4,6 +4,7 @@ import { Database } from "./Database.Middleware";
 import { JSONParser } from "./JSONParser.Middleware";
 import { Logger } from "./Logger.Middleware";
 import { Request } from "./Request.Middleware";
+import { Response } from "./Response.Middleware";
 
 export * as ZodMiddleware from "./zod";
 export * as MulterMiddleware from "./Multer.Middleware";
@@ -16,4 +17,5 @@ export const Middlewares = {
   Logger,
   JSONParser,
   Request,
+  Response,
 };

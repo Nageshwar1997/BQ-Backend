@@ -1,5 +1,5 @@
 import { raw, Router } from "express";
-import { ResponseMiddleware } from "../../../Middlewares";
+import { Middlewares } from "../../../Middlewares";
 import { razorpayWebhooksController } from "../razorpay";
 
 export const webhookRouter = Router();
@@ -7,5 +7,5 @@ export const webhookRouter = Router();
 webhookRouter.use(
   "/razorpay",
   raw({ type: "application/json" }), //NOTE - To parse the raw json
-  ResponseMiddleware.catchAsync(razorpayWebhooksController),
+  Middlewares.Response.Async.TryCatch(razorpayWebhooksController),
 );

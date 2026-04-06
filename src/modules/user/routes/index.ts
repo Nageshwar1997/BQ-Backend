@@ -20,7 +20,6 @@ import {
 import {
   Middlewares,
   MulterMiddleware,
-  ResponseMiddleware,
   ZodMiddleware,
 } from "../../../Middlewares";
 import {
@@ -34,7 +33,7 @@ import { MB } from "../../../constants";
 export const userRouter = Router();
 
 // User Routes
-userRouter.get("/user", ResponseMiddleware.catchAsync(getUserController));
+userRouter.get("/user", Middlewares.Response.Async.TryCatch(getUserController));
 
 userRouter.patch(
   "/user/update",
@@ -42,7 +41,7 @@ userRouter.patch(
   MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
   Middlewares.Request.Empty({ fileOrBody: true }),
   ZodMiddleware.validateZodSchema(updateUserZodSchema),
-  ResponseMiddleware.catchAsync(updateUserController),
+  Middlewares.Response.Async.TryCatch(updateUserController),
 );
 
 userRouter.patch(
@@ -50,45 +49,45 @@ userRouter.patch(
   Middlewares.Auth.Authenticated(true),
   Middlewares.Request.Empty({ body: true }),
   ZodMiddleware.validateZodSchema(updatePasswordZodSchema),
-  ResponseMiddleware.catchAsync(updatePasswordController),
+  Middlewares.Response.Async.TryCatch(updatePasswordController),
 );
 
 userRouter.patch(
   "/user/send-reset-password-link",
   Middlewares.Auth.Authenticated(false),
-  ResponseMiddleware.catchAsync(resetPasswordSendLinkController),
+  Middlewares.Response.Async.TryCatch(resetPasswordSendLinkController),
 );
 
 userRouter.patch(
   "/user/reset-password",
-  ResponseMiddleware.catchAsync(resetPasswordController),
+  Middlewares.Response.Async.TryCatch(resetPasswordController),
 );
 
 userRouter.get(
   "/user/reset-password-token-validity",
-  ResponseMiddleware.catchAsync(validResetPasswordTokenController),
+  Middlewares.Response.Async.TryCatch(validResetPasswordTokenController),
 );
 
 userRouter.post(
   "/user/forgot-password",
   Middlewares.Request.Empty({ query: true, body: true }),
-  ResponseMiddleware.catchAsync(forgotPasswordController),
+  Middlewares.Response.Async.TryCatch(forgotPasswordController),
 );
 
 userRouter.get(
   "/user/forgot-password-token-validity",
-  ResponseMiddleware.catchAsync(checkPasswordTokenValidityController),
+  Middlewares.Response.Async.TryCatch(checkPasswordTokenValidityController),
 );
 
 userRouter.post(
   "/user/forgot-password-link",
   Middlewares.Request.Empty({ body: true }),
-  ResponseMiddleware.catchAsync(forgotPasswordSendLinkController),
+  Middlewares.Response.Async.TryCatch(forgotPasswordSendLinkController),
 );
 
 userRouter.post(
   "/user/forgot-password-resend-link",
-  ResponseMiddleware.catchAsync(forgotPasswordResendLinkController),
+  Middlewares.Response.Async.TryCatch(forgotPasswordResendLinkController),
 );
 
 userRouter.patch(
@@ -96,7 +95,7 @@ userRouter.patch(
   Middlewares.Auth.Authenticated(true),
   Middlewares.Request.Empty({ body: true }),
   ZodMiddleware.validateZodSchema(changePasswordZodSchema),
-  ResponseMiddleware.catchAsync(changePasswordController),
+  Middlewares.Response.Async.TryCatch(changePasswordController),
 );
 
 // Seller Routes
@@ -117,28 +116,28 @@ userRouter.post(
     fieldsToParse: ["businessAddress", "businessDetails"],
   }),
   ZodMiddleware.validateZodSchema(sellerRequestZodSchema),
-  ResponseMiddleware.catchAsync(createSellerRequestController),
+  Middlewares.Response.Async.TryCatch(createSellerRequestController),
 );
 
 // Wishlist Routes
 userRouter.get(
   "/wishlist",
   Middlewares.Auth.Authenticated(false),
-  ResponseMiddleware.catchAsync(getWishlistController),
+  Middlewares.Response.Async.TryCatch(getWishlistController),
 );
 
 userRouter.post(
   "/wishlist/add/:productId",
   Middlewares.Request.Empty({ params: true }),
   Middlewares.Auth.Authenticated(false),
-  ResponseMiddleware.catchAsync(addProductToWishlistController),
+  Middlewares.Response.Async.TryCatch(addProductToWishlistController),
 );
 
 userRouter.delete(
   "/wishlist/remove/:productId",
   Middlewares.Request.Empty({ params: true }),
   Middlewares.Auth.Authenticated(false),
-  ResponseMiddleware.catchAsyncWithTransaction(
+  Middlewares.Response.Async.TryCatchWithSession(
     removeProductFromWishlistController,
   ),
 );

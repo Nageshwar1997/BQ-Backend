@@ -4,7 +4,7 @@ import { authControllers } from "../controllers";
 import {
   ZodMiddleware,
   MulterMiddleware,
-  ResponseMiddleware,
+  Middlewares,
 } from "../../../Middlewares";
 import { zodSchemas } from "../../../validations";
 
@@ -15,14 +15,14 @@ authRouter.post(
   "/register/send-otp",
   Middlewares.Request.Empty({ body: true }),
   ZodMiddleware.validateZodSchema(zodSchemas.auth.register.email),
-  ResponseMiddleware.catchAsync(authControllers.register.sendOtp),
+  Middlewares.Response.Async.TryCatch(authControllers.register.sendOtp),
 );
 
 authRouter.post(
   "/register/resend-otp",
   Middlewares.Request.Empty({ body: true }),
   ZodMiddleware.validateZodSchema(zodSchemas.auth.register.email),
-  ResponseMiddleware.catchAsync(authControllers.register.resendOtp),
+  Middlewares.Response.Async.TryCatch(authControllers.register.resendOtp),
 );
 
 authRouter.post(
@@ -34,7 +34,7 @@ authRouter.post(
     query: true,
   }),
   ZodMiddleware.validateZodSchema(zodSchemas.auth.register.verify),
-  ResponseMiddleware.catchAsync(authControllers.register.verifyOtp),
+  Middlewares.Response.Async.TryCatch(authControllers.register.verifyOtp),
 );
 
 // Login Route
@@ -42,57 +42,57 @@ authRouter.post(
   "/login",
   Middlewares.Request.Empty({ body: true }),
   ZodMiddleware.validateZodSchema(zodSchemas.auth.login),
-  ResponseMiddleware.catchAsync(authControllers.login.manual),
+  Middlewares.Response.Async.TryCatch(authControllers.login.manual),
 );
 
 // Logout
 authRouter.delete(
   "/logout/:userId",
   Middlewares.Request.Empty({ params: true }),
-  ResponseMiddleware.catchAsync(authControllers.logout),
+  Middlewares.Response.Async.TryCatch(authControllers.logout),
 );
 
 // Google Auth
 authRouter.get(
   "/google",
-  ResponseMiddleware.catchAsync(authControllers.login.google.redirect),
+  Middlewares.Response.Async.TryCatch(authControllers.login.google.redirect),
 );
 authRouter.get(
   "/google/callback",
-  ResponseMiddleware.catchAsync(authControllers.login.google.callback),
+  Middlewares.Response.Async.TryCatch(authControllers.login.google.callback),
 );
 
 // LinkedIn Auth
 authRouter.get(
   "/linkedin",
-  ResponseMiddleware.catchAsync(authControllers.login.linkedin.redirect),
+  Middlewares.Response.Async.TryCatch(authControllers.login.linkedin.redirect),
 );
 authRouter.get(
   "/linkedin/callback",
-  ResponseMiddleware.catchAsync(authControllers.login.linkedin.callback),
+  Middlewares.Response.Async.TryCatch(authControllers.login.linkedin.callback),
 );
 
 // GitHub Auth
 authRouter.get(
   "/github",
-  ResponseMiddleware.catchAsync(authControllers.login.github.redirect),
+  Middlewares.Response.Async.TryCatch(authControllers.login.github.redirect),
 );
 authRouter.get(
   "/github/callback",
-  ResponseMiddleware.catchAsync(authControllers.login.github.callback),
+  Middlewares.Response.Async.TryCatch(authControllers.login.github.callback),
 );
 
 // Password Route
 authRouter.post(
   "/forgot-password-send-link-and-otp",
-  ResponseMiddleware.catchAsync(
+  Middlewares.Response.Async.TryCatch(
     authControllers.password.forgotPassword.sendLinkAndOtp,
   ),
 );
 
 authRouter.post(
   "/forgot-password-resend-link-and-otp",
-  ResponseMiddleware.catchAsync(
+  Middlewares.Response.Async.TryCatch(
     authControllers.password.forgotPassword.resendLinkAndOtp,
   ),
 );
@@ -100,14 +100,14 @@ authRouter.post(
 authRouter.post(
   "/forgot-password-verify-otp",
   Middlewares.Request.Empty({ body: true }),
-  ResponseMiddleware.catchAsync(
+  Middlewares.Response.Async.TryCatch(
     authControllers.password.forgotPassword.verifyOtp,
   ),
 );
 
 authRouter.get(
   "/forgot-password-validate-token",
-  ResponseMiddleware.catchAsync(
+  Middlewares.Response.Async.TryCatch(
     authControllers.password.forgotPassword.validateToken,
   ),
 );
@@ -115,7 +115,7 @@ authRouter.get(
 authRouter.patch(
   "/forgot-password-set-password",
   Middlewares.Request.Empty({ body: true }),
-  ResponseMiddleware.catchAsync(
+  Middlewares.Response.Async.TryCatch(
     authControllers.password.forgotPassword.setPassword,
   ),
 );

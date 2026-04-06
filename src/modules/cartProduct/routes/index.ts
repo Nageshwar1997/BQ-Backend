@@ -1,9 +1,5 @@
 import { Router } from "express";
-import {
-  Middlewares,
-  ResponseMiddleware,
-  ZodMiddleware,
-} from "../../../Middlewares";
+import { Middlewares, ZodMiddleware } from "../../../Middlewares";
 import {
   addProductToCartController,
   removeProductFromCartController,
@@ -18,18 +14,20 @@ cartProductRouter.use(Middlewares.Auth.Authenticated(false));
 cartProductRouter.post(
   "/add/:productId",
   Middlewares.Request.Empty({ params: true }),
-  ResponseMiddleware.catchAsyncWithTransaction(addProductToCartController),
+  Middlewares.Response.Async.TryCatchWithSession(addProductToCartController),
 );
 
 cartProductRouter.patch(
   "/update/:id",
   Middlewares.Request.Empty({ body: true, params: true }),
   ZodMiddleware.validateZodSchema(updateCartProductQuantityZodSchema),
-  ResponseMiddleware.catchAsync(updateCartProductQuantityController),
+  Middlewares.Response.Async.TryCatch(updateCartProductQuantityController),
 );
 
 cartProductRouter.delete(
   "/remove/:id",
   Middlewares.Request.Empty({ params: true }),
-  ResponseMiddleware.catchAsyncWithTransaction(removeProductFromCartController),
+  Middlewares.Response.Async.TryCatchWithSession(
+    removeProductFromCartController,
+  ),
 );

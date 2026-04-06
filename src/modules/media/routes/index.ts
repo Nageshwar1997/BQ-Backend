@@ -11,7 +11,6 @@ import {
 import {
   Middlewares,
   MulterMiddleware,
-  ResponseMiddleware,
   ZodMiddleware,
 } from "../../../Middlewares";
 import {
@@ -34,7 +33,7 @@ mediaRouter.post(
   }),
   Middlewares.Request.Empty({ file: true, fileOrBody: true }),
   ZodMiddleware.validateZodSchema(uploadImageZodSchema),
-  ResponseMiddleware.catchAsync(uploadSingleImageController),
+  Middlewares.Response.Async.TryCatch(uploadSingleImageController),
 );
 
 // For Multiple Images Upload
@@ -48,7 +47,7 @@ mediaRouter.post(
   }),
   Middlewares.Request.Empty({ files: true, body: true }),
   ZodMiddleware.validateZodSchema(uploadImageZodSchema),
-  ResponseMiddleware.catchAsync(uploadMultipleImagesController),
+  Middlewares.Response.Async.TryCatch(uploadMultipleImagesController),
 );
 
 // For Single Image Remove
@@ -57,7 +56,7 @@ mediaRouter.delete(
   Middlewares.Request.Empty({ body: true }),
   Middlewares.Auth.Authorization(["MASTER", "ADMIN", "SELLER"]),
   ZodMiddleware.validateZodSchema(removeSingleImageZodSchema),
-  ResponseMiddleware.catchAsync(removeSingleImageController),
+  Middlewares.Response.Async.TryCatch(removeSingleImageController),
 );
 
 // For Multiple Images Remove
@@ -66,7 +65,7 @@ mediaRouter.delete(
   Middlewares.Request.Empty({ body: true }),
   Middlewares.Auth.Authorization(["MASTER", "ADMIN", "SELLER"]),
   ZodMiddleware.validateZodSchema(removeMultipleImagesZodSchema),
-  ResponseMiddleware.catchAsync(removeMultipleImagesController),
+  Middlewares.Response.Async.TryCatch(removeMultipleImagesController),
 );
 
 // ========== Video Upload ==========
@@ -79,11 +78,11 @@ mediaRouter.post(
     fieldsConfig: ["video", "poster"].map((name) => ({ name, maxCount: 1 })),
   }),
   ZodMiddleware.validateZodSchema(uploadHomeVideoZodSchema),
-  ResponseMiddleware.catchAsync(uploadHomeVideoController),
+  Middlewares.Response.Async.TryCatch(uploadHomeVideoController),
 );
 
 // Home Carousel Video Routes
 mediaRouter.get(
   "/videos/home",
-  ResponseMiddleware.catchAsync(getAllHomeVideosController),
+  Middlewares.Response.Async.TryCatch(getAllHomeVideosController),
 );

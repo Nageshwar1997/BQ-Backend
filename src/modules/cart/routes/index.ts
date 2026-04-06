@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { Middlewares, ResponseMiddleware } from "../../../Middlewares";
+import { Middlewares } from "../../../Middlewares";
 import { clearCartController, getCartController } from "../controllers";
 
 export const cartRouter = Router();
@@ -7,11 +7,11 @@ export const cartRouter = Router();
 cartRouter.get(
   "/",
   Middlewares.Auth.Authenticated(false),
-  ResponseMiddleware.catchAsync(getCartController),
+  Middlewares.Response.Async.TryCatch(getCartController),
 );
 
 cartRouter.patch(
   "/clear",
   Middlewares.Auth.Authenticated(false),
-  ResponseMiddleware.catchAsyncWithTransaction(clearCartController),
+  Middlewares.Response.Async.TryCatchWithSession(clearCartController),
 );

@@ -10,7 +10,6 @@ import {
 import {
   Middlewares,
   MulterMiddleware,
-  ResponseMiddleware,
   ZodMiddleware,
 } from "../../../../Middlewares";
 import {
@@ -30,18 +29,18 @@ productRouter.post(
     fieldsToParse: POSSIBLE_PARSED_FIELDS,
   }),
   ZodMiddleware.validateZodSchema(uploadProductZodSchema),
-  ResponseMiddleware.catchAsync(uploadProductController),
+  Middlewares.Response.Async.TryCatch(uploadProductController),
 );
 
 productRouter.get(
   "/all",
-  ResponseMiddleware.catchAsync(getAllProductsController),
+  Middlewares.Response.Async.TryCatch(getAllProductsController),
 );
 
 productRouter.get(
   "/product/:productId",
   Middlewares.Request.Empty({ params: true }),
-  ResponseMiddleware.catchAsync(getProductByIdController),
+  Middlewares.Response.Async.TryCatch(getProductByIdController),
 );
 
 productRouter.patch(
@@ -53,12 +52,12 @@ productRouter.patch(
     fieldsToParse: POSSIBLE_PARSED_FIELDS,
   }),
   ZodMiddleware.validateZodSchema(updateProductZodSchema),
-  ResponseMiddleware.catchAsync(updateProductController),
+  Middlewares.Response.Async.TryCatch(updateProductController),
 );
 
 productRouter.delete(
   "/product/delete/:productId",
   Middlewares.Request.Empty({ params: true }),
   Middlewares.Auth.Authorization(["ADMIN", "MASTER", "SELLER"]),
-  ResponseMiddleware.catchAsync(deleteProductController),
+  Middlewares.Response.Async.TryCatch(deleteProductController),
 );

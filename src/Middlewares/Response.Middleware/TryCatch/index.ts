@@ -1,21 +1,21 @@
 import { NextFunction, Request, Response } from "express";
 import { ClientSession, startSession } from "mongoose";
 
-export const catchAsync = (
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>
+const TryCatch = (
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>,
 ) => {
   return (req: Request, res: Response, next: NextFunction) => {
     fn(req, res, next).catch(next);
   };
 };
 
-export const catchAsyncWithTransaction = (
+const TryCatchWithSession = (
   fn: (
     req: Request,
     res: Response,
     next: NextFunction,
-    session: ClientSession
-  ) => Promise<void>
+    session: ClientSession,
+  ) => Promise<void>,
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const session = await startSession();
@@ -31,4 +31,9 @@ export const catchAsyncWithTransaction = (
       session.endSession();
     }
   };
+};
+
+export const AsyncHandler = {
+  TryCatch,
+  TryCatchWithSession,
 };

@@ -1,9 +1,5 @@
 import { Router } from "express";
-import {
-  Middlewares,
-  ResponseMiddleware,
-  ZodMiddleware,
-} from "../../../Middlewares";
+import { Middlewares, ZodMiddleware } from "../../../Middlewares";
 import { addAddressSchema, updateAddressSchema } from "../validations";
 import {
   addAddressController,
@@ -21,23 +17,23 @@ addressRouter.post(
   "/add",
   Middlewares.Request.Empty({ body: true }),
   ZodMiddleware.validateZodSchema(addAddressSchema),
-  ResponseMiddleware.catchAsyncWithTransaction(addAddressController),
+  Middlewares.Response.Async.TryCatchWithSession(addAddressController),
 );
 addressRouter.patch(
   "/update/:addressId",
   Middlewares.Request.Empty({ body: true, params: true }),
   ZodMiddleware.validateZodSchema(updateAddressSchema),
-  ResponseMiddleware.catchAsyncWithTransaction(updateAddressController),
+  Middlewares.Response.Async.TryCatchWithSession(updateAddressController),
 );
 
 addressRouter.delete(
   "/remove/:addressId",
   Middlewares.Request.Empty({ params: true }),
-  ResponseMiddleware.catchAsyncWithTransaction(removeAddressController),
+  Middlewares.Response.Async.TryCatchWithSession(removeAddressController),
 );
 
 // User Address Routes
 addressRouter.get(
   "/",
-  ResponseMiddleware.catchAsync(getUserAddressesController),
+  Middlewares.Response.Async.TryCatch(getUserAddressesController),
 );
