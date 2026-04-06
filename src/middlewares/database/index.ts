@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { connection } from "mongoose";
 import { AppError } from "../../classes";
 
-export const checkDbConnection = async (
+export const Database = async (
   _: Request,
   __: Response,
   next: NextFunction

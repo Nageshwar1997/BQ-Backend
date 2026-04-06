@@ -8,7 +8,6 @@ import router from "./routes";
 import { connectDB, handleNamespace, initSocket } from "./configs";
 import {
   ResponseMiddleware,
-  DatabaseMiddleware,
   RequestMiddleware,
   LoggerMiddleware,
   Middlewares,
@@ -35,7 +34,7 @@ app.use(LoggerMiddleware.expressLogger);
 // 4. Custom middlewares
 app.use(ResponseMiddleware.success);
 app.use(Middlewares.Cors);
-app.use(DatabaseMiddleware.checkDbConnection);
+app.use(Middlewares.Database);
 
 // ----------------- ROUTES -----------------
 // Home Route
