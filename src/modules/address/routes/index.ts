@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  AuthMiddleware,
+  Middlewares,
   RequestMiddleware,
   ResponseMiddleware,
   ZodMiddleware,
@@ -15,30 +15,30 @@ import {
 
 export const addressRouter = Router();
 
-addressRouter.use(AuthMiddleware.authenticated(false));
+addressRouter.use(Middlewares.Auth.Authenticated(false));
 
 // Address Routes
 addressRouter.post(
   "/add",
   RequestMiddleware.checkEmptyRequest({ body: true }),
   ZodMiddleware.validateZodSchema(addAddressSchema),
-  ResponseMiddleware.catchAsyncWithTransaction(addAddressController)
+  ResponseMiddleware.catchAsyncWithTransaction(addAddressController),
 );
 addressRouter.patch(
   "/update/:addressId",
   RequestMiddleware.checkEmptyRequest({ body: true, params: true }),
   ZodMiddleware.validateZodSchema(updateAddressSchema),
-  ResponseMiddleware.catchAsyncWithTransaction(updateAddressController)
+  ResponseMiddleware.catchAsyncWithTransaction(updateAddressController),
 );
 
 addressRouter.delete(
   "/remove/:addressId",
   RequestMiddleware.checkEmptyRequest({ params: true }),
-  ResponseMiddleware.catchAsyncWithTransaction(removeAddressController)
+  ResponseMiddleware.catchAsyncWithTransaction(removeAddressController),
 );
 
 // User Address Routes
 addressRouter.get(
   "/",
-  ResponseMiddleware.catchAsync(getUserAddressesController)
+  ResponseMiddleware.catchAsync(getUserAddressesController),
 );

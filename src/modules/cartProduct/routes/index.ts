@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  AuthMiddleware,
+  Middlewares,
   RequestMiddleware,
   ResponseMiddleware,
   ZodMiddleware,
@@ -14,23 +14,23 @@ import { updateCartProductQuantityZodSchema } from "../validations";
 
 export const cartProductRouter = Router();
 
-cartProductRouter.use(AuthMiddleware.authenticated(false));
+cartProductRouter.use(Middlewares.Auth.Authenticated(false));
 
 cartProductRouter.post(
   "/add/:productId",
   RequestMiddleware.checkEmptyRequest({ params: true }),
-  ResponseMiddleware.catchAsyncWithTransaction(addProductToCartController)
+  ResponseMiddleware.catchAsyncWithTransaction(addProductToCartController),
 );
 
 cartProductRouter.patch(
   "/update/:id",
   RequestMiddleware.checkEmptyRequest({ body: true, params: true }),
   ZodMiddleware.validateZodSchema(updateCartProductQuantityZodSchema),
-  ResponseMiddleware.catchAsync(updateCartProductQuantityController)
+  ResponseMiddleware.catchAsync(updateCartProductQuantityController),
 );
 
 cartProductRouter.delete(
   "/remove/:id",
   RequestMiddleware.checkEmptyRequest({ params: true }),
-  ResponseMiddleware.catchAsyncWithTransaction(removeProductFromCartController)
+  ResponseMiddleware.catchAsyncWithTransaction(removeProductFromCartController),
 );

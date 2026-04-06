@@ -1,4 +1,5 @@
-export * as AuthMiddleware from "./auth";
+import { Auth } from "./auth";
+
 export * as CorsMiddleware from "./cors";
 export * as DatabaseMiddleware from "./database";
 export * as ZodMiddleware from "./zod";
@@ -7,3 +8,7 @@ export * as ResponseMiddleware from "./response";
 export * as JSONParseMiddleware from "./JSONParse";
 export * as RequestMiddleware from "./request";
 export * as LoggerMiddleware from "./logger";
+
+export const Middlewares = {
+  Auth,
+};

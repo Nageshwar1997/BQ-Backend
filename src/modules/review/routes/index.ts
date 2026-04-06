@@ -7,8 +7,8 @@ import {
   updateReviewController,
 } from "../controllers";
 import {
-  AuthMiddleware,
   JSONParseMiddleware,
+  Middlewares,
   MulterMiddleware,
   RequestMiddleware,
   ResponseMiddleware,
@@ -32,9 +32,9 @@ reviewRouter.post(
     ],
   }),
   RequestMiddleware.checkEmptyRequest({ body: true }),
-  AuthMiddleware.authenticated(false),
+  Middlewares.Auth.Authenticated(false),
   ZodMiddleware.validateZodSchema(createReviewZodSchema),
-  ResponseMiddleware.catchAsync(createReviewController)
+  ResponseMiddleware.catchAsync(createReviewController),
 );
 
 reviewRouter.patch(
@@ -47,31 +47,31 @@ reviewRouter.patch(
     ],
   }),
   RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
-  AuthMiddleware.authenticated(false),
+  Middlewares.Auth.Authenticated(false),
   JSONParseMiddleware.JSONParse({
     fieldsToParse: ["removedImages", "removedVideos"],
   }),
   ZodMiddleware.validateZodSchema(updateReviewZodSchema),
-  ResponseMiddleware.catchAsync(updateReviewController)
+  ResponseMiddleware.catchAsync(updateReviewController),
 );
 
 reviewRouter.patch(
   "/:reviewId",
   RequestMiddleware.checkEmptyRequest({ body: true, params: true }),
-  AuthMiddleware.authenticated(false),
+  Middlewares.Auth.Authenticated(false),
   ZodMiddleware.validateZodSchema(updateLikeDislikeHelpfulSchema),
-  ResponseMiddleware.catchAsync(likeDislikeHelpfulController)
+  ResponseMiddleware.catchAsync(likeDislikeHelpfulController),
 );
 
 reviewRouter.delete(
   "/:productId/:reviewId",
   RequestMiddleware.checkEmptyRequest({ params: true }),
-  AuthMiddleware.authenticated(false),
-  ResponseMiddleware.catchAsync(deleteReviewController)
+  Middlewares.Auth.Authenticated(false),
+  ResponseMiddleware.catchAsync(deleteReviewController),
 );
 
 reviewRouter.get(
   "/:productId",
   RequestMiddleware.checkEmptyRequest({ params: true }),
-  ResponseMiddleware.catchAsync(getReviewsByProductIdController)
+  ResponseMiddleware.catchAsync(getReviewsByProductIdController),
 );
