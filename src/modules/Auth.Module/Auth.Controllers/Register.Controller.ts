@@ -3,9 +3,9 @@ import { Request, Response } from "express";
 import { AppError, mailService, redisService } from "../../../Classes";
 import { MediaModule, UserModule } from "../..";
 
-import { authUtils } from "../utils";
+import { authUtils } from "../Auth.Utils";
 import { Constants } from "../../../Constants";
-import { authServices } from "../services";
+import { AuthServices } from "../Auth.Services";
 import {
   getAuthorizationToken,
   PARSE_DATA,
@@ -233,7 +233,7 @@ export const registerVerifyOtpController = async (
 
     await redisService.setCachedUser(restUser);
 
-    const token = authServices.generateToken(user._id);
+    const token = AuthServices.GenerateToken(user._id);
 
     res.success(201, "User registered successfully", { token, user: restUser });
   } catch (error) {

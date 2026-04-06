@@ -4,7 +4,7 @@ import { Types } from "mongoose";
 import { AppError } from "../../../Classes";
 import { JWT_SECRET } from "../../../Envs";
 
-export const generateToken = (userId: Types.ObjectId | string): string => {
+export const GenerateToken = (userId: Types.ObjectId | string): string => {
   if (!JWT_SECRET) {
     throw new AppError({
       message: "JWT secret not defined",

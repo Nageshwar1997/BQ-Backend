@@ -5,7 +5,7 @@ import { AppError } from "../../../Classes";
 import { JWT_SECRET } from "../../../Envs";
 import { getAuthorizationToken } from "../../../utils";
 
-export const getUserIdFromToken = (req: Request) => {
+export const GetUserIdFromToken = (req: Request) => {
   try {
     const token = req.get("Authorization");
 

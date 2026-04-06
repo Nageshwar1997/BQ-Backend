@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { authControllers } from "../controllers";
+import { authControllers } from "../Auth.Controllers";
 import { Middlewares } from "../../../Middlewares";
 import { zodSchemas } from "../../../validations";
 

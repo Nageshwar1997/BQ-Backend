@@ -7,15 +7,15 @@ import {
   linkedinRedirectController,
   logoutController,
   manualLoginController,
-} from "./login";
-import { forgotPasswordResendLinkAndOtpController, forgotPasswordSendLinkAndOtpController, forgotPasswordSetPasswordController, forgotPasswordValidateTokenController, forgotPasswordVerifyOtpController } from "./password";
+} from "./Login.Controller";
+import { forgotPasswordResendLinkAndOtpController, forgotPasswordSendLinkAndOtpController, forgotPasswordSetPasswordController, forgotPasswordValidateTokenController, forgotPasswordVerifyOtpController } from "./Password.Controller";
 import {
   registerResendOtpController,
   registerSendOtpController,
   registerVerifyOtpController,
-} from "./register";
+} from "./Register.Controller";
 
-export * from "./password";
+export * from "./Password.Controller";
 
 export const authControllers = {
   login: {

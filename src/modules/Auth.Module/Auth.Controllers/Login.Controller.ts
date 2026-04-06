@@ -3,8 +3,8 @@ import bcrypt from "bcryptjs";
 
 import { AppError, redisService } from "../../../Classes";
 import { UserModule } from "../..";
-import { authServices } from "../services";
-import { authSuccessRedirectUrl, getOAuthDbPayload } from "../utils";
+import { AuthServices } from "../Auth.Services";
+import { authSuccessRedirectUrl, getOAuthDbPayload } from "../Auth.Utils";
 import { AuthenticatedRequest } from "../../../types";
 import { Configs } from "../../../Configs";
 
@@ -49,7 +49,7 @@ export const manualLoginController = async (req: Request, res: Response) => {
     });
   }
 
-  const token = authServices.generateToken(user._id);
+  const token = AuthServices.GenerateToken(user._id);
 
   const { password: _, ...restUser } = user;
 
@@ -104,7 +104,7 @@ export const googleCallbackController = async (
       user = await UserModule.Models.User.create(payload);
     }
 
-    const token = authServices.generateToken(user._id);
+    const token = AuthServices.GenerateToken(user._id);
 
     await redisService.setCachedUser(user);
 
@@ -159,7 +159,7 @@ export const linkedinCallbackController = async (
       user = await UserModule.Models.User.create(payload);
     }
 
-    const token = authServices.generateToken(user._id);
+    const token = AuthServices.GenerateToken(user._id);
 
     await redisService.setCachedUser(user);
 
@@ -221,7 +221,7 @@ export const githubCallbackController = async (
       user = await UserModule.Models.User.create(payload);
     }
 
-    const token = authServices.generateToken(user._id);
+    const token = AuthServices.GenerateToken(user._id);
 
     await redisService.setCachedUser(user);
 

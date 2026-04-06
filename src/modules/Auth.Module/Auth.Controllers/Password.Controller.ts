@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { UserModule } from "../..";
 import { AppError, mailService, redisService } from "../../../Classes";
-import { authUtils } from "../utils";
+import { authUtils } from "../Auth.Utils";
 import { Constants } from "../../../Constants";
 import {
   getAuthorizationToken,
@@ -11,7 +11,7 @@ import {
   STRINGIFY_DATA,
 } from "../../../utils";
 import { TAuthProvider } from "../../user/types";
-import { authServices } from "../services";
+import { AuthServices } from "../Auth.Services";
 
 const checkManuallyLoggedIn = (providers: TAuthProvider[]) => {
   if (!providers?.includes("MANUAL")) {
@@ -314,7 +314,7 @@ export const forgotPasswordSetPasswordController = async (
 
   await redisService.getClient()?.del(`forgot-password:${token}`);
 
-  const userToken = authServices.generateToken(user._id);
+  const userToken = AuthServices.GenerateToken(user._id);
 
   const { password: _, ...restUser } = user?.toObject() ?? {};
 
