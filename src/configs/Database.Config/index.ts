@@ -31,7 +31,7 @@ const MONGO_OPTIONS: IMongoOptions = {
  * @throws {Error} If connection fails
  */
 
-export const connectDB = async (): Promise<typeof mongoose> => {
+export const DatabaseConfig = async (): Promise<typeof mongoose> => {
   // Use cached connection if exists
   if (cachedConnection) {
     return cachedConnection;

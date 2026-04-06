@@ -1,5 +1,9 @@
 import { Server as HttpServer } from "http";
-import { Server as SocketIOServer, Socket, Namespace } from "socket.io";
+import {
+  Server as SocketIOServer,
+  Socket as SocketIO,
+  Namespace,
+} from "socket.io";
 
 import { allowedOrigins } from "../../constants";
 import { AppError } from "../../Classes";
@@ -7,7 +11,7 @@ import { ChatbotModule } from "../../modules";
 
 let io: SocketIOServer | null = null;
 
-export const initSocket = (server: HttpServer) => {
+const InitSocket = (server: HttpServer) => {
   if (io) return io;
 
   io = new SocketIOServer(server, {
@@ -32,12 +36,12 @@ export const initSocket = (server: HttpServer) => {
   return io;
 };
 
-export const handleNamespace = (name: "products" | "orders") => {
+const HandleNamespace = (name: "products" | "orders") => {
   if (!io) throw new Error("Socket.IO not initialized");
 
   const nsp: Namespace = io.of(`/${name}`); // namespace created only when first client connects
 
-  nsp.on("connection", (socket: Socket) => {
+  nsp.on("connection", (socket: SocketIO) => {
     console.log(`Client connected on /${name} namespace:`, socket.id);
     if (name === "products") {
       ChatbotModule.Sockets.initProductSocket(socket);
@@ -51,4 +55,9 @@ export const handleNamespace = (name: "products" | "orders") => {
   });
 
   return nsp;
+};
+
+export const SocketConfigs = {
+  Init: InitSocket,
+  Namespace: HandleNamespace,
 };

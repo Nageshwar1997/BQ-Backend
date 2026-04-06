@@ -1,4 +1,5 @@
-import { getEmbeddings, postEmbeddings } from "../../../configs";
+
+import { Configs } from "../../../Configs";
 import { EmbeddedProduct } from "../models";
 import {
   IAggregatedEmbeddedProduct,
@@ -13,9 +14,9 @@ const removeHTMLTags = (text: string): string => {
 };
 
 export const getEmbeddedProducts = async (
-  message: string
+  message: string,
 ): Promise<IAggregatedEmbeddedProduct[]> => {
-  const queryVector = await getEmbeddings.embedQuery(message);
+  const queryVector = await Configs.Chatbot.Get.embedQuery(message);
 
   const products = await EmbeddedProduct.aggregate([
     // Vector search
@@ -162,7 +163,7 @@ export const getEmbeddedProducts = async (
 };
 
 export const getMinimalProductsForAiPrompt = (
-  products: IAggregatedEmbeddedProduct[]
+  products: IAggregatedEmbeddedProduct[],
 ) => {
   const minimalProducts = products?.map(({ product }, i) => ({
     "Product No.": i + 1,
@@ -201,12 +202,12 @@ export const createOrUpdateEmbeddedProduct = async ({
 }: TCreateOrUpdateEmbeddedProduct) => {
   try {
     const searchText = `${title} ${brand} ${category.grandParent} ${category.parent} ${category.child}`;
-    const embeddings = await postEmbeddings.embedQuery(searchText);
+    const embeddings = await Configs.Chatbot.Post.embedQuery(searchText);
 
     await EmbeddedProduct.findOneAndUpdate(
       { product: productId },
       { $set: { embeddings, searchText } },
-      { new: true, upsert: true, ...(session ? { session } : {}) }
+      { new: true, upsert: true, ...(session ? { session } : {}) },
     );
 
     console.log("Background product embedding done");

@@ -3,7 +3,7 @@ import { REDIS_HOST, REDIS_PASSWORD, REDIS_PORT } from "../../envs";
 
 const MAX_RECONNECT_ATTEMPTS = 5;
 
-export const redisClient: RedisClientType = createClient({
+export const RedisConfig: RedisClientType = createClient({
   socket: {
     host: REDIS_HOST,
     port: Number(REDIS_PORT),

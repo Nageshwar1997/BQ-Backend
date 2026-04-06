@@ -6,7 +6,7 @@ import { Order } from "../models";
 import { AppError } from "../../../Classes";
 import { isValidMongoId } from "../../../utils";
 import { ChatbotModule } from "../..";
-import { razorpay } from "../../../configs";
+import { Configs } from "../../../Configs";
 
 export const cancelOrderController = async (
   req: AuthenticatedRequest,
@@ -49,7 +49,7 @@ export const cancelOrderController = async (
 
   if (isPaid && paymentId) {
     try {
-      await razorpay.payments.refund(paymentId, {
+      await Configs.Razorpay.payments.refund(paymentId, {
         amount: order.payment.amount * 100,
         notes: {
           db_order_id: order._id.toString(),

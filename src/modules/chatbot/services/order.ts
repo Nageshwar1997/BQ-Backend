@@ -1,13 +1,13 @@
 import { ClientSession, Types } from "mongoose";
-import { getEmbeddings, postEmbeddings } from "../../../configs";
+import { Configs } from "../../../Configs";
 import { EmbeddedOrder } from "../models";
 import { IAggregatedEmbeddedOrder } from "../types";
 
 export const getEmbeddedOrders = async (
   message: string,
-  userId: string
+  userId: string,
 ): Promise<IAggregatedEmbeddedOrder[]> => {
-  const queryVector = await getEmbeddings.embedQuery(message);
+  const queryVector = await Configs.Chatbot.Get.embedQuery(message);
 
   const orders = await EmbeddedOrder.aggregate([
     {
@@ -112,7 +112,7 @@ export const getEmbeddedOrders = async (
 };
 
 export const getMinimalOrdersForAiPrompt = (
-  orders: IAggregatedEmbeddedOrder[]
+  orders: IAggregatedEmbeddedOrder[],
 ) => {
   const minimalOrders = orders?.map(({ order }) => {
     if (!order) "No Orders Found";
@@ -132,7 +132,7 @@ export const getMinimalOrdersForAiPrompt = (
         order.status === "CONFIRMED" && {
           "Expected Delivery": new Date(
             (order.payment.paid_at?.getTime() || Date.now()) +
-              7 * 24 * 60 * 60 * 1000
+              7 * 24 * 60 * 60 * 1000,
           ),
         }),
       "Order  At": order.cancelled_at,
@@ -173,7 +173,7 @@ export const createOrUpdateEmbeddedOrder = async ({
       order.status === "CONFIRMED" && {
         "Expected Delivery": new Date(
           (order.payment.paid_at?.getTime() || Date.now()) +
-            7 * 24 * 60 * 60 * 1000
+            7 * 24 * 60 * 60 * 1000,
         ),
       }),
     "Payment Status": order.payment.status,
@@ -192,12 +192,12 @@ export const createOrUpdateEmbeddedOrder = async ({
   });
 
   try {
-    const embeddings = await postEmbeddings.embedQuery(searchText);
+    const embeddings = await Configs.Chatbot.Post.embedQuery(searchText);
 
     await EmbeddedOrder.findOneAndUpdate(
       { order: order._id, user: order.user?._id || order.user },
       { $set: { embeddings, searchText } },
-      { new: true, upsert: true, ...(session ? { session } : {}) } // only include session if defined
+      { new: true, upsert: true, ...(session ? { session } : {}) }, // only include session if defined
     );
 
     console.log("Background order embedding done");

@@ -1,16 +1,16 @@
 import { Types } from "mongoose";
 import { RedisClientType } from "redis";
-import { redisClient } from "../configs";
 import { UserModule } from "../modules";
 import { MINUTE } from "../constants";
 import { PARSE_DATA, STRINGIFY_DATA } from "../utils";
+import { Configs } from "../Configs";
 
 class RedisService {
   private client: RedisClientType | null = null;
   private isReady: boolean = false;
 
   constructor() {
-    this.client = redisClient;
+    this.client = Configs.Redis;
 
     this.client.on("error", (err) => {
       console.log("❌ Redis Error:", err);
@@ -75,13 +75,13 @@ class RedisService {
     await client.setEx(
       `user:${user._id}`,
       MINUTE * MINUTE,
-      STRINGIFY_DATA(restUser)
+      STRINGIFY_DATA(restUser),
     );
   }
 
   // Get user (Redis fallback → DB → Redis set)
   public async getCachedUser(
-    userId: string | Types.ObjectId
+    userId: string | Types.ObjectId,
   ): Promise<UserModule.Types.UserProps | null> {
     const client = this.getClient();
 

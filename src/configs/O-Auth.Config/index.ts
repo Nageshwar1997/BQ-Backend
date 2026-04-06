@@ -11,13 +11,13 @@ import {
 } from "../../envs";
 import { getSocialAuthRedirectURL } from "../../utils";
 
-export const googleAuthConfig = new google.auth.OAuth2(
+const googleAuthConfig = new google.auth.OAuth2(
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
-  getSocialAuthRedirectURL("GOOGLE")
+  getSocialAuthRedirectURL("GOOGLE"),
 );
 
-export const googleAuthClient = {
+const googleAuthClient = {
   url: googleAuthConfig.generateAuthUrl({
     access_type: "offline",
     scope: [
@@ -35,16 +35,16 @@ export const googleAuthClient = {
 
     const { data } = await axios.get(
       "https://www.googleapis.com/oauth2/v2/userinfo",
-      { headers: { Authorization: `Bearer ${tokens.access_token}` } }
+      { headers: { Authorization: `Bearer ${tokens.access_token}` } },
     );
 
     return data;
   },
 };
 
-export const linkedinAuthClient = {
+const linkedinAuthClient = {
   url: `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${LINKEDIN_CLIENT_ID}&redirect_uri=${encodeURIComponent(
-    getSocialAuthRedirectURL("LINKEDIN")
+    getSocialAuthRedirectURL("LINKEDIN"),
   )}&scope=openid%20profile%20email`,
   token_response: async (code: string | ParsedQs | (string | ParsedQs)[]) => {
     const { data } = await axios.post(
@@ -59,7 +59,7 @@ export const linkedinAuthClient = {
           client_secret: LINKEDIN_CLIENT_SECRET,
         },
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      }
+      },
     );
 
     return data;
@@ -72,7 +72,7 @@ export const linkedinAuthClient = {
   },
 };
 
-export const githubAuthClient = {
+const githubAuthClient = {
   url: `https://github.com/login/oauth/authorize?${new URLSearchParams({
     client_id: GITHUB_CLIENT_ID!,
     redirect_uri: getSocialAuthRedirectURL("GITHUB"),
@@ -88,7 +88,7 @@ export const githubAuthClient = {
         code,
         redirect_uri: getSocialAuthRedirectURL("GITHUB"),
       },
-      { headers: { Accept: "application/json" } }
+      { headers: { Accept: "application/json" } },
     );
 
     return data;
@@ -105,7 +105,7 @@ export const githubAuthClient = {
     if (!profile.email) {
       const { data: emails } = await axios.get(
         "https://api.github.com/user/emails",
-        { headers }
+        { headers },
       );
 
       const email =
@@ -116,4 +116,10 @@ export const githubAuthClient = {
 
     return profile;
   },
+};
+
+export const OAuthConfig = {
+  Google: googleAuthClient,
+  Linkedin: linkedinAuthClient,
+  Github: githubAuthClient,
 };

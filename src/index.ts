@@ -5,7 +5,7 @@ import { parse } from "qs";
 import http from "http";
 
 import router from "./routes";
-import { connectDB, handleNamespace, initSocket } from "./configs";
+import { Configs } from "./Configs";
 import { Middlewares } from "./Middlewares";
 import { PORT } from "./envs";
 import { mailService, redisService } from "./Classes";
@@ -49,14 +49,14 @@ app.use(Middlewares.Response.Error);
 const server = http.createServer(app);
 
 // Initialize Socket.IO
-initSocket(server);
+Configs.Socket.Init(server);
 
-handleNamespace("products");
-handleNamespace("orders");
+Configs.Socket.Namespace("products");
+Configs.Socket.Namespace("orders");
 
 (async () => {
   try {
-    await connectDB();
+    await Configs.ConnectDB();
     await Promise.all([redisService.connect(), mailService.checkConnection()]);
 
     server.listen(PORT, () => {

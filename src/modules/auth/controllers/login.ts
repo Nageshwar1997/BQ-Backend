@@ -4,13 +4,9 @@ import bcrypt from "bcryptjs";
 import { AppError, redisService } from "../../../Classes";
 import { UserModule } from "../..";
 import { authServices } from "../services";
-import {
-  githubAuthClient,
-  googleAuthClient,
-  linkedinAuthClient,
-} from "../../../configs";
 import { authSuccessRedirectUrl, getOAuthDbPayload } from "../utils";
 import { AuthenticatedRequest } from "../../../types";
+import { Configs } from "../../../Configs";
 
 export const manualLoginController = async (req: Request, res: Response) => {
   const { email, password, phoneNumber } = req.body ?? {};
@@ -66,7 +62,7 @@ export const googleRedirectController = async (
   _req: Request,
   res: Response,
 ) => {
-  const url = googleAuthClient.url;
+  const url = Configs.OAuth.Google.url;
   res.redirect(url);
 };
 
@@ -85,7 +81,7 @@ export const googleCallbackController = async (
       });
 
     // Fetch user info from Google
-    const profile = await googleAuthClient.decode(code);
+    const profile = await Configs.OAuth.Google.decode(code);
     if (!profile)
       throw new AppError({ message: "User info not found", statusCode: 400 });
 
@@ -122,7 +118,7 @@ export const linkedinRedirectController = async (
   _req: Request,
   res: Response,
 ) => {
-  const url = linkedinAuthClient.url;
+  const url = Configs.OAuth.Linkedin.url;
 
   res.redirect(url);
 };
@@ -141,9 +137,9 @@ export const linkedinCallbackController = async (
         statusCode: 400,
       });
 
-    const { id_token } = await linkedinAuthClient.token_response(code);
+    const { id_token } = await Configs.OAuth.Linkedin.token_response(code);
 
-    const data = linkedinAuthClient.decode(id_token);
+    const data = Configs.OAuth.Linkedin.decode(id_token);
 
     const payload = await getOAuthDbPayload(data, "LINKEDIN");
 
@@ -177,7 +173,7 @@ export const githubRedirectController = async (
   _req: Request,
   res: Response,
 ) => {
-  const url = githubAuthClient.url;
+  const url = Configs.OAuth.Github.url;
 
   res.redirect(url);
 };
@@ -196,7 +192,7 @@ export const githubCallbackController = async (
         statusCode: 400,
       });
 
-    const { access_token } = await githubAuthClient.token_response(code);
+    const { access_token } = await Configs.OAuth.Github.token_response(code);
 
     if (!access_token) {
       throw new AppError({
@@ -205,7 +201,7 @@ export const githubCallbackController = async (
       });
     }
 
-    const data = await githubAuthClient.decode(access_token);
+    const data = await Configs.OAuth.Github.decode(access_token);
 
     const payload = await getOAuthDbPayload(data, "GITHUB");
 
