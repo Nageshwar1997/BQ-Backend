@@ -9,7 +9,7 @@ const logFormat = printf(({ level, message, timestamp }) => {
 });
 
 // ===== Winston Logger =====
-const logger = winston.createLogger({
+const winstonInstance = winston.createLogger({
   level: "info",
   format: combine(timestamp(), logFormat),
 
@@ -28,7 +28,7 @@ const logger = winston.createLogger({
           return info.level === "error" ? info : false;
         })(),
         timestamp(),
-        logFormat
+        logFormat,
       ),
     }),
 
@@ -41,15 +41,15 @@ const logger = winston.createLogger({
           return info.level === "info" ? info : false;
         })(),
         timestamp(),
-        logFormat
+        logFormat,
       ),
     }),
   ],
 });
 
 // ===== Request Logger =====
-export const expressLogger = expressWinston.logger({
-  winstonInstance: logger,
+export const expressRequestLogger = expressWinston.logger({
+  winstonInstance,
   msg: "[{{req.requestId}}] {{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms",
   expressFormat: false,
   colorize: false,
@@ -60,7 +60,7 @@ export const expressLogger = expressWinston.logger({
 
 // ===== Error Logger =====
 export const expressErrorLogger = expressWinston.errorLogger({
-  winstonInstance: logger,
+  winstonInstance,
   msg: "[{{req.requestId}}] {{req.method}} {{req.url}} {{res.statusCode}} {{err.message}}",
   meta: true,
   requestWhitelist: [...expressWinston.requestWhitelist, "requestId"],
@@ -77,3 +77,8 @@ export const expressErrorLogger = expressWinston.errorLogger({
     return !e.statusCode || e.statusCode < 400;
   },
 });
+
+export const Logger = {
+  Request: expressRequestLogger,
+  Error: expressErrorLogger,
+};

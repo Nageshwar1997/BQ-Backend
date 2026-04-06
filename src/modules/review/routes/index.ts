@@ -7,7 +7,6 @@ import {
   updateReviewController,
 } from "../controllers";
 import {
-  JSONParseMiddleware,
   Middlewares,
   MulterMiddleware,
   RequestMiddleware,
@@ -48,7 +47,7 @@ reviewRouter.patch(
   }),
   RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
   Middlewares.Auth.Authenticated(false),
-  JSONParseMiddleware.JSONParse({
+  Middlewares.JSONParser({
     fieldsToParse: ["removedImages", "removedVideos"],
   }),
   ZodMiddleware.validateZodSchema(updateReviewZodSchema),

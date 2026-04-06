@@ -8,7 +8,6 @@ import {
   uploadProductController,
 } from "../../controllers";
 import {
-  JSONParseMiddleware,
   Middlewares,
   MulterMiddleware,
   RequestMiddleware,
@@ -28,7 +27,7 @@ productRouter.post(
   Middlewares.Auth.Authorization(["ADMIN", "MASTER", "SELLER"]),
   MulterMiddleware.validateFiles({ type: "any" }),
   RequestMiddleware.checkEmptyRequest({ body: true, files: true }),
-  JSONParseMiddleware.JSONParse({
+  Middlewares.JSONParser({
     fieldsToParse: POSSIBLE_PARSED_FIELDS,
   }),
   ZodMiddleware.validateZodSchema(uploadProductZodSchema),
@@ -51,7 +50,7 @@ productRouter.patch(
   Middlewares.Auth.Authorization(["ADMIN", "MASTER", "SELLER"]),
   MulterMiddleware.validateFiles({ type: "any" }),
   RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
-  JSONParseMiddleware.JSONParse({
+  Middlewares.JSONParser({
     fieldsToParse: POSSIBLE_PARSED_FIELDS,
   }),
   ZodMiddleware.validateZodSchema(updateProductZodSchema),

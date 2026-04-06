@@ -9,7 +9,6 @@ import { connectDB, handleNamespace, initSocket } from "./configs";
 import {
   ResponseMiddleware,
   RequestMiddleware,
-  LoggerMiddleware,
   Middlewares,
 } from "./Middlewares";
 import { PORT } from "./envs";
@@ -29,7 +28,7 @@ app.use(express.static(path.resolve("public")));
 app.set("query parser", (str: string) => parse(str));
 
 // 3. Logger (logs all requests)
-app.use(LoggerMiddleware.expressLogger);
+app.use(Middlewares.Logger.Request);
 
 // 4. Custom middlewares
 app.use(ResponseMiddleware.success);
@@ -47,7 +46,7 @@ app.use("/api", router);
 
 // ----------------- ERROR HANDLING -----------------
 app.use(ResponseMiddleware.notFound);
-app.use(LoggerMiddleware.expressErrorLogger);
+app.use(Middlewares.Logger.Error);
 app.use(ResponseMiddleware.errorHandler);
 
 // ----------------- SERVER SETUP -----------------

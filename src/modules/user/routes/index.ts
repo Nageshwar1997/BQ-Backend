@@ -18,7 +18,6 @@ import {
   checkPasswordTokenValidityController,
 } from "../controllers";
 import {
-  JSONParseMiddleware,
   Middlewares,
   MulterMiddleware,
   RequestMiddleware,
@@ -115,7 +114,7 @@ userRouter.post(
     customLimits: { imageSize: 0.5 * MB },
   }),
   RequestMiddleware.checkEmptyRequest({ body: true, files: true }),
-  JSONParseMiddleware.JSONParse({
+  Middlewares.JSONParser({
     fieldsToParse: ["businessAddress", "businessDetails"],
   }),
   ZodMiddleware.validateZodSchema(sellerRequestZodSchema),

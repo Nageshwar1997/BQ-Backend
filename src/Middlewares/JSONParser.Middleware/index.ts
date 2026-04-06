@@ -4,7 +4,7 @@ type ParseFieldsMiddlewareProps = {
   fieldsToParse: string[];
 };
 
-export const JSONParse = ({
+export const JSONParser = ({
   fieldsToParse = [],
 }: ParseFieldsMiddlewareProps) => {
   return (req: Request, _: Response, next: NextFunction) => {
