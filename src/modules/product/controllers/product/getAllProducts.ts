@@ -53,7 +53,7 @@ export const getAllProductsController = async (req: Request, res: Response) => {
     let level3CategoryIds: string[] = [];
 
     const cat1 = await Category.findOne({
-      category: category_1,
+      category: category_1?.toString(),
       level: 1,
     })
       .lean()
@@ -90,7 +90,7 @@ export const getAllProductsController = async (req: Request, res: Response) => {
 
     if (category_1 && category_2 && !category_3) {
       const cat2 = await Category.findOne({
-        category: category_2,
+        category: category_2?.toString(),
         level: 2,
         parentCategory: cat1._id,
       }).lean();
@@ -116,7 +116,7 @@ export const getAllProductsController = async (req: Request, res: Response) => {
 
     if (category_1 && category_2 && category_3) {
       const cat2 = await Category.findOne({
-        category: category_2,
+        category: category_2?.toString(),
         level: 2,
         parentCategory: cat1._id,
       }).lean();
@@ -131,7 +131,7 @@ export const getAllProductsController = async (req: Request, res: Response) => {
       }
 
       const cat3 = await Category.findOne({
-        category: category_3,
+        category: category_3?.toString(),
         level: 3,
         parentCategory: cat2._id,
       }).lean();

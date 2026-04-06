@@ -13,7 +13,7 @@ import {
   RequestMiddleware,
   ResponseMiddleware,
   ZodMiddleware,
-} from "../../../Middleware";
+} from "../../../Middlewares";
 import {
   createReviewZodSchema,
   updateLikeDislikeHelpfulSchema,

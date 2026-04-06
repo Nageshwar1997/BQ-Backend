@@ -10,7 +10,7 @@ import {
   Middlewares,
   RequestMiddleware,
   ResponseMiddleware,
-} from "../../../Middleware";
+} from "../../../Middlewares";
 
 export const orderRouter = Router();
 

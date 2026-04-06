@@ -14,7 +14,7 @@ import {
   RequestMiddleware,
   JSONParseMiddleware,
   Middlewares,
-} from "../../../Middleware";
+} from "../../../Middlewares";
 import { editBlogZodSchema, uploadBlogZodSchema } from "../validations";
 
 export const blogRouter = Router();

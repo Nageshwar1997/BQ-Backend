@@ -4,7 +4,7 @@ import {
   RequestMiddleware,
   ResponseMiddleware,
   ZodMiddleware,
-} from "../../../Middleware";
+} from "../../../Middlewares";
 import { addAddressSchema, updateAddressSchema } from "../validations";
 import {
   addAddressController,

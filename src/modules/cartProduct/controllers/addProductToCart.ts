@@ -12,7 +12,7 @@ export const addProductToCartController = async (
 ) => {
   const userId = req.user?._id;
   const { productId } = req.params;
-  const { shadeId } = req.query;
+  const { shadeId } = req.query as Record<string, string>;
 
   if (!productId) {
     throw new AppError({ message: "Product Id is required", statusCode: 400 });
@@ -28,7 +28,11 @@ export const addProductToCartController = async (
   );
 
   if (!cart) {
-    throw new AppError({ message: "Failed to create or fetch cart", statusCode: 500, code: "INTERNAL_ERROR" });
+    throw new AppError({
+      message: "Failed to create or fetch cart",
+      statusCode: 500,
+      code: "INTERNAL_ERROR",
+    });
   }
 
   // 2️ Check if cartProduct already exists
@@ -39,7 +43,10 @@ export const addProductToCartController = async (
   });
 
   if (existCartProduct) {
-    throw new AppError({ message: "Product already exists in cart", statusCode: 400 });
+    throw new AppError({
+      message: "Product already exists in cart",
+      statusCode: 400,
+    });
   }
 
   // 3️ Create new CartProduct
