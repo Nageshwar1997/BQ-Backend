@@ -5,7 +5,7 @@ import { JSONParser } from "./JSONParser.Middleware";
 import { Logger } from "./Logger.Middleware";
 
 export * as ZodMiddleware from "./zod";
-export * as MulterMiddleware from "./multer";
+export * as MulterMiddleware from "./Multer.Middleware";
 export * as ResponseMiddleware from "./response";
 export * as RequestMiddleware from "./request";
 

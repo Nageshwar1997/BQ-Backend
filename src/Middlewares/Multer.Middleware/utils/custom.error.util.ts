@@ -8,7 +8,7 @@ import {
 import { ErrorBuilder } from "../../../classes";
 import { CustomFileErrorProps } from "../../../types";
 
-export const getCustomError = ({
+export const CustomErrorUtil = ({
   files = [],
   customLimits,
   customFileTypes,

@@ -2,7 +2,7 @@ import { MulterError } from "multer";
 import { IS_DEV_MODE } from "../../../envs";
 import { ErrorBuilder } from "../../../classes";
 
-export const getMulterError = ({
+export const MulterErrorUtil = ({
   err,
   fieldName = "",
   maxCount,

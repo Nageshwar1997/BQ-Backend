@@ -3,7 +3,7 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 
 import { FileValidatorOptionsProps, MulterType } from "../../types";
 import { ErrorBuilder } from "../../classes";
-import { getCustomError, getMulterError } from "./utils";
+import { MulterUtils } from "./utils";
 
 export const validateFiles = ({
   type,
@@ -54,13 +54,7 @@ export const validateFiles = ({
       const error = new ErrorBuilder();
 
       // Multer errors
-      error.merge(
-        getMulterError({
-          err,
-          fieldName,
-          maxCount,
-        }),
-      );
+      error.merge(MulterUtils.Multer({ err, fieldName, maxCount }));
 
       if (error.hasErrors()) {
         return next(
@@ -76,11 +70,11 @@ export const validateFiles = ({
       const checkableTypes: MulterType[] = ["single", "array", "any", "fields"];
 
       if (checkableTypes.includes(type)) {
-        let allFiles: Express.Multer.File[] = [];
+        let files: Express.Multer.File[] = [];
 
         switch (type) {
           case "fields": {
-            allFiles = Object.values(
+            files = Object.values(
               req.files || {},
             ).flat() as Express.Multer.File[];
             break;
@@ -88,22 +82,18 @@ export const validateFiles = ({
 
           case "array":
           case "any": {
-            allFiles = (req.files as Express.Multer.File[]) || [];
+            files = (req.files as Express.Multer.File[]) || [];
             break;
           }
 
           case "single": {
-            if (req.file) allFiles = [req.file];
+            if (req.file) files = [req.file];
             break;
           }
         }
 
         error.merge(
-          getCustomError({
-            files: allFiles,
-            customLimits,
-            customFileTypes,
-          }),
+          MulterUtils.Custom({ files, customLimits, customFileTypes }),
         );
 
         if (error.hasErrors()) {
