@@ -8,10 +8,10 @@ import router from "./routes";
 import { connectDB, handleNamespace, initSocket } from "./configs";
 import {
   ResponseMiddleware,
-  CorsMiddleware,
   DatabaseMiddleware,
   RequestMiddleware,
   LoggerMiddleware,
+  Middlewares,
 } from "./middlewares";
 import { PORT } from "./envs";
 import { mailService, redisService } from "./classes";
@@ -34,7 +34,7 @@ app.use(LoggerMiddleware.expressLogger);
 
 // 4. Custom middlewares
 app.use(ResponseMiddleware.success);
-app.use(CorsMiddleware.checkOrigin);
+app.use(Middlewares.Cors);
 app.use(DatabaseMiddleware.checkDbConnection);
 
 // ----------------- ROUTES -----------------

@@ -1,6 +1,6 @@
 import { Auth } from "./auth";
+import { Cors } from "./cors";
 
-export * as CorsMiddleware from "./cors";
 export * as DatabaseMiddleware from "./database";
 export * as ZodMiddleware from "./zod";
 export * as MulterMiddleware from "./multer";
@@ -11,4 +11,5 @@ export * as LoggerMiddleware from "./logger";
 
 export const Middlewares = {
   Auth,
+  Cors,
 };
