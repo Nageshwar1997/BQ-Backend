@@ -24,5 +24,3 @@ export interface IUserAddresses {
   addresses: Types.ObjectId[];
   defaultAddress?: Types.ObjectId;
 }
-
-export * as AddressTypes from ".";

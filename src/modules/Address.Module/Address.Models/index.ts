@@ -1,10 +1,10 @@
 import { model } from "mongoose";
 import { AddressSchemas } from "../Address.Schemas";
-import { AddressTypes } from "../Address.Types";
+import { IAddress, IUserAddresses } from "../Address.Types";
 
-const Address = model<AddressTypes.IAddress>("Address", AddressSchemas.Address);
+const Address = model<IAddress>("Address", AddressSchemas.Address);
 
-const UserAddress = model<AddressTypes.IUserAddresses>(
+const UserAddress = model<IUserAddresses>(
   "User-Address",
   AddressSchemas.UserAddress,
 );
