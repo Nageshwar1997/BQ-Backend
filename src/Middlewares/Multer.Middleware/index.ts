@@ -3,7 +3,7 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 
 import { FileValidatorOptionsProps, MulterType } from "../../types";
 import { ErrorBuilder } from "../../Classes";
-import { MulterUtils } from "./utils";
+import { MulterUtils } from "./Multer.Utils";
 
 export const Multer = ({
   type,

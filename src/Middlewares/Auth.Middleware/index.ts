@@ -8,7 +8,7 @@ const Authenticated =
   (needPassword?: boolean) =>
   async (req: AuthenticatedRequest, _: Response, next: NextFunction) => {
     try {
-      const userId = Modules.Auth.Services.getUserIdFromToken(req);
+      const userId = Modules.Auth.Services.GetUserIdFromToken(req);
 
       isValidMongoId(userId, "Invalid userId", 400);
 
@@ -30,7 +30,7 @@ const Authorization =
   (allowedRoles: TRole[], needPassword?: boolean) =>
   async (req: AuthorizedRequest, _: Response, next: NextFunction) => {
     try {
-      const userId = Modules.Auth.Services.getUserIdFromToken(req);
+      const userId = Modules.Auth.Services.GetUserIdFromToken(req);
 
       isValidMongoId(userId, "Invalid userId", 400);
 
