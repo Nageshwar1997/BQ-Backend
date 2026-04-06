@@ -1,4 +1,4 @@
-export const regexes = {
+export const Regex = {
   phoneStart: /^[6-9]/, // Starts with 6, 7, 8, or 9
   phoneExactLength: /^\d{10}$/, // Exactly 10 digits
   phone: /^[6-9][0-9]{9}$/, // Phone number e.g. 9876543210

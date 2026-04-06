@@ -13,7 +13,7 @@ import {
   TRole,
 } from "../types";
 import { AppError } from "../Classes";
-import { regexes } from "../Constants";
+import { Constants } from "../Constants";
 import {
   BACKEND_LOCALHOST_URL,
   BACKEND_PRODUCTION_URL,
@@ -201,11 +201,11 @@ export const validateZodString = ({
   }
 
   if (blockMultipleSpaces) {
-    schema = schema.regex(regexes.singleSpace, messages.multiple_spaces);
+    schema = schema.regex(Constants.Regex.singleSpace, messages.multiple_spaces);
   }
 
   if (blockSingleSpace) {
-    schema = schema.regex(regexes.noSpace, messages.single_space);
+    schema = schema.regex(Constants.Regex.noSpace, messages.single_space);
   }
 
   if (lowerCase) {
@@ -225,7 +225,9 @@ export const validateZodUrl = ({ ...props }: ZodCommonConfigs) => {
   return validateZodString({
     ...props,
     blockSingleSpace: true,
-    customRegexes: [{ regex: regexes.url, message: "must be a valid URL" }],
+    customRegexes: [
+      { regex: Constants.Regex.url, message: "must be a valid URL" },
+    ],
   });
 };
 
@@ -311,7 +313,7 @@ export const validateZodDate = ({
 
   const baseSchema = z
     .string({ error: messages.required })
-    .refine((val) => regexes.date.test(val), {
+    .refine((val) => Constants.Regex.date.test(val), {
       message: messages.invalid_format,
     })
     .transform((val) => {
@@ -403,7 +405,7 @@ export const getSocialAuthRedirectURL = (
 };
 
 export const escapeRegexSpecialChars = (value: string): string => {
-  return value.replace(regexes.escapeSpecialChars, "\\$&");
+  return value.replace(Constants.Regex.escapeSpecialChars, "\\$&");
 };
 
 export const toArray = (value?: string | ParsedQs | (string | ParsedQs)[]) => {

@@ -1,6 +1,6 @@
 import z from "zod";
 import { validateZodEnums, validateZodString } from "../../../utils";
-import { Constants, regexes } from "../../../Constants";
+import { Constants } from "../../../Constants";
 
 export const sellerRequestZodSchema = z.object({
   businessAddress: z.object(
@@ -41,7 +41,9 @@ export const sellerRequestZodSchema = z.object({
         min: 6,
         max: 6,
         blockSingleSpace: true,
-        customRegexes: [{ regex: regexes.pinCode, message: "must be valid" }],
+        customRegexes: [
+          { regex: Constants.Regex.pinCode, message: "must be valid" },
+        ],
       }),
       pan: validateZodString({
         field: "pan",
@@ -49,7 +51,9 @@ export const sellerRequestZodSchema = z.object({
         min: 10,
         max: 10,
         blockSingleSpace: true,
-        customRegexes: [{ regex: regexes.pan, message: "must be valid" }],
+        customRegexes: [
+          { regex: Constants.Regex.pan, message: "must be valid" },
+        ],
       }),
       gst: validateZodString({
         field: "gst",
@@ -57,7 +61,9 @@ export const sellerRequestZodSchema = z.object({
         min: 15,
         max: 16,
         blockSingleSpace: true,
-        customRegexes: [{ regex: regexes.gst, message: "must be valid" }],
+        customRegexes: [
+          { regex: Constants.Regex.gst, message: "must be valid" },
+        ],
       }),
     },
     { error: "businessAddress is required" },
@@ -71,7 +77,7 @@ export const sellerRequestZodSchema = z.object({
         min: 2,
         customRegexes: [
           {
-            regex: regexes.name,
+            regex: Constants.Regex.name,
             message:
               "can only contain letters and only one space is allowed between words",
           },
@@ -84,7 +90,7 @@ export const sellerRequestZodSchema = z.object({
         lowerCase: true,
         customRegexes: [
           {
-            regex: regexes.email,
+            regex: Constants.Regex.email,
             message:
               "please provide a valid email address, like example@domain.com",
           },
@@ -98,7 +104,7 @@ export const sellerRequestZodSchema = z.object({
         max: 10,
         customRegexes: [
           {
-            regex: regexes.phone,
+            regex: Constants.Regex.phone,
             message:
               "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
           },
@@ -124,7 +130,7 @@ export const updateUserZodSchema = z.object({
     max: 50,
     customRegexes: [
       {
-        regex: regexes.name,
+        regex: Constants.Regex.name,
         message:
           "can only contain letters and only one space is allowed between words",
       },
@@ -138,7 +144,7 @@ export const updateUserZodSchema = z.object({
     max: 50,
     customRegexes: [
       {
-        regex: regexes.name,
+        regex: Constants.Regex.name,
         message:
           "can only contain letters and only one space is allowed between words",
       },
@@ -151,7 +157,7 @@ export const updateUserZodSchema = z.object({
     isOptional: true,
     customRegexes: [
       {
-        regex: regexes.email,
+        regex: Constants.Regex.email,
         message:
           "please provide a valid email address, like example@domain.com",
       },
@@ -165,7 +171,7 @@ export const updateUserZodSchema = z.object({
     max: 10,
     customRegexes: [
       {
-        regex: regexes.phone,
+        regex: Constants.Regex.phone,
         message:
           "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
       },
@@ -182,7 +188,7 @@ export const updatePasswordZodSchema = z
       field: "password",
       customRegexes: [
         {
-          regex: regexes.password,
+          regex: Constants.Regex.password,
           message:
             "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
         },
@@ -195,7 +201,7 @@ export const updatePasswordZodSchema = z
       field: "confirmPassword",
       customRegexes: [
         {
-          regex: regexes.password,
+          regex: Constants.Regex.password,
           message:
             "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
         },
@@ -216,7 +222,7 @@ export const changePasswordZodSchema = z
       field: "oldPassword",
       customRegexes: [
         {
-          regex: regexes.password,
+          regex: Constants.Regex.password,
           message:
             "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
         },
@@ -229,7 +235,7 @@ export const changePasswordZodSchema = z
       field: "password",
       customRegexes: [
         {
-          regex: regexes.password,
+          regex: Constants.Regex.password,
           message:
             "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
         },
@@ -242,7 +248,7 @@ export const changePasswordZodSchema = z
       field: "confirmPassword",
       customRegexes: [
         {
-          regex: regexes.password,
+          regex: Constants.Regex.password,
           message:
             "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
         },

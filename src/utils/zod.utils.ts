@@ -12,7 +12,7 @@ import {
   IZodNumberConfigs,
   IZodStringConfigs,
 } from "../types";
-import { regexes } from "../Constants";
+import { Constants } from "../Constants";
 
 export const appendZodCustomIssue = (
   ctx: RefinementCtx,
@@ -31,23 +31,23 @@ export const passwordValidationOptions: IZodStringConfigs = {
   max: 20,
   customRegexes: [
     {
-      regex: regexes.atLeastOneUppercaseLetter,
+      regex: Constants.Regex.atLeastOneUppercaseLetter,
       message: "must contain at least one uppercase letter",
     },
     {
-      regex: regexes.atLeastOneLowercaseLetter,
+      regex: Constants.Regex.atLeastOneLowercaseLetter,
       message: "must contain at least one lowercase letter",
     },
     {
-      regex: regexes.atLeastOneDigit,
+      regex: Constants.Regex.atLeastOneDigit,
       message: "must contain at least one number",
     },
     {
-      regex: regexes.atLeastOneSpecialCharacter,
+      regex: Constants.Regex.atLeastOneSpecialCharacter,
       message: "must contain at least one special character e.g. @$!%*?&#",
     },
     {
-      regex: regexes.password,
+      regex: Constants.Regex.password,
       message:
         "must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
     },
@@ -61,7 +61,7 @@ export const nameValidationOptions: IZodStringConfigs = {
   max: 50,
   customRegexes: [
     {
-      regex: regexes.name,
+      regex: Constants.Regex.name,
       message:
         "can only contain letters and only one space is allowed between words",
     },
@@ -103,11 +103,14 @@ export const ValidateString = (props: IZodStringConfigs): ZodString => {
 
   if (allowSpace === "singleSpace") {
     schema = schema.regex(
-      regexes.singleSpace,
+      Constants.Regex.singleSpace,
       `${name} must not contain multiple spaces.`,
     );
   } else if (allowSpace === "noSpace") {
-    schema = schema.regex(regexes.noSpace, `${name} must not contain spaces.`);
+    schema = schema.regex(
+      Constants.Regex.noSpace,
+      `${name} must not contain spaces.`,
+    );
   }
 
   if (customRegexes?.length) {

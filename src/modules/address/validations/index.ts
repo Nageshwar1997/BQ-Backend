@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { validateZodEnums, validateZodString } from "../../../utils";
-import { Constants, regexes } from "../../../Constants";
+import { Constants } from "../../../Constants";
 import { ADDRESS_TYPES } from "../constants";
 
 const addressBaseSchema = z.object({
@@ -26,7 +26,7 @@ const addressBaseSchema = z.object({
     blockSingleSpace: true,
     min: 15,
     max: 15,
-    customRegexes: [{ regex: regexes.gst, message: "must be valid" }],
+    customRegexes: [{ regex: Constants.Regex.gst, message: "must be valid" }],
     isOptional: true,
     nonEmpty: false,
   }),
@@ -35,7 +35,9 @@ const addressBaseSchema = z.object({
     min: 6,
     max: 6,
     blockSingleSpace: true,
-    customRegexes: [{ regex: regexes.pinCode, message: "must be valid" }],
+    customRegexes: [
+      { regex: Constants.Regex.pinCode, message: "must be valid" },
+    ],
   }),
   state: validateZodString({
     field: "state",
@@ -57,7 +59,7 @@ const addressBaseSchema = z.object({
     max: 50,
     customRegexes: [
       {
-        regex: regexes.name,
+        regex: Constants.Regex.name,
         message:
           "can only contain letters and only one space is allowed between words",
       },
@@ -70,7 +72,7 @@ const addressBaseSchema = z.object({
     max: 50,
     customRegexes: [
       {
-        regex: regexes.name,
+        regex: Constants.Regex.name,
         message:
           "can only contain letters and only one space is allowed between words",
       },
@@ -82,7 +84,7 @@ const addressBaseSchema = z.object({
     lowerCase: true,
     customRegexes: [
       {
-        regex: regexes.email,
+        regex: Constants.Regex.email,
         message:
           "please provide a valid email address, like example@domain.com",
       },
@@ -95,7 +97,7 @@ const addressBaseSchema = z.object({
     max: 10,
     customRegexes: [
       {
-        regex: regexes.phone,
+        regex: Constants.Regex.phone,
         message:
           "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
       },
@@ -110,7 +112,7 @@ const addressBaseSchema = z.object({
     max: 10,
     customRegexes: [
       {
-        regex: regexes.phone,
+        regex: Constants.Regex.phone,
         message:
           "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
       },
