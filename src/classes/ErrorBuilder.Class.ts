@@ -1,6 +1,6 @@
 // utils/ErrorBuilder.ts
 
-import { AppError } from "./AppError";
+import { AppError } from "./AppError.Class";
 import { TErrorPayload } from "../types";
 
 export class ErrorBuilder {
