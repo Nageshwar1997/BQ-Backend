@@ -24,7 +24,7 @@ import {
   updatePasswordZodSchema,
   updateUserZodSchema,
 } from "../validations";
-import { MB } from "../../../Constants";
+import { Constants } from "../../../Constants";
 
 export const userRouter = Router();
 
@@ -105,7 +105,7 @@ userRouter.post(
       name,
       maxCount: 1,
     })),
-    customLimits: { imageSize: 0.5 * MB },
+    customLimits: { imageSize: 0.5 * Constants.File.MB },
   }),
   Middlewares.Request.Empty({ body: true, files: true }),
   Middlewares.JSONParser({

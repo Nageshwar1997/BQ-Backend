@@ -2,7 +2,7 @@ import { Response } from "express";
 
 import { AuthorizedRequest } from "../../../types";
 import { AppError } from "../../../Classes";
-import { ALLOWED_IMAGE_TYPES, ALLOWED_VIDEO_TYPES } from "../../../Constants";
+import { Constants } from "../../../Constants";
 import {
   singleImageRemover,
   singleImageUploader,
@@ -35,18 +35,18 @@ export const uploadHomeVideoController = async (
     });
   }
 
-  if (!ALLOWED_VIDEO_TYPES.includes(videoFile.mimetype)) {
+  if (!Constants.File.ALLOWED_VIDEO_TYPES.includes(videoFile.mimetype)) {
     throw new AppError({
-      message: `Invalid video format. Allowed formats: ${ALLOWED_VIDEO_TYPES.map(
+      message: `Invalid video format. Allowed formats: ${Constants.File.ALLOWED_VIDEO_TYPES.map(
         (t) => t.replace("video/", ""),
       ).join(", ")}`,
       statusCode: 400,
     });
   }
 
-  if (!ALLOWED_IMAGE_TYPES.includes(posterFile.mimetype)) {
+  if (!Constants.File.ALLOWED_IMAGE_TYPES.includes(posterFile.mimetype)) {
     throw new AppError({
-      message: `Invalid poster format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map(
+      message: `Invalid poster format. Allowed formats: ${Constants.File.ALLOWED_IMAGE_TYPES.map(
         (t) => t.replace("image/", ""),
       ).join(", ")}`,
       statusCode: 400,

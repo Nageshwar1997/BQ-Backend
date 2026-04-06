@@ -1,10 +1,4 @@
-import {
-  ALLOWED_IMAGE_TYPES,
-  ALLOWED_VIDEO_TYPES,
-  MAX_IMAGE_FILE_SIZE,
-  MAX_VIDEO_FILE_SIZE,
-  MB,
-} from "../../../Constants";
+import { Constants } from "../../../Constants";
 import { ErrorBuilder } from "../../../Classes";
 import { CustomFileErrorProps } from "../../../types";
 
@@ -16,13 +10,17 @@ export const CustomErrorUtil = ({
   const error = new ErrorBuilder();
 
   // Limits
-  const imageSizeLimit = customLimits?.imageSize ?? MAX_IMAGE_FILE_SIZE;
-  const videoSizeLimit = customLimits?.videoSize ?? MAX_VIDEO_FILE_SIZE;
-  const otherSizeLimit = customLimits?.otherSize ?? 2 * MB;
+  const imageSizeLimit =
+    customLimits?.imageSize ?? Constants.File.MAX_IMAGE_FILE_SIZE;
+  const videoSizeLimit =
+    customLimits?.videoSize ?? Constants.File.MAX_VIDEO_FILE_SIZE;
+  const otherSizeLimit = customLimits?.otherSize ?? 2 * Constants.File.MB;
 
   // Types
-  const allowedImageTypes = customFileTypes?.imageTypes ?? ALLOWED_IMAGE_TYPES;
-  const allowedVideoTypes = customFileTypes?.videoTypes ?? ALLOWED_VIDEO_TYPES;
+  const allowedImageTypes =
+    customFileTypes?.imageTypes ?? Constants.File.ALLOWED_IMAGE_TYPES;
+  const allowedVideoTypes =
+    customFileTypes?.videoTypes ?? Constants.File.ALLOWED_VIDEO_TYPES;
   const allowedOtherTypes = customFileTypes?.otherTypes ?? [];
 
   for (const file of files) {
@@ -32,13 +30,16 @@ export const CustomErrorUtil = ({
     const isVideo = allowedVideoTypes.includes(mimetype);
     const isOther = allowedOtherTypes.includes(mimetype);
 
-    const fileSizeMB = (size / MB).toFixed(2);
+    const fileSizeMB = (size / Constants.File.MB).toFixed(2);
 
     let allowedSizeMB = "0";
 
-    if (isImage) allowedSizeMB = (imageSizeLimit / MB).toFixed(2);
-    else if (isVideo) allowedSizeMB = (videoSizeLimit / MB).toFixed(2);
-    else if (isOther) allowedSizeMB = (otherSizeLimit / MB).toFixed(2);
+    if (isImage)
+      allowedSizeMB = (imageSizeLimit / Constants.File.MB).toFixed(2);
+    else if (isVideo)
+      allowedSizeMB = (videoSizeLimit / Constants.File.MB).toFixed(2);
+    else if (isOther)
+      allowedSizeMB = (otherSizeLimit / Constants.File.MB).toFixed(2);
 
     // SIZE VALIDATION
     if (isImage && size > imageSizeLimit) {
