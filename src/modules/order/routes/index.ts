@@ -6,7 +6,11 @@ import {
   getAllOrdersController,
   getOrderByIdController,
 } from "../controllers";
-import { Middlewares, RequestMiddleware, ResponseMiddleware } from "../../../middlewares";
+import {
+  Middlewares,
+  RequestMiddleware,
+  ResponseMiddleware,
+} from "../../../Middleware";
 
 export const orderRouter = Router();
 

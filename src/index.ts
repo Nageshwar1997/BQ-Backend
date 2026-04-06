@@ -11,7 +11,7 @@ import {
   RequestMiddleware,
   LoggerMiddleware,
   Middlewares,
-} from "./middlewares";
+} from "./Middleware";
 import { PORT } from "./envs";
 import { mailService, redisService } from "./classes";
 

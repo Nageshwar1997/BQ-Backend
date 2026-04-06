@@ -1,6 +1,6 @@
-import { Auth } from "./auth";
-import { Cors } from "./cors";
-import { Database } from "./database";
+import { Auth } from "./Auth.Middleware";
+import { Cors } from "./Cors.Middleware";
+import { Database } from "./Database.Middleware";
 
 export * as ZodMiddleware from "./zod";
 export * as MulterMiddleware from "./multer";

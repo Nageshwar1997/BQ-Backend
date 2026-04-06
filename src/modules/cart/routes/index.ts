@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { Middlewares, ResponseMiddleware } from "../../../middlewares";
+import { Middlewares, ResponseMiddleware } from "../../../Middleware";
 import { clearCartController, getCartController } from "../controllers";
 
 export const cartRouter = Router();

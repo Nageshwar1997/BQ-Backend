@@ -6,7 +6,7 @@ import {
   MulterMiddleware,
   ResponseMiddleware,
   RequestMiddleware,
-} from "../../../middlewares";
+} from "../../../Middleware";
 import { zodSchemas } from "../../../validations";
 
 export const authRouter = Router();
