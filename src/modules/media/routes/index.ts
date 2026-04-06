@@ -11,7 +11,6 @@ import {
 import {
   Middlewares,
   MulterMiddleware,
-  RequestMiddleware,
   ResponseMiddleware,
   ZodMiddleware,
 } from "../../../Middlewares";
@@ -33,7 +32,7 @@ mediaRouter.post(
     type: "single",
     fieldName: "image",
   }),
-  RequestMiddleware.checkEmptyRequest({ file: true, fileOrBody: true }),
+  Middlewares.Request.Empty({ file: true, fileOrBody: true }),
   ZodMiddleware.validateZodSchema(uploadImageZodSchema),
   ResponseMiddleware.catchAsync(uploadSingleImageController),
 );
@@ -47,7 +46,7 @@ mediaRouter.post(
     fieldName: "images",
     maxCount: 10,
   }),
-  RequestMiddleware.checkEmptyRequest({ files: true, body: true }),
+  Middlewares.Request.Empty({ files: true, body: true }),
   ZodMiddleware.validateZodSchema(uploadImageZodSchema),
   ResponseMiddleware.catchAsync(uploadMultipleImagesController),
 );
@@ -55,7 +54,7 @@ mediaRouter.post(
 // For Single Image Remove
 mediaRouter.delete(
   "/image/delete",
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  Middlewares.Request.Empty({ body: true }),
   Middlewares.Auth.Authorization(["MASTER", "ADMIN", "SELLER"]),
   ZodMiddleware.validateZodSchema(removeSingleImageZodSchema),
   ResponseMiddleware.catchAsync(removeSingleImageController),
@@ -64,7 +63,7 @@ mediaRouter.delete(
 // For Multiple Images Remove
 mediaRouter.delete(
   "/images/delete",
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  Middlewares.Request.Empty({ body: true }),
   Middlewares.Auth.Authorization(["MASTER", "ADMIN", "SELLER"]),
   ZodMiddleware.validateZodSchema(removeMultipleImagesZodSchema),
   ResponseMiddleware.catchAsync(removeMultipleImagesController),

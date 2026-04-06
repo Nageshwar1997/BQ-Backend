@@ -9,7 +9,6 @@ import {
 import {
   Middlewares,
   MulterMiddleware,
-  RequestMiddleware,
   ResponseMiddleware,
   ZodMiddleware,
 } from "../../../Middlewares";
@@ -30,7 +29,7 @@ reviewRouter.post(
       { name: "videos", maxCount: 5 },
     ],
   }),
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  Middlewares.Request.Empty({ body: true }),
   Middlewares.Auth.Authenticated(false),
   ZodMiddleware.validateZodSchema(createReviewZodSchema),
   ResponseMiddleware.catchAsync(createReviewController),
@@ -45,7 +44,7 @@ reviewRouter.patch(
       { name: "videos", maxCount: 5 },
     ],
   }),
-  RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
+  Middlewares.Request.Empty({ filesOrBody: true }),
   Middlewares.Auth.Authenticated(false),
   Middlewares.JSONParser({
     fieldsToParse: ["removedImages", "removedVideos"],
@@ -56,7 +55,7 @@ reviewRouter.patch(
 
 reviewRouter.patch(
   "/:reviewId",
-  RequestMiddleware.checkEmptyRequest({ body: true, params: true }),
+  Middlewares.Request.Empty({ body: true, params: true }),
   Middlewares.Auth.Authenticated(false),
   ZodMiddleware.validateZodSchema(updateLikeDislikeHelpfulSchema),
   ResponseMiddleware.catchAsync(likeDislikeHelpfulController),
@@ -64,13 +63,13 @@ reviewRouter.patch(
 
 reviewRouter.delete(
   "/:productId/:reviewId",
-  RequestMiddleware.checkEmptyRequest({ params: true }),
+  Middlewares.Request.Empty({ params: true }),
   Middlewares.Auth.Authenticated(false),
   ResponseMiddleware.catchAsync(deleteReviewController),
 );
 
 reviewRouter.get(
   "/:productId",
-  RequestMiddleware.checkEmptyRequest({ params: true }),
+  Middlewares.Request.Empty({ params: true }),
   ResponseMiddleware.catchAsync(getReviewsByProductIdController),
 );

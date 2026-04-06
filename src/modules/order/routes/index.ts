@@ -6,44 +6,40 @@ import {
   getAllOrdersController,
   getOrderByIdController,
 } from "../controllers";
-import {
-  Middlewares,
-  RequestMiddleware,
-  ResponseMiddleware,
-} from "../../../Middlewares";
+import { Middlewares, ResponseMiddleware } from "../../../Middlewares";
 
 export const orderRouter = Router();
 
 orderRouter.post(
   "/create",
-  RequestMiddleware.checkEmptyRequest({ query: true }),
+  Middlewares.Request.Empty({ query: true }),
   Middlewares.Auth.Authenticated(false),
   ResponseMiddleware.catchAsyncWithTransaction(createOrderController),
 );
 
 orderRouter.patch(
   "/cancel-payment/:orderId",
-  RequestMiddleware.checkEmptyRequest({ params: true }),
+  Middlewares.Request.Empty({ params: true }),
   Middlewares.Auth.Authenticated(false),
   ResponseMiddleware.catchAsync(cancelPaymentController),
 );
 
 orderRouter.get(
   "/",
-  RequestMiddleware.checkEmptyRequest({ query: false }), //LINK - Optional
+  Middlewares.Request.Empty({ query: false }), //LINK - Optional
   Middlewares.Auth.Authenticated(false),
   ResponseMiddleware.catchAsync(getAllOrdersController),
 );
 
 orderRouter.get(
   "/:orderId",
-  RequestMiddleware.checkEmptyRequest({ params: true }),
+  Middlewares.Request.Empty({ params: true }),
   Middlewares.Auth.Authenticated(false),
   ResponseMiddleware.catchAsync(getOrderByIdController),
 );
 orderRouter.patch(
   "/cancel/:orderId",
-  RequestMiddleware.checkEmptyRequest({ params: true, body: false }),
+  Middlewares.Request.Empty({ params: true, body: false }),
   Middlewares.Auth.Authenticated(false),
   ResponseMiddleware.catchAsyncWithTransaction(cancelOrderController),
 );

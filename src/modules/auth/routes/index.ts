@@ -5,7 +5,6 @@ import {
   ZodMiddleware,
   MulterMiddleware,
   ResponseMiddleware,
-  RequestMiddleware,
 } from "../../../Middlewares";
 import { zodSchemas } from "../../../validations";
 
@@ -14,14 +13,14 @@ export const authRouter = Router();
 // Register Route
 authRouter.post(
   "/register/send-otp",
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  Middlewares.Request.Empty({ body: true }),
   ZodMiddleware.validateZodSchema(zodSchemas.auth.register.email),
   ResponseMiddleware.catchAsync(authControllers.register.sendOtp),
 );
 
 authRouter.post(
   "/register/resend-otp",
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  Middlewares.Request.Empty({ body: true }),
   ZodMiddleware.validateZodSchema(zodSchemas.auth.register.email),
   ResponseMiddleware.catchAsync(authControllers.register.resendOtp),
 );
@@ -29,7 +28,7 @@ authRouter.post(
 authRouter.post(
   "/register/verify-otp",
   MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
-  RequestMiddleware.checkEmptyRequest({
+  Middlewares.Request.Empty({
     file: false,
     body: true,
     query: true,
@@ -41,7 +40,7 @@ authRouter.post(
 // Login Route
 authRouter.post(
   "/login",
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  Middlewares.Request.Empty({ body: true }),
   ZodMiddleware.validateZodSchema(zodSchemas.auth.login),
   ResponseMiddleware.catchAsync(authControllers.login.manual),
 );
@@ -49,7 +48,7 @@ authRouter.post(
 // Logout
 authRouter.delete(
   "/logout/:userId",
-  RequestMiddleware.checkEmptyRequest({ params: true }),
+  Middlewares.Request.Empty({ params: true }),
   ResponseMiddleware.catchAsync(authControllers.logout),
 );
 
@@ -100,7 +99,7 @@ authRouter.post(
 
 authRouter.post(
   "/forgot-password-verify-otp",
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  Middlewares.Request.Empty({ body: true }),
   ResponseMiddleware.catchAsync(
     authControllers.password.forgotPassword.verifyOtp,
   ),
@@ -115,7 +114,7 @@ authRouter.get(
 
 authRouter.patch(
   "/forgot-password-set-password",
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  Middlewares.Request.Empty({ body: true }),
   ResponseMiddleware.catchAsync(
     authControllers.password.forgotPassword.setPassword,
   ),

@@ -3,11 +3,11 @@ import { Cors } from "./Cors.Middleware";
 import { Database } from "./Database.Middleware";
 import { JSONParser } from "./JSONParser.Middleware";
 import { Logger } from "./Logger.Middleware";
+import { Request } from "./Request.Middleware";
 
 export * as ZodMiddleware from "./zod";
 export * as MulterMiddleware from "./Multer.Middleware";
-export * as ResponseMiddleware from "./response";
-export * as RequestMiddleware from "./request";
+export * as ResponseMiddleware from "./Response.Middleware";
 
 export const Middlewares = {
   Auth,
@@ -15,4 +15,5 @@ export const Middlewares = {
   Database,
   Logger,
   JSONParser,
+  Request,
 };

@@ -6,11 +6,7 @@ import http from "http";
 
 import router from "./routes";
 import { connectDB, handleNamespace, initSocket } from "./configs";
-import {
-  ResponseMiddleware,
-  RequestMiddleware,
-  Middlewares,
-} from "./Middlewares";
+import { ResponseMiddleware, Middlewares } from "./Middlewares";
 import { PORT } from "./envs";
 import { mailService, redisService } from "./classes";
 
@@ -19,7 +15,7 @@ const app = express();
 // ----------------- MIDDLEWARES ORDER -----------------
 
 // 1. Assign requestId first (for tracing logs)
-app.use(RequestMiddleware.requestId);
+app.use(Middlewares.Request.Id);
 
 // 2. Body parsers & static files
 app.use(express.json());

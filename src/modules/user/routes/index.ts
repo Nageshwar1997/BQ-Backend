@@ -20,7 +20,6 @@ import {
 import {
   Middlewares,
   MulterMiddleware,
-  RequestMiddleware,
   ResponseMiddleware,
   ZodMiddleware,
 } from "../../../Middlewares";
@@ -41,7 +40,7 @@ userRouter.patch(
   "/user/update",
   Middlewares.Auth.Authenticated(false),
   MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
-  RequestMiddleware.checkEmptyRequest({ fileOrBody: true }),
+  Middlewares.Request.Empty({ fileOrBody: true }),
   ZodMiddleware.validateZodSchema(updateUserZodSchema),
   ResponseMiddleware.catchAsync(updateUserController),
 );
@@ -49,7 +48,7 @@ userRouter.patch(
 userRouter.patch(
   "/user/update-password",
   Middlewares.Auth.Authenticated(true),
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  Middlewares.Request.Empty({ body: true }),
   ZodMiddleware.validateZodSchema(updatePasswordZodSchema),
   ResponseMiddleware.catchAsync(updatePasswordController),
 );
@@ -72,7 +71,7 @@ userRouter.get(
 
 userRouter.post(
   "/user/forgot-password",
-  RequestMiddleware.checkEmptyRequest({ query: true, body: true }),
+  Middlewares.Request.Empty({ query: true, body: true }),
   ResponseMiddleware.catchAsync(forgotPasswordController),
 );
 
@@ -83,7 +82,7 @@ userRouter.get(
 
 userRouter.post(
   "/user/forgot-password-link",
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  Middlewares.Request.Empty({ body: true }),
   ResponseMiddleware.catchAsync(forgotPasswordSendLinkController),
 );
 
@@ -95,7 +94,7 @@ userRouter.post(
 userRouter.patch(
   "/user/change-password",
   Middlewares.Auth.Authenticated(true),
-  RequestMiddleware.checkEmptyRequest({ body: true }),
+  Middlewares.Request.Empty({ body: true }),
   ZodMiddleware.validateZodSchema(changePasswordZodSchema),
   ResponseMiddleware.catchAsync(changePasswordController),
 );
@@ -113,7 +112,7 @@ userRouter.post(
     })),
     customLimits: { imageSize: 0.5 * MB },
   }),
-  RequestMiddleware.checkEmptyRequest({ body: true, files: true }),
+  Middlewares.Request.Empty({ body: true, files: true }),
   Middlewares.JSONParser({
     fieldsToParse: ["businessAddress", "businessDetails"],
   }),
@@ -130,14 +129,14 @@ userRouter.get(
 
 userRouter.post(
   "/wishlist/add/:productId",
-  RequestMiddleware.checkEmptyRequest({ params: true }),
+  Middlewares.Request.Empty({ params: true }),
   Middlewares.Auth.Authenticated(false),
   ResponseMiddleware.catchAsync(addProductToWishlistController),
 );
 
 userRouter.delete(
   "/wishlist/remove/:productId",
-  RequestMiddleware.checkEmptyRequest({ params: true }),
+  Middlewares.Request.Empty({ params: true }),
   Middlewares.Auth.Authenticated(false),
   ResponseMiddleware.catchAsyncWithTransaction(
     removeProductFromWishlistController,

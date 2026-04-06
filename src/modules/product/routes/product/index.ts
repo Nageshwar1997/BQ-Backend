@@ -10,7 +10,6 @@ import {
 import {
   Middlewares,
   MulterMiddleware,
-  RequestMiddleware,
   ResponseMiddleware,
   ZodMiddleware,
 } from "../../../../Middlewares";
@@ -26,7 +25,7 @@ productRouter.post(
   "/upload",
   Middlewares.Auth.Authorization(["ADMIN", "MASTER", "SELLER"]),
   MulterMiddleware.validateFiles({ type: "any" }),
-  RequestMiddleware.checkEmptyRequest({ body: true, files: true }),
+  Middlewares.Request.Empty({ body: true, files: true }),
   Middlewares.JSONParser({
     fieldsToParse: POSSIBLE_PARSED_FIELDS,
   }),
@@ -41,7 +40,7 @@ productRouter.get(
 
 productRouter.get(
   "/product/:productId",
-  RequestMiddleware.checkEmptyRequest({ params: true }),
+  Middlewares.Request.Empty({ params: true }),
   ResponseMiddleware.catchAsync(getProductByIdController),
 );
 
@@ -49,7 +48,7 @@ productRouter.patch(
   "/product/update/:productId",
   Middlewares.Auth.Authorization(["ADMIN", "MASTER", "SELLER"]),
   MulterMiddleware.validateFiles({ type: "any" }),
-  RequestMiddleware.checkEmptyRequest({ filesOrBody: true }),
+  Middlewares.Request.Empty({ filesOrBody: true }),
   Middlewares.JSONParser({
     fieldsToParse: POSSIBLE_PARSED_FIELDS,
   }),
@@ -59,7 +58,7 @@ productRouter.patch(
 
 productRouter.delete(
   "/product/delete/:productId",
-  RequestMiddleware.checkEmptyRequest({ params: true }),
+  Middlewares.Request.Empty({ params: true }),
   Middlewares.Auth.Authorization(["ADMIN", "MASTER", "SELLER"]),
   ResponseMiddleware.catchAsync(deleteProductController),
 );

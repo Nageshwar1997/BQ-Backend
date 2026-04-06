@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request as ExpressRequest, Response } from "express";
 import { randomUUID } from "crypto";
 import { AppError } from "../../classes";
 
@@ -12,9 +12,9 @@ type CheckOptions = {
   query?: boolean;
 };
 
-export const checkEmptyRequest =
+const EmptyRequest =
   (options: CheckOptions) =>
-  (req: Request, _: Response, next: NextFunction) => {
+  (req: ExpressRequest, _: Response, next: NextFunction) => {
     try {
       const { body, file, files, fileOrBody, filesOrBody, params, query } =
         options;
@@ -48,27 +48,42 @@ export const checkEmptyRequest =
 
       // Case 3: If only body is required and is empty
       if (!files && !file && body && isBodyEmpty) {
-        throw new AppError({ message: "Please provide some data in the body!", statusCode: 400 });
+        throw new AppError({
+          message: "Please provide some data in the body!",
+          statusCode: 400,
+        });
       }
 
       // Case 4: If only files are required and are empty
       if (files && !file && !body && isFilesEmpty) {
-        throw new AppError({ message: "Please provide some files!", statusCode: 400 });
+        throw new AppError({
+          message: "Please provide some files!",
+          statusCode: 400,
+        });
       }
 
       // Case 5: If only single file is required and is empty
       if (file && !files && !body && isFileEmpty) {
-        throw new AppError({ message: "Please provide some files!", statusCode: 400 });
+        throw new AppError({
+          message: "Please provide some files!",
+          statusCode: 400,
+        });
       }
 
       // Case 6: If params are required and are empty
       if (params && isParamsEmpty) {
-        throw new AppError({ message: "Please provide some params!", statusCode: 400 });
+        throw new AppError({
+          message: "Please provide some params!",
+          statusCode: 400,
+        });
       }
 
       // Case 7: If query is required and is empty
       if (query && isQueryEmpty) {
-        throw new AppError({ message: "Please provide some query!", statusCode: 400 });
+        throw new AppError({
+          message: "Please provide some query!",
+          statusCode: 400,
+        });
       }
 
       next();
@@ -77,9 +92,14 @@ export const checkEmptyRequest =
     }
   };
 
-export const requestId = (req: Request, res: Response, next: NextFunction) => {
+const RequestId = (req: ExpressRequest, res: Response, next: NextFunction) => {
   const id = randomUUID();
   req.requestId = id; // ← must be on req
   res.setHeader("X-Request-Id", id);
   next();
+};
+
+export const Request = {
+  Empty: EmptyRequest,
+  Id: RequestId,
 };

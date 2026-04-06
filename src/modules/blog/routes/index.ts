@@ -11,7 +11,6 @@ import {
   ResponseMiddleware,
   MulterMiddleware,
   ZodMiddleware,
-  RequestMiddleware,
   Middlewares,
 } from "../../../Middlewares";
 import { editBlogZodSchema, uploadBlogZodSchema } from "../validations";
@@ -24,7 +23,7 @@ blogRouter.get("/all", ResponseMiddleware.catchAsync(getAllBlogsController));
 // Get Blog By Id Route
 blogRouter.get(
   "/blog/:id",
-  RequestMiddleware.checkEmptyRequest({ params: true }),
+  Middlewares.Request.Empty({ params: true }),
   ResponseMiddleware.catchAsync(getBlogByIdController),
 );
 
@@ -39,7 +38,7 @@ blogRouter.post(
       maxCount: 1,
     })),
   }),
-  RequestMiddleware.checkEmptyRequest({ body: true, files: true }),
+  Middlewares.Request.Empty({ body: true, files: true }),
   Middlewares.JSONParser({ fieldsToParse: ["tags"] }),
   ZodMiddleware.validateZodSchema(uploadBlogZodSchema),
   ResponseMiddleware.catchAsync(uploadBlogController),
@@ -56,7 +55,7 @@ blogRouter.patch(
       maxCount: 1,
     })),
   }),
-  RequestMiddleware.checkEmptyRequest({ fileOrBody: true, params: true }),
+  Middlewares.Request.Empty({ fileOrBody: true, params: true }),
   ZodMiddleware.validateZodSchema(editBlogZodSchema),
   ResponseMiddleware.catchAsync(editBlogController),
 );
