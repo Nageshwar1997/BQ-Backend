@@ -10,7 +10,7 @@ declare module "express-serve-static-core" {
   }
 }
 
-export const success = (req: Request, res: Response, next: NextFunction) => {
+export const Success = (req: Request, res: Response, next: NextFunction) => {
   res.success = (statusCode: number, message: string, data: object = {}) => {
     const response = new AppSuccess(statusCode, message, data);
 

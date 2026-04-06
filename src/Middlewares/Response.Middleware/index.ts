@@ -1,10 +1,11 @@
 import { AsyncHandler } from "./TryCatch";
 import { ErrorHandler } from "./Error";
-
-export * from "./notFound";
-export * from "./success";
+import { NotFound } from "./NotFound";
+import { Success } from "./Success";
 
 export const Response = {
   Async: AsyncHandler,
   Error: ErrorHandler,
+  NotFound,
+  Success,
 };

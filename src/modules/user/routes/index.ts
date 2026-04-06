@@ -17,11 +17,7 @@ import {
   forgotPasswordResendLinkController,
   checkPasswordTokenValidityController,
 } from "../controllers";
-import {
-  Middlewares,
-  MulterMiddleware,
-  ZodMiddleware,
-} from "../../../Middlewares";
+import { Middlewares } from "../../../Middlewares";
 import {
   changePasswordZodSchema,
   sellerRequestZodSchema,
@@ -38,9 +34,9 @@ userRouter.get("/user", Middlewares.Response.Async.TryCatch(getUserController));
 userRouter.patch(
   "/user/update",
   Middlewares.Auth.Authenticated(false),
-  MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
+  Middlewares.Multer({ type: "single", fieldName: "profilePic" }),
   Middlewares.Request.Empty({ fileOrBody: true }),
-  ZodMiddleware.validateZodSchema(updateUserZodSchema),
+  Middlewares.Zod(updateUserZodSchema),
   Middlewares.Response.Async.TryCatch(updateUserController),
 );
 
@@ -48,7 +44,7 @@ userRouter.patch(
   "/user/update-password",
   Middlewares.Auth.Authenticated(true),
   Middlewares.Request.Empty({ body: true }),
-  ZodMiddleware.validateZodSchema(updatePasswordZodSchema),
+  Middlewares.Zod(updatePasswordZodSchema),
   Middlewares.Response.Async.TryCatch(updatePasswordController),
 );
 
@@ -94,7 +90,7 @@ userRouter.patch(
   "/user/change-password",
   Middlewares.Auth.Authenticated(true),
   Middlewares.Request.Empty({ body: true }),
-  ZodMiddleware.validateZodSchema(changePasswordZodSchema),
+  Middlewares.Zod(changePasswordZodSchema),
   Middlewares.Response.Async.TryCatch(changePasswordController),
 );
 
@@ -102,7 +98,7 @@ userRouter.patch(
 userRouter.post(
   "/seller/create",
   Middlewares.Auth.Authenticated(false),
-  MulterMiddleware.validateFiles({
+  Middlewares.Multer({
     fieldName: "requiredDocuments",
     type: "fields",
     fieldsConfig: ["gst", "itr", "addressProof", "geoTagging"].map((name) => ({
@@ -115,7 +111,7 @@ userRouter.post(
   Middlewares.JSONParser({
     fieldsToParse: ["businessAddress", "businessDetails"],
   }),
-  ZodMiddleware.validateZodSchema(sellerRequestZodSchema),
+  Middlewares.Zod(sellerRequestZodSchema),
   Middlewares.Response.Async.TryCatch(createSellerRequestController),
 );
 

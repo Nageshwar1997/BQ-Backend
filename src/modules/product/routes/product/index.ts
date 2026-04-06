@@ -7,11 +7,7 @@ import {
   updateProductController,
   uploadProductController,
 } from "../../controllers";
-import {
-  Middlewares,
-  MulterMiddleware,
-  ZodMiddleware,
-} from "../../../../Middlewares";
+import { Middlewares } from "../../../../Middlewares";
 import {
   updateProductZodSchema,
   uploadProductZodSchema,
@@ -23,12 +19,12 @@ export const productRouter = Router();
 productRouter.post(
   "/upload",
   Middlewares.Auth.Authorization(["ADMIN", "MASTER", "SELLER"]),
-  MulterMiddleware.validateFiles({ type: "any" }),
+  Middlewares.Multer({ type: "any" }),
   Middlewares.Request.Empty({ body: true, files: true }),
   Middlewares.JSONParser({
     fieldsToParse: POSSIBLE_PARSED_FIELDS,
   }),
-  ZodMiddleware.validateZodSchema(uploadProductZodSchema),
+  Middlewares.Zod(uploadProductZodSchema),
   Middlewares.Response.Async.TryCatch(uploadProductController),
 );
 
@@ -46,12 +42,12 @@ productRouter.get(
 productRouter.patch(
   "/product/update/:productId",
   Middlewares.Auth.Authorization(["ADMIN", "MASTER", "SELLER"]),
-  MulterMiddleware.validateFiles({ type: "any" }),
+  Middlewares.Multer({ type: "any" }),
   Middlewares.Request.Empty({ filesOrBody: true }),
   Middlewares.JSONParser({
     fieldsToParse: POSSIBLE_PARSED_FIELDS,
   }),
-  ZodMiddleware.validateZodSchema(updateProductZodSchema),
+  Middlewares.Zod(updateProductZodSchema),
   Middlewares.Response.Async.TryCatch(updateProductController),
 );
 

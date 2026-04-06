@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { Middlewares, ZodMiddleware } from "../../../Middlewares";
+import { Middlewares } from "../../../Middlewares";
 import {
   addProductToCartController,
   removeProductFromCartController,
@@ -20,7 +20,7 @@ cartProductRouter.post(
 cartProductRouter.patch(
   "/update/:id",
   Middlewares.Request.Empty({ body: true, params: true }),
-  ZodMiddleware.validateZodSchema(updateCartProductQuantityZodSchema),
+  Middlewares.Zod(updateCartProductQuantityZodSchema),
   Middlewares.Response.Async.TryCatch(updateCartProductQuantityController),
 );
 

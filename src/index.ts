@@ -6,7 +6,7 @@ import http from "http";
 
 import router from "./routes";
 import { connectDB, handleNamespace, initSocket } from "./configs";
-import { ResponseMiddleware, Middlewares } from "./Middlewares";
+import { Middlewares } from "./Middlewares";
 import { PORT } from "./envs";
 import { mailService, redisService } from "./classes";
 
@@ -27,7 +27,7 @@ app.set("query parser", (str: string) => parse(str));
 app.use(Middlewares.Logger.Request);
 
 // 4. Custom middlewares
-app.use(ResponseMiddleware.success);
+app.use(Middlewares.Response.Success);
 app.use(Middlewares.Cors);
 app.use(Middlewares.Database);
 
@@ -41,7 +41,7 @@ app.get("/", (_: Request, res: Response) =>
 app.use("/api", router);
 
 // ----------------- ERROR HANDLING -----------------
-app.use(ResponseMiddleware.notFound);
+app.use(Middlewares.Response.NotFound);
 app.use(Middlewares.Logger.Error);
 app.use(Middlewares.Response.Error);
 

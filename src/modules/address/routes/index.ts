@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { Middlewares, ZodMiddleware } from "../../../Middlewares";
+import { Middlewares } from "../../../Middlewares";
 import { addAddressSchema, updateAddressSchema } from "../validations";
 import {
   addAddressController,
@@ -16,13 +16,13 @@ addressRouter.use(Middlewares.Auth.Authenticated(false));
 addressRouter.post(
   "/add",
   Middlewares.Request.Empty({ body: true }),
-  ZodMiddleware.validateZodSchema(addAddressSchema),
+  Middlewares.Zod(addAddressSchema),
   Middlewares.Response.Async.TryCatchWithSession(addAddressController),
 );
 addressRouter.patch(
   "/update/:addressId",
   Middlewares.Request.Empty({ body: true, params: true }),
-  ZodMiddleware.validateZodSchema(updateAddressSchema),
+  Middlewares.Zod(updateAddressSchema),
   Middlewares.Response.Async.TryCatchWithSession(updateAddressController),
 );
 

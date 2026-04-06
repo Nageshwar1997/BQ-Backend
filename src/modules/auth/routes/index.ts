@@ -1,11 +1,7 @@
 import { Router } from "express";
 
 import { authControllers } from "../controllers";
-import {
-  ZodMiddleware,
-  MulterMiddleware,
-  Middlewares,
-} from "../../../Middlewares";
+import { Middlewares } from "../../../Middlewares";
 import { zodSchemas } from "../../../validations";
 
 export const authRouter = Router();
@@ -14,26 +10,26 @@ export const authRouter = Router();
 authRouter.post(
   "/register/send-otp",
   Middlewares.Request.Empty({ body: true }),
-  ZodMiddleware.validateZodSchema(zodSchemas.auth.register.email),
+  Middlewares.Zod(zodSchemas.auth.register.email),
   Middlewares.Response.Async.TryCatch(authControllers.register.sendOtp),
 );
 
 authRouter.post(
   "/register/resend-otp",
   Middlewares.Request.Empty({ body: true }),
-  ZodMiddleware.validateZodSchema(zodSchemas.auth.register.email),
+  Middlewares.Zod(zodSchemas.auth.register.email),
   Middlewares.Response.Async.TryCatch(authControllers.register.resendOtp),
 );
 
 authRouter.post(
   "/register/verify-otp",
-  MulterMiddleware.validateFiles({ type: "single", fieldName: "profilePic" }),
+  Middlewares.Multer({ type: "single", fieldName: "profilePic" }),
   Middlewares.Request.Empty({
     file: false,
     body: true,
     query: true,
   }),
-  ZodMiddleware.validateZodSchema(zodSchemas.auth.register.verify),
+  Middlewares.Zod(zodSchemas.auth.register.verify),
   Middlewares.Response.Async.TryCatch(authControllers.register.verifyOtp),
 );
 
@@ -41,7 +37,7 @@ authRouter.post(
 authRouter.post(
   "/login",
   Middlewares.Request.Empty({ body: true }),
-  ZodMiddleware.validateZodSchema(zodSchemas.auth.login),
+  Middlewares.Zod(zodSchemas.auth.login),
   Middlewares.Response.Async.TryCatch(authControllers.login.manual),
 );
 

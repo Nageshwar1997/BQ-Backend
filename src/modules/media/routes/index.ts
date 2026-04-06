@@ -8,11 +8,7 @@ import {
   uploadMultipleImagesController,
   uploadSingleImageController,
 } from "../controllers";
-import {
-  Middlewares,
-  MulterMiddleware,
-  ZodMiddleware,
-} from "../../../Middlewares";
+import { Middlewares } from "../../../Middlewares";
 import {
   removeMultipleImagesZodSchema,
   removeSingleImageZodSchema,
@@ -27,12 +23,12 @@ export const mediaRouter = Router();
 mediaRouter.post(
   "/image/upload",
   Middlewares.Auth.Authorization(["MASTER", "ADMIN", "SELLER"]),
-  MulterMiddleware.validateFiles({
+  Middlewares.Multer({
     type: "single",
     fieldName: "image",
   }),
   Middlewares.Request.Empty({ file: true, fileOrBody: true }),
-  ZodMiddleware.validateZodSchema(uploadImageZodSchema),
+  Middlewares.Zod(uploadImageZodSchema),
   Middlewares.Response.Async.TryCatch(uploadSingleImageController),
 );
 
@@ -40,13 +36,13 @@ mediaRouter.post(
 mediaRouter.post(
   "/images/upload",
   Middlewares.Auth.Authorization(["MASTER", "ADMIN", "SELLER"]),
-  MulterMiddleware.validateFiles({
+  Middlewares.Multer({
     type: "array",
     fieldName: "images",
     maxCount: 10,
   }),
   Middlewares.Request.Empty({ files: true, body: true }),
-  ZodMiddleware.validateZodSchema(uploadImageZodSchema),
+  Middlewares.Zod(uploadImageZodSchema),
   Middlewares.Response.Async.TryCatch(uploadMultipleImagesController),
 );
 
@@ -55,7 +51,7 @@ mediaRouter.delete(
   "/image/delete",
   Middlewares.Request.Empty({ body: true }),
   Middlewares.Auth.Authorization(["MASTER", "ADMIN", "SELLER"]),
-  ZodMiddleware.validateZodSchema(removeSingleImageZodSchema),
+  Middlewares.Zod(removeSingleImageZodSchema),
   Middlewares.Response.Async.TryCatch(removeSingleImageController),
 );
 
@@ -64,7 +60,7 @@ mediaRouter.delete(
   "/images/delete",
   Middlewares.Request.Empty({ body: true }),
   Middlewares.Auth.Authorization(["MASTER", "ADMIN", "SELLER"]),
-  ZodMiddleware.validateZodSchema(removeMultipleImagesZodSchema),
+  Middlewares.Zod(removeMultipleImagesZodSchema),
   Middlewares.Response.Async.TryCatch(removeMultipleImagesController),
 );
 
@@ -73,11 +69,11 @@ mediaRouter.delete(
 mediaRouter.post(
   "/video/upload",
   Middlewares.Auth.Authorization(["MASTER"]),
-  MulterMiddleware.validateFiles({
+  Middlewares.Multer({
     type: "fields",
     fieldsConfig: ["video", "poster"].map((name) => ({ name, maxCount: 1 })),
   }),
-  ZodMiddleware.validateZodSchema(uploadHomeVideoZodSchema),
+  Middlewares.Zod(uploadHomeVideoZodSchema),
   Middlewares.Response.Async.TryCatch(uploadHomeVideoController),
 );
 

@@ -7,11 +7,7 @@ import {
   getBlogByIdController,
   uploadBlogController,
 } from "../controllers";
-import {
-  MulterMiddleware,
-  ZodMiddleware,
-  Middlewares,
-} from "../../../Middlewares";
+import { Middlewares } from "../../../Middlewares";
 import { editBlogZodSchema, uploadBlogZodSchema } from "../validations";
 
 export const blogRouter = Router();
@@ -33,7 +29,7 @@ blogRouter.get(
 blogRouter.post(
   "/blog/upload",
   Middlewares.Auth.Authorization(["ADMIN", "SELLER", "MASTER"]),
-  MulterMiddleware.validateFiles({
+  Middlewares.Multer({
     type: "fields",
     fieldsConfig: BLOGS_THUMBNAILS.map((thumbnail) => ({
       name: thumbnail,
@@ -42,7 +38,7 @@ blogRouter.post(
   }),
   Middlewares.Request.Empty({ body: true, files: true }),
   Middlewares.JSONParser({ fieldsToParse: ["tags"] }),
-  ZodMiddleware.validateZodSchema(uploadBlogZodSchema),
+  Middlewares.Zod(uploadBlogZodSchema),
   Middlewares.Response.Async.TryCatch(uploadBlogController),
 );
 
@@ -50,7 +46,7 @@ blogRouter.post(
 blogRouter.patch(
   "/blog/edit/:id",
   Middlewares.Auth.Authorization(["ADMIN", "SELLER", "MASTER"]),
-  MulterMiddleware.validateFiles({
+  Middlewares.Multer({
     type: "fields",
     fieldsConfig: BLOGS_THUMBNAILS.map((thumbnail) => ({
       name: thumbnail,
@@ -58,7 +54,7 @@ blogRouter.patch(
     })),
   }),
   Middlewares.Request.Empty({ fileOrBody: true, params: true }),
-  ZodMiddleware.validateZodSchema(editBlogZodSchema),
+  Middlewares.Zod(editBlogZodSchema),
   Middlewares.Response.Async.TryCatch(editBlogController),
 );
 

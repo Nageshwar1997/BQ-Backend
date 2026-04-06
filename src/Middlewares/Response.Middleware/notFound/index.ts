@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import path from "path";
 
-export const notFound = (
+export const NotFound = (
   req: Request,
   res: Response,
   _: NextFunction

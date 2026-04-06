@@ -3,7 +3,7 @@ import { ZodObject } from "zod";
 import { AppError } from "../../classes";
 import { segregateErrors } from "../../utils";
 
-export const validateZodSchema =
+export const ValidateZodSchema =
   <T extends ZodObject<any>>(schema: T) =>
   (req: Request, _: Response, next: NextFunction) => {
     const result = schema.safeParse(req.body ?? {});

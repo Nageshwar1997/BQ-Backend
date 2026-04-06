@@ -6,11 +6,7 @@ import {
   likeDislikeHelpfulController,
   updateReviewController,
 } from "../controllers";
-import {
-  Middlewares,
-  MulterMiddleware,
-  ZodMiddleware,
-} from "../../../Middlewares";
+import { Middlewares } from "../../../Middlewares";
 import {
   createReviewZodSchema,
   updateLikeDislikeHelpfulSchema,
@@ -21,7 +17,7 @@ export const reviewRouter = Router();
 
 reviewRouter.post(
   "/:productId",
-  MulterMiddleware.validateFiles({
+  Middlewares.Multer({
     type: "fields",
     fieldsConfig: [
       { name: "images", maxCount: 5 },
@@ -30,13 +26,13 @@ reviewRouter.post(
   }),
   Middlewares.Request.Empty({ body: true }),
   Middlewares.Auth.Authenticated(false),
-  ZodMiddleware.validateZodSchema(createReviewZodSchema),
+  Middlewares.Zod(createReviewZodSchema),
   Middlewares.Response.Async.TryCatch(createReviewController),
 );
 
 reviewRouter.patch(
   "/:productId/:reviewId",
-  MulterMiddleware.validateFiles({
+  Middlewares.Multer({
     type: "fields",
     fieldsConfig: [
       { name: "images", maxCount: 5 },
@@ -48,7 +44,7 @@ reviewRouter.patch(
   Middlewares.JSONParser({
     fieldsToParse: ["removedImages", "removedVideos"],
   }),
-  ZodMiddleware.validateZodSchema(updateReviewZodSchema),
+  Middlewares.Zod(updateReviewZodSchema),
   Middlewares.Response.Async.TryCatch(updateReviewController),
 );
 
@@ -56,7 +52,7 @@ reviewRouter.patch(
   "/:reviewId",
   Middlewares.Request.Empty({ body: true, params: true }),
   Middlewares.Auth.Authenticated(false),
-  ZodMiddleware.validateZodSchema(updateLikeDislikeHelpfulSchema),
+  Middlewares.Zod(updateLikeDislikeHelpfulSchema),
   Middlewares.Response.Async.TryCatch(likeDislikeHelpfulController),
 );
 
