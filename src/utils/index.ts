@@ -13,7 +13,7 @@ import {
   TRole,
 } from "../types";
 import { AppError } from "../Classes";
-import { regexes } from "../constants";
+import { regexes } from "../Constants";
 import {
   BACKEND_LOCALHOST_URL,
   BACKEND_PRODUCTION_URL,

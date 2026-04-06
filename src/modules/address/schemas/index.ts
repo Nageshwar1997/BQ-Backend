@@ -1,21 +1,22 @@
 import { Schema } from "mongoose";
 import { IAddress, IUserAddresses } from "../types";
 import { ADDRESS_TYPES } from "../constants";
-import {
-  ALLOWED_COUNTRIES,
-  STATES_AND_UNION_TERRITORIES,
-} from "../../../constants";
+import { Constants } from "../../../Constants";
 
 export const addressBaseFields = {
   address: { type: String, required: true },
   landmark: { type: String },
   city: { type: String, required: true },
-  state: { type: String, required: true, enum: STATES_AND_UNION_TERRITORIES },
+  state: {
+    type: String,
+    required: true,
+    enum: Constants.Common.STATES_AND_UNION_TERRITORIES,
+  },
   pinCode: { type: String, required: true, minlength: 6, maxlength: 6 },
   country: {
     type: String,
     required: true,
-    enum: ALLOWED_COUNTRIES,
+    enum: Constants.Common.ALLOWED_COUNTRIES,
     default: "India",
   },
   phoneNumber: { type: String, required: true },
@@ -37,7 +38,7 @@ export const addressSchema = new Schema<IAddress>(
     ...addressBaseFields,
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
-  { timestamps: true, versionKey: false }
+  { timestamps: true, versionKey: false },
 );
 
 export const userAddressesSchema = new Schema<IUserAddresses>(
@@ -56,5 +57,5 @@ export const userAddressesSchema = new Schema<IUserAddresses>(
     defaultAddress: { type: Schema.Types.ObjectId, ref: "Address" },
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
-  { timestamps: true, versionKey: false }
+  { timestamps: true, versionKey: false },
 );

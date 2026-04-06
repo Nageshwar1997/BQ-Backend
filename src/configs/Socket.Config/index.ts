@@ -5,9 +5,9 @@ import {
   Namespace,
 } from "socket.io";
 
-import { allowedOrigins } from "../../constants";
 import { AppError } from "../../Classes";
 import { ChatbotModule } from "../../modules";
+import { Constants } from "../../Constants";
 
 let io: SocketIOServer | null = null;
 
@@ -17,7 +17,7 @@ const InitSocket = (server: HttpServer) => {
   io = new SocketIOServer(server, {
     cors: {
       origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (!origin || Constants.Common.ALLOWED_ORIGINS.includes(origin)) {
           callback(null, true);
         } else {
           callback(

@@ -1,13 +1,12 @@
 import { Types } from "mongoose";
 import { UserModule } from "../..";
 import { ADDRESS_TYPES } from "../constants";
-import { ALLOWED_COUNTRIES } from "../../../constants";
+import { Constants } from "../../../Constants";
 
-export interface IAddress
-  extends Pick<
-    UserModule.Types.UserProps,
-    "firstName" | "lastName" | "email" | "phoneNumber"
-  > {
+export interface IAddress extends Pick<
+  UserModule.Types.UserProps,
+  "firstName" | "lastName" | "email" | "phoneNumber"
+> {
   user: Types.ObjectId;
   altPhoneNumber?: string;
   address: string;
@@ -15,7 +14,7 @@ export interface IAddress
   city: string;
   state: string;
   pinCode: string;
-  country: (typeof ALLOWED_COUNTRIES)[number];
+  country: (typeof Constants.Common.ALLOWED_COUNTRIES)[number];
   gst?: string;
   type: (typeof ADDRESS_TYPES)[number];
 }

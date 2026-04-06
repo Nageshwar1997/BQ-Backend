@@ -4,7 +4,7 @@ import {
   MAX_IMAGE_FILE_SIZE,
   MAX_VIDEO_FILE_SIZE,
   MB,
-} from "../../../constants";
+} from "../../../Constants";
 import { ErrorBuilder } from "../../../Classes";
 import { CustomFileErrorProps } from "../../../types";
 

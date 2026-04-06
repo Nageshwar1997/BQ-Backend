@@ -1,7 +1,7 @@
 import { object } from "zod";
 import { commonZodSchemas } from "./common.validation";
 import { appendZodCustomIssue, ZodValidator } from "../utils/zod.utils";
-import { zodStringOptions } from "../constants";
+import { zodStringOptions } from "../Constants";
 
 export const registerOtpZodSchema = object({ otp: commonZodSchemas.otp });
 export const registerEmailZodSchema = object({ email: commonZodSchemas.email });

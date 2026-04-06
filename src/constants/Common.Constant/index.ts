@@ -11,14 +11,14 @@ import {
 import { TAuthProvider } from "../../modules/user/types";
 import { TRole } from "../../types";
 
-export const AUTH_PROVIDERS: TAuthProvider[] = [
+const AUTH_PROVIDERS: TAuthProvider[] = [
   "MANUAL",
   "GOOGLE",
   "LINKEDIN",
   "GITHUB",
 ] as const;
 
-export const allowedOrigins = [
+const ALLOWED_ORIGINS = [
   FRONTEND_LOCAL_HOST_CLIENT_URL,
   FRONTEND_LOCAL_HOST_ADMIN_URL,
   FRONTEND_LOCAL_HOST_MASTER_URL,
@@ -29,9 +29,9 @@ export const allowedOrigins = [
   FRONTEND_PRODUCTION_MASTER_URL,
 ];
 
-export const ROLES: TRole[] = ["USER", "SELLER", "ADMIN", "MASTER"] as const;
+const ROLES: TRole[] = ["USER", "SELLER", "ADMIN", "MASTER"] as const;
 
-export const STATES_AND_UNION_TERRITORIES = [
+const STATES_AND_UNION_TERRITORIES = [
   "Andhra Pradesh",
   "Arunachal Pradesh",
   "Assam",
@@ -71,9 +71,9 @@ export const STATES_AND_UNION_TERRITORIES = [
   "Puducherry",
 ];
 
-export const ALLOWED_COUNTRIES = ["India"];
+const ALLOWED_COUNTRIES = ["India"];
 
-export const ALLOWED_BUSINESSES = [
+const ALLOWED_BUSINESSES = [
   "Individual",
   "Freelance Seller",
   "Small Business",
@@ -83,8 +83,20 @@ export const ALLOWED_BUSINESSES = [
   "Wholesale Distributor",
 ];
 
-export const MINUTE = 60;
+const MINUTE = 60;
 
-export const OTP_EXPIRY = 10 * MINUTE;
+const OTP_EXPIRY = 10 * MINUTE;
 
-export const MAX_RESEND = 3;
+const MAX_RESEND = 3;
+
+export const CommonConstants = {
+  AUTH_PROVIDERS,
+  ALLOWED_ORIGINS,
+  ROLES,
+  STATES_AND_UNION_TERRITORIES,
+  ALLOWED_COUNTRIES,
+  ALLOWED_BUSINESSES,
+  MINUTE,
+  OTP_EXPIRY,
+  MAX_RESEND,
+};

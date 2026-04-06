@@ -1,11 +1,6 @@
 import { Schema } from "mongoose";
 import { IWishlist, SellerProps, UserProps } from "../types";
-import {
-  ALLOWED_BUSINESSES,
-  ALLOWED_COUNTRIES,
-  ROLES,
-  STATES_AND_UNION_TERRITORIES,
-} from "../../../constants";
+import { Constants } from "../../../Constants";
 
 export const userSchema = new Schema<UserProps>(
   {
@@ -14,7 +9,7 @@ export const userSchema = new Schema<UserProps>(
     phoneNumber: { type: String, trim: true },
     email: { type: String, trim: true, lowercase: true },
     profilePic: { type: String, default: "", trim: true },
-    role: { type: String, enum: ROLES, default: "USER" },
+    role: { type: String, enum: Constants.Common.ROLES, default: "USER" },
     password: { type: String, trim: true },
     providers: { type: [String], default: ["MANUAL"] },
     // addresses: [{ type: Schema.Types.ObjectId, ref: "Address" }],
@@ -25,13 +20,13 @@ export const userSchema = new Schema<UserProps>(
     // ratings: [{ type: Schema.Types.ObjectId, ref: "Rating" }],
     // payments: [{ type: Schema.Types.ObjectId, ref: "Payment" }],
   },
-  { versionKey: false, timestamps: true }
+  { versionKey: false, timestamps: true },
 );
 
 userSchema.index({ email: 1 }, { unique: true });
 userSchema.index(
   { phoneNumber: 1 },
-  { unique: true, partialFilterExpression: { phoneNumber: { $ne: "" } } }
+  { unique: true, partialFilterExpression: { phoneNumber: { $ne: "" } } },
 );
 userSchema.index({ role: 1 });
 
@@ -40,12 +35,16 @@ const businessAddressSchema = new Schema<SellerProps["businessAddress"]>(
     address: { type: String, required: true, minlength: 3 },
     landmark: { type: String, default: "" },
     city: { type: String, required: true, minlength: 2 },
-    state: { type: String, required: true, enum: STATES_AND_UNION_TERRITORIES },
+    state: {
+      type: String,
+      required: true,
+      enum: Constants.Common.STATES_AND_UNION_TERRITORIES,
+    },
     pinCode: { type: String, required: true, minlength: 6, maxlength: 6 },
     country: {
       type: String,
       required: true,
-      enum: ALLOWED_COUNTRIES,
+      enum: Constants.Common.ALLOWED_COUNTRIES,
       default: "India",
     },
     pan: {
@@ -63,7 +62,7 @@ const businessAddressSchema = new Schema<SellerProps["businessAddress"]>(
       uppercase: true,
     },
   },
-  { versionKey: false, _id: false }
+  { versionKey: false, _id: false },
 );
 
 const personalDetailsSchema = new Schema<SellerProps["personalDetails"]>(
@@ -72,7 +71,7 @@ const personalDetailsSchema = new Schema<SellerProps["personalDetails"]>(
     email: { type: String, required: true },
     phoneNumber: { type: String, required: true, minlength: 10, maxlength: 10 },
   },
-  { versionKey: false, _id: false }
+  { versionKey: false, _id: false },
 );
 
 const businessDetailsSchema = new Schema<SellerProps["businessDetails"]>(
@@ -80,9 +79,13 @@ const businessDetailsSchema = new Schema<SellerProps["businessDetails"]>(
     name: { type: String, required: true, minlength: 2 },
     email: { type: String, required: true },
     phoneNumber: { type: String, required: true, minlength: 10, maxlength: 10 },
-    category: { type: String, required: true, enum: ALLOWED_BUSINESSES },
+    category: {
+      type: String,
+      required: true,
+      enum: Constants.Common.ALLOWED_BUSINESSES,
+    },
   },
-  { versionKey: false, _id: false }
+  { versionKey: false, _id: false },
 );
 
 const requiredDocumentsSchema = new Schema<SellerProps["requiredDocuments"]>(
@@ -92,7 +95,7 @@ const requiredDocumentsSchema = new Schema<SellerProps["requiredDocuments"]>(
     geoTagging: { type: String, required: true },
     addressProof: { type: String, required: true },
   },
-  { versionKey: false, _id: false }
+  { versionKey: false, _id: false },
 );
 
 export const sellerSchema = new Schema<SellerProps>(
@@ -108,7 +111,7 @@ export const sellerSchema = new Schema<SellerProps>(
       default: "PENDING",
     },
   },
-  { versionKey: false, timestamps: true }
+  { versionKey: false, timestamps: true },
 );
 
 export const wishlistSchema = new Schema<IWishlist>(
@@ -116,5 +119,5 @@ export const wishlistSchema = new Schema<IWishlist>(
     _id: { type: Schema.Types.ObjectId, ref: "User", required: true },
     products: [{ type: Schema.Types.ObjectId, ref: "Product" }],
   },
-  { versionKey: false, timestamps: true }
+  { versionKey: false, timestamps: true },
 );

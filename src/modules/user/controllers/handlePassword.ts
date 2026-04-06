@@ -5,7 +5,7 @@ import { getUserByEmail, getUserById, updateUser } from "../services";
 import { TAuthProvider } from "../types";
 import { AppError, mailService, redisService } from "../../../Classes";
 import { generateTokenForRedis } from "../../auth/utils";
-import { MAX_RESEND, MINUTE } from "../../../constants";
+import { Constants } from "../../../Constants";
 import {
   getAuthorizationToken,
   getFrontendURL,
@@ -85,7 +85,7 @@ export const resetPasswordSendLinkController = async (
 
   await redisService.getClient()?.setEx(
     `resetPassword:${resetToken}`,
-    MINUTE * MINUTE, // 1 hour in seconds
+    Constants.Common.MINUTE * Constants.Common.MINUTE, // 1 hour in seconds
     user._id.toString(),
   );
 
@@ -203,7 +203,7 @@ export const forgotPasswordSendLinkController = async (
 
   await redisService.getClient()?.setEx(
     `forgot-password:${token}`,
-    MINUTE * MINUTE, // 1 hour in seconds
+    Constants.Common.MINUTE * Constants.Common.MINUTE, // 1 hour in seconds
     STRINGIFY_DATA({
       userId: user._id,
       sendCount: 1,
@@ -257,7 +257,7 @@ export const forgotPasswordResendLinkController = async (
 
   // Increment sendCount and check limit
   const sendCount = (parsedData?.sendCount ?? 1) + 1;
-  if (sendCount > MAX_RESEND) {
+  if (sendCount > Constants.Common.MAX_RESEND) {
     throw new AppError({
       message: "Maximum resend attempts reached, try again later",
       statusCode: 400,
@@ -284,7 +284,7 @@ export const forgotPasswordResendLinkController = async (
 
   await redisService.getClient()?.setEx(
     `forgot-password:${token}`,
-    MINUTE * MINUTE, // 1 hour in seconds
+    Constants.Common.MINUTE * Constants.Common.MINUTE, // 1 hour in seconds
     STRINGIFY_DATA({ userId: user._id, sendCount }),
   );
 

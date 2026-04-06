@@ -24,7 +24,7 @@ import {
   updatePasswordZodSchema,
   updateUserZodSchema,
 } from "../validations";
-import { MB } from "../../../constants";
+import { MB } from "../../../Constants";
 
 export const userRouter = Router();
 

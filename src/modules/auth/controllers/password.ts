@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { UserModule } from "../..";
 import { AppError, mailService, redisService } from "../../../Classes";
 import { authUtils } from "../utils";
-import { MAX_RESEND, MINUTE } from "../../../constants";
+import { Constants } from "../../../Constants";
 import {
   getAuthorizationToken,
   getFrontendURL,
@@ -54,7 +54,7 @@ export const forgotPasswordSendLinkAndOtpController = async (
 
   await redisService.getClient()?.setEx(
     `forgot-password:${token}`,
-    MINUTE * MINUTE, // 1 hour in seconds
+    Constants.Common.MINUTE * Constants.Common.MINUTE, // 1 hour in seconds
     STRINGIFY_DATA({
       userId: user._id,
       sendCount: 1,
@@ -115,7 +115,7 @@ export const forgotPasswordResendLinkAndOtpController = async (
 
   const sendCount = (parsedData?.sendCount ?? 1) + 1;
 
-  if (sendCount > MAX_RESEND) {
+  if (sendCount > Constants.Common.MAX_RESEND) {
     throw new AppError({
       message: "Maximum resend attempts reached. Please try again later.",
       statusCode: 400,
@@ -134,7 +134,7 @@ export const forgotPasswordResendLinkAndOtpController = async (
 
   await redisService.getClient()?.setEx(
     `forgot-password:${token}`,
-    MINUTE * MINUTE,
+    Constants.Common.MINUTE * Constants.Common.MINUTE,
     STRINGIFY_DATA({
       userId: parsedData.userId,
       sendCount,
@@ -211,7 +211,7 @@ export const forgotPasswordVerifyOtpController = async (
 
   await redisService.getClient()?.setEx(
     `forgot-password:${token}`,
-    MINUTE * MINUTE,
+    Constants.Common.MINUTE * Constants.Common.MINUTE,
     STRINGIFY_DATA({
       ...parsedData,
       verified: true,

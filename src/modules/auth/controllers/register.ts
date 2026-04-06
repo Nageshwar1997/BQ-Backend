@@ -4,7 +4,7 @@ import { AppError, mailService, redisService } from "../../../Classes";
 import { MediaModule, UserModule } from "../..";
 
 import { authUtils } from "../utils";
-import { MAX_RESEND, OTP_EXPIRY } from "../../../constants";
+import { Constants } from "../../../Constants";
 import { authServices } from "../services";
 import {
   getAuthorizationToken,
@@ -38,7 +38,7 @@ export const registerSendOtpController = async (
     .getClient()
     ?.setEx(
       `register_data:${otpToken}`,
-      OTP_EXPIRY,
+      Constants.Common.OTP_EXPIRY,
       STRINGIFY_DATA({ otp, email, sendCount: 1 }),
     );
 
@@ -103,7 +103,7 @@ export const registerResendOtpController = async (
 
   // Increment sendCount and check limit
   const sendCount = (parsedData.sendCount ?? 1) + 1;
-  if (sendCount > MAX_RESEND)
+  if (sendCount > Constants.Common.MAX_RESEND)
     throw new AppError({
       message: "Maximum resend attempts reached",
       statusCode: 410,
@@ -118,7 +118,7 @@ export const registerResendOtpController = async (
     .getClient()
     ?.setEx(
       `register_data:${otpToken}`,
-      OTP_EXPIRY,
+      Constants.Common.OTP_EXPIRY,
       STRINGIFY_DATA({ ...parsedData, otp: newOtp, sendCount }),
     );
 
@@ -132,7 +132,10 @@ export const registerResendOtpController = async (
     throw new AppError({ message, statusCode: 500, code: "INTERNAL_ERROR" });
   }
 
-  res.success(200, `OTP resent successfully (${sendCount}/${MAX_RESEND})`);
+  res.success(
+    200,
+    `OTP resent successfully (${sendCount}/${Constants.Common.MAX_RESEND})`,
+  );
 };
 
 // -------------------- Verify OTP --------------------

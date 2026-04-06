@@ -2,7 +2,7 @@ import { Response } from "express";
 
 import { AuthorizedRequest } from "../../../types";
 import { AppError } from "../../../Classes";
-import { ALLOWED_IMAGE_TYPES, ALLOWED_VIDEO_TYPES } from "../../../constants";
+import { ALLOWED_IMAGE_TYPES, ALLOWED_VIDEO_TYPES } from "../../../Constants";
 import {
   singleImageRemover,
   singleImageUploader,

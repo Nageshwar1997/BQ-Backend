@@ -1,5 +1,5 @@
 import { IZodStringConfigs } from "../../types";
-import { regexes } from "../regex";
+import { regexes } from "../Regex.Constant.ts";
 
 export const zodStringOptions: Record<
   "email" | "phoneNumber" | "password" | "name" | "otp",

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { validateZodEnums, validateZodString } from "../../../utils";
-import { ALLOWED_COUNTRIES, regexes } from "../../../constants";
+import { Constants, regexes } from "../../../Constants";
 import { ADDRESS_TYPES } from "../constants";
 
 const addressBaseSchema = z.object({
@@ -44,7 +44,7 @@ const addressBaseSchema = z.object({
   }),
   country: validateZodEnums({
     field: "country",
-    enums: ALLOWED_COUNTRIES,
+    enums: Constants.Common.ALLOWED_COUNTRIES,
   }).default("India"),
   type: validateZodEnums({
     field: "type",

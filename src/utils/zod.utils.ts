@@ -12,7 +12,7 @@ import {
   IZodNumberConfigs,
   IZodStringConfigs,
 } from "../types";
-import { regexes } from "../constants";
+import { regexes } from "../Constants";
 
 export const appendZodCustomIssue = (
   ctx: RefinementCtx,

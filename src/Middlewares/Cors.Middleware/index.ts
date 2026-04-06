@@ -1,10 +1,10 @@
 import cors from "cors";
-import { allowedOrigins } from "../../constants";
+import { Constants } from "../../Constants";
 import { AppError } from "../../Classes";
 
 export const Cors = cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || Constants.Common.ALLOWED_ORIGINS.includes(origin)) {
       callback(null, true);
     } else {
       callback(

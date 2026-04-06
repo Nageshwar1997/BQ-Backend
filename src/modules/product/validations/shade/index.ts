@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { regexes } from "../../../../constants";
+import { regexes } from "../../../../Constants";
 import { validateProductField } from "../../utils";
 import { validateZodString } from "../../../../utils";
 

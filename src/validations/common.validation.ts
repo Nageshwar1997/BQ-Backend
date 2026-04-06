@@ -1,5 +1,5 @@
 import { ZodValidator } from "../utils/zod.utils";
-import { zodStringOptions } from "../constants";
+import { zodStringOptions } from "../Constants";
 
 const emailZodSchema = ZodValidator.string(zodStringOptions.email);
 const phoneNumberZodSchema = ZodValidator.string(zodStringOptions.phoneNumber);

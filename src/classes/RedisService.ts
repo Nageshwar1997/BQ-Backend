@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { RedisClientType } from "redis";
 import { UserModule } from "../modules";
-import { MINUTE } from "../constants";
+import { Constants } from "../Constants";
 import { PARSE_DATA, STRINGIFY_DATA } from "../utils";
 import { Configs } from "../Configs";
 
@@ -74,7 +74,7 @@ class RedisService {
 
     await client.setEx(
       `user:${user._id}`,
-      MINUTE * MINUTE,
+      Constants.Common.MINUTE * Constants.Common.MINUTE,
       STRINGIFY_DATA(restUser),
     );
   }

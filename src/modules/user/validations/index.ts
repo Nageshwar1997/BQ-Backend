@@ -1,11 +1,6 @@
 import z from "zod";
 import { validateZodEnums, validateZodString } from "../../../utils";
-import {
-  ALLOWED_BUSINESSES,
-  ALLOWED_COUNTRIES,
-  regexes,
-  STATES_AND_UNION_TERRITORIES,
-} from "../../../constants";
+import { Constants, regexes } from "../../../Constants";
 
 export const sellerRequestZodSchema = z.object({
   businessAddress: z.object(
@@ -33,12 +28,12 @@ export const sellerRequestZodSchema = z.object({
       state: validateZodEnums({
         field: "state",
         parentField: "businessAddress",
-        enums: STATES_AND_UNION_TERRITORIES,
+        enums: Constants.Common.STATES_AND_UNION_TERRITORIES,
       }),
       country: validateZodEnums({
         field: "country",
         parentField: "businessAddress",
-        enums: ALLOWED_COUNTRIES,
+        enums: Constants.Common.ALLOWED_COUNTRIES,
       }).default("India"),
       pinCode: validateZodString({
         field: "pinCode",
@@ -112,7 +107,7 @@ export const sellerRequestZodSchema = z.object({
       category: validateZodEnums({
         field: "category",
         parentField: "businessDetails",
-        enums: ALLOWED_BUSINESSES,
+        enums: Constants.Common.ALLOWED_BUSINESSES,
       }),
     },
     { error: "businessDetails is required" },
