@@ -1,15 +1,15 @@
-import { ChatbotConfigs } from "./Chatbot.Config";
-import { DatabaseConfig } from "./Database.Config";
-import { OAuthConfig } from "./O-Auth.Config";
-import { RazorpayConfig } from "./Razorpay.Config";
-import { RedisConfig } from "./Redis.Config";
-import { SocketConfigs } from "./Socket.Config";
+import { chatbotConfigs } from "./chatbot.config";
+import { databaseConfig } from "./database.config";
+import { oAuthConfig } from "./oAuth.config";
+import { razorpayConfig } from "./razorpay.config";
+import { redisConfig } from "./redis.config";
+import { socketConfigs } from "./socket.config";
 
-export const Configs = {
-  Chatbot: ChatbotConfigs,
-  ConnectDB: DatabaseConfig,
-  OAuth: OAuthConfig,
-  Razorpay: RazorpayConfig,
-  Redis: RedisConfig,
-  Socket: SocketConfigs,
+export const configs = {
+  chatbot: chatbotConfigs,
+  connectDB: databaseConfig,
+  oAuth: oAuthConfig,
+  razorpay: razorpayConfig,
+  redis: redisConfig,
+  socket: socketConfigs,
 };

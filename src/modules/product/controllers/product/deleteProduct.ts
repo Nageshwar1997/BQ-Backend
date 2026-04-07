@@ -2,7 +2,7 @@ import { Response } from "express";
 import { AuthorizedRequest } from "../../../../types";
 import { Product, Shade } from "../../models";
 import { checkUserPermission, isValidMongoId } from "../../../../utils";
-import { AppError } from "../../../../Classes";
+import { AppError } from "../../../../classes";
 import { MediaModule } from "../../..";
 import { Types } from "mongoose";
 

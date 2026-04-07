@@ -1,11 +1,11 @@
 import { ZodValidator } from "../utils/zod.utils";
-import { Constants } from "../Constants";
+import { constants } from "../constants";
 
-const emailZodSchema = ZodValidator.string(Constants.Zod.StringOptions.email);
+const emailZodSchema = ZodValidator.string(constants.zod.stringOptions.EMAIL);
 const phoneNumberZodSchema = ZodValidator.string(
-  Constants.Zod.StringOptions.phoneNumber,
+  constants.zod.stringOptions.PHONE_NUMBER,
 );
-const otpZodSchema = ZodValidator.string(Constants.Zod.StringOptions.otp);
+const otpZodSchema = ZodValidator.string(constants.zod.stringOptions.OTP);
 
 export const commonZodSchemas = {
   email: emailZodSchema,

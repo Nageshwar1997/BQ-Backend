@@ -2,7 +2,7 @@ import { Response } from "express";
 import { Types } from "mongoose";
 import { MediaModule, ProductModule } from "../..";
 import { AuthenticatedRequest } from "../../../types";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { checkUserPermission, isValidMongoId } from "../../../utils";
 import { Review } from "../models";
 
@@ -22,7 +22,7 @@ export const deleteReviewController = async (
   isValidMongoId(productId, "Invalid Product Id provided", 404);
   isValidMongoId(reviewId, "Invalid Review Id provided", 404);
 
-  const product = await ProductModule.Models.Product.findById(productId);
+  const product = await ProductModule.models.Product.findById(productId);
   if (!product) {
     throw new AppError({
       message: "Product not found",

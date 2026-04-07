@@ -3,9 +3,9 @@ import { ClientSession, Types } from "mongoose";
 import { AuthenticatedRequest } from "../../../types";
 import { Order } from "../models";
 import { CartModule, ChatbotModule } from "../..";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { IOrder } from "../types";
-import { AddressModule, TAddressModule } from "../../Address.Module";
+import { addressModule, TAddressModule } from "../../address";
 import { rzp_create_order } from "../services";
 
 export const createOrderController = async (
@@ -39,7 +39,7 @@ export const createOrderController = async (
   else if (both) addressIds.push(both);
 
   const foundAddresses: TAddressModule.IAddress[] =
-    await AddressModule.Models.Address.find({
+    await addressModule.models.Address.find({
       user: user?._id,
       _id: { $in: addressIds },
     })

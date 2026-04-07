@@ -7,7 +7,7 @@ import {
   SingleFileUploaderProps,
 } from "../../types";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
-import { AppError } from "../../../../Classes";
+import { AppError } from "../../../../classes";
 import { getSafeFolderName, getSafePublicId } from "../common";
 
 // ========== COMMON VIDEO UPLOADER FUNCTION ==========

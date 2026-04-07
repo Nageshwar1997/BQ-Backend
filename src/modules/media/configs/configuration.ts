@@ -10,7 +10,7 @@ import {
   CLOUDINARY_VIDEO_API_KEY,
   CLOUDINARY_VIDEO_API_SECRET,
   CLOUDINARY_VIDEO_CLOUD_NAME,
-} from "../../../Envs";
+} from "../../../envs";
 
 export const myCloudinary = (
   isImageOrVideoOrProduct: CloudinaryConfigOption,

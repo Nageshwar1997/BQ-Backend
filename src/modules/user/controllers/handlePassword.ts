@@ -3,15 +3,16 @@ import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { getUserByEmail, getUserById, updateUser } from "../services";
 import { TAuthProvider } from "../types";
-import { AppError, mailService, redisService } from "../../../Classes";
-import { generateTokenForRedis } from "../../Auth.Module/Auth.Utils";
-import { Constants } from "../../../Constants";
+import { AppError } from "../../../classes";
+import { generateTokenForRedis } from "../../auth/utils";
+import { constants } from "../../../constants";
 import {
   getAuthorizationToken,
   getFrontendURL,
   PARSE_DATA,
   STRINGIFY_DATA,
 } from "../../../utils";
+import { services } from "../../../services";
 
 export const changePasswordController = async (
   req: AuthenticatedRequest,
@@ -83,9 +84,9 @@ export const resetPasswordSendLinkController = async (
 
   const resetToken = generateTokenForRedis(32);
 
-  await redisService.getClient()?.setEx(
+  await services.redis.getClient()?.setEx(
     `resetPassword:${resetToken}`,
-    Constants.Common.MINUTE * Constants.Common.MINUTE, // 1 hour in seconds
+    constants.common.MINUTE * constants.common.MINUTE, // 1 hour in seconds
     user._id.toString(),
   );
 
@@ -94,7 +95,7 @@ export const resetPasswordSendLinkController = async (
     user.role,
   )}/reset-password?token=${resetToken}`;
 
-  const { message, success } = await mailService.sendPasswordResetLink({
+  const { message, success } = await services.mail.sendPasswordResetLink({
     to: user.email,
     resetLink: resetUrl,
   });
@@ -123,7 +124,7 @@ export const validResetPasswordTokenController = async (
   const token = getAuthorizationToken(rawToken);
 
   const redisKey = `resetPassword:${token}`;
-  const userId = await redisService.getClient()?.get(redisKey);
+  const userId = await services.redis.getClient()?.get(redisKey);
 
   if (!userId) {
     throw new AppError({
@@ -149,7 +150,7 @@ export const resetPasswordController = async (req: Request, res: Response) => {
   const token = getAuthorizationToken(rawToken);
 
   const redisKey = `resetPassword:${token}`;
-  const userId = await redisService.getClient()?.get(redisKey);
+  const userId = await services.redis.getClient()?.get(redisKey);
 
   if (!userId) {
     throw new AppError({
@@ -166,7 +167,7 @@ export const resetPasswordController = async (req: Request, res: Response) => {
     password: hashedPassword,
   });
 
-  await redisService.getClient()?.del(redisKey);
+  await services.redis.getClient()?.del(redisKey);
 
   res.success(200, "Password reset successfully");
 };
@@ -190,7 +191,7 @@ export const forgotPasswordSendLinkController = async (
   if (!user.providers.includes("MANUAL")) {
     // Check if user has MANUAL login
     throw new AppError({
-      message: `This account was created using an OAuth (${user.providers.join(
+      message: `This account was created using an oAuth (${user.providers.join(
         " / ",
       )}) login. Please login using your provider (e.g., ${user.providers.join(
         ", ",
@@ -201,9 +202,9 @@ export const forgotPasswordSendLinkController = async (
 
   const token = generateTokenForRedis(32);
 
-  await redisService.getClient()?.setEx(
+  await services.redis.getClient()?.setEx(
     `forgot-password:${token}`,
-    Constants.Common.MINUTE * Constants.Common.MINUTE, // 1 hour in seconds
+    constants.common.MINUTE * constants.common.MINUTE, // 1 hour in seconds
     STRINGIFY_DATA({
       userId: user._id,
       sendCount: 1,
@@ -214,11 +215,13 @@ export const forgotPasswordSendLinkController = async (
     user.role,
   )}/forgot-password?token=${token}`;
 
-  const { message, success } = await mailService.sendForgotPasswordLinkAndOtp({
-    to: user.email,
-    link: redirectUrl,
-    otp: "123",
-  });
+  const { message, success } = await services.mail.sendForgotPasswordLinkAndOtp(
+    {
+      to: user.email,
+      link: redirectUrl,
+      otp: "123",
+    },
+  );
 
   if (!success) {
     throw new AppError({ message, statusCode: 500, code: "INTERNAL_ERROR" });
@@ -245,7 +248,7 @@ export const forgotPasswordResendLinkController = async (
 
   const token = getAuthorizationToken(rawToken);
 
-  const redisData = await redisService
+  const redisData = await services.redis
     .getClient()
     ?.get(`forgot-password:${token}`);
 
@@ -257,7 +260,7 @@ export const forgotPasswordResendLinkController = async (
 
   // Increment sendCount and check limit
   const sendCount = (parsedData?.sendCount ?? 1) + 1;
-  if (sendCount > Constants.Common.MAX_RESEND) {
+  if (sendCount > constants.common.MAX_RESEND) {
     throw new AppError({
       message: "Maximum resend attempts reached, try again later",
       statusCode: 400,
@@ -273,7 +276,7 @@ export const forgotPasswordResendLinkController = async (
   if (!user?.providers?.includes("MANUAL")) {
     // Check if user has MANUAL login
     throw new AppError({
-      message: `This account was created using an OAuth (${user.providers.join(
+      message: `This account was created using an oAuth (${user.providers.join(
         " / ",
       )}) login. Please login using your provider (e.g., ${user.providers.join(
         ", ",
@@ -282,9 +285,9 @@ export const forgotPasswordResendLinkController = async (
     });
   }
 
-  await redisService.getClient()?.setEx(
+  await services.redis.getClient()?.setEx(
     `forgot-password:${token}`,
-    Constants.Common.MINUTE * Constants.Common.MINUTE, // 1 hour in seconds
+    constants.common.MINUTE * constants.common.MINUTE, // 1 hour in seconds
     STRINGIFY_DATA({ userId: user._id, sendCount }),
   );
 
@@ -292,11 +295,13 @@ export const forgotPasswordResendLinkController = async (
     user.role,
   )}/forgot-password?token=${token}`;
 
-  const { message, success } = await mailService.sendForgotPasswordLinkAndOtp({
-    to: user.email,
-    link: redirectUrl,
-    otp: "123",
-  });
+  const { message, success } = await services.mail.sendForgotPasswordLinkAndOtp(
+    {
+      to: user.email,
+      link: redirectUrl,
+      otp: "123",
+    },
+  );
 
   if (!success) {
     throw new AppError({ message, statusCode: 500, code: "INTERNAL_ERROR" });
@@ -325,7 +330,7 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
   if (!token)
     throw new AppError({ message: "Link token is required", statusCode: 400 });
 
-  const redisData = await redisService
+  const redisData = await services.redis
     .getClient()
     ?.get(`forgot-password:${token}`);
 
@@ -360,7 +365,7 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
   if (!user.providers.includes("MANUAL")) {
     // Check if user has MANUAL login
     throw new AppError({
-      message: `This account was created using an OAuth (${user.providers.join(
+      message: `This account was created using an oAuth (${user.providers.join(
         " / ",
       )}) login. Please login using your provider (e.g., ${user.providers.join(
         ", ",
@@ -373,7 +378,7 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
 
   await user.updateOne({ password: hashedPassword });
 
-  await redisService.getClient()?.del(`forgot-password:${token}`);
+  await services.redis.getClient()?.del(`forgot-password:${token}`);
 
   res.success(202, "Password sent on your email address");
 };
@@ -386,7 +391,7 @@ export const checkPasswordTokenValidityController = async (
 
   const token = getAuthorizationToken(rawToken ?? "");
 
-  const redisData = await redisService
+  const redisData = await services.redis
     .getClient()
     ?.get(`forgot-password:${token}`);
 

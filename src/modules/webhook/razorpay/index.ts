@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import crypto from "crypto";
-import { RAZORPAY_WEBHOOK_SECRET } from "../../../Envs";
-import { AppError } from "../../../Classes";
+import { RAZORPAY_WEBHOOK_SECRET } from "../../../envs";
+import { AppError } from "../../../classes";
 import { ChatbotModule, OrderModule } from "../..";
 import { isValidMongoId } from "../../../utils";
 import { IRazorPayPayment } from "../types";
@@ -48,7 +48,7 @@ export const razorpayWebhooksController = async (
   isValidMongoId(orderDBId, "Invalid order id in notes", 400);
   isValidMongoId(userId, "Invalid user id in notes", 400);
 
-  const order = await OrderModule.Models.Order.findById(orderDBId);
+  const order = await OrderModule.models.Order.findById(orderDBId);
   if (!order) {
     console.log("Order not found");
     throw new AppError({
@@ -67,7 +67,7 @@ export const razorpayWebhooksController = async (
 
   // Safe update: only if not terminal states
   if (Object.keys(updatePayload).length) {
-    const updatedOrder = await OrderModule.Models.Order.findOneAndUpdate(
+    const updatedOrder = await OrderModule.models.Order.findOneAndUpdate(
       { _id: orderDBId },
       { $set: updatePayload },
       { new: true },

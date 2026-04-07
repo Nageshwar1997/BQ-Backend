@@ -7,7 +7,7 @@ import {
   updateProductController,
   uploadProductController,
 } from "../../controllers";
-import { Middlewares } from "../../../../Middlewares";
+import { middlewares } from "../../../../middlewares";
 import {
   updateProductZodSchema,
   uploadProductZodSchema,
@@ -18,42 +18,38 @@ export const productRouter = Router();
 
 productRouter.post(
   "/upload",
-  Middlewares.Auth.Authorization(["ADMIN", "MASTER", "SELLER"]),
-  Middlewares.Multer({ type: "any" }),
-  Middlewares.Request.Empty({ body: true, files: true }),
-  Middlewares.JSONParser({
-    fieldsToParse: POSSIBLE_PARSED_FIELDS,
-  }),
-  Middlewares.Zod(uploadProductZodSchema),
-  Middlewares.Response.Async.TryCatch(uploadProductController),
+  middlewares.auth.authorized(["ADMIN", "MASTER", "SELLER"]),
+  middlewares.multer({ type: "any" }),
+  middlewares.request.empty({ body: true, files: true }),
+  middlewares.toJSON(POSSIBLE_PARSED_FIELDS),
+  middlewares.zod(uploadProductZodSchema),
+  middlewares.response.async.tryCatch(uploadProductController),
 );
 
 productRouter.get(
   "/all",
-  Middlewares.Response.Async.TryCatch(getAllProductsController),
+  middlewares.response.async.tryCatch(getAllProductsController),
 );
 
 productRouter.get(
   "/product/:productId",
-  Middlewares.Request.Empty({ params: true }),
-  Middlewares.Response.Async.TryCatch(getProductByIdController),
+  middlewares.request.empty({ params: true }),
+  middlewares.response.async.tryCatch(getProductByIdController),
 );
 
 productRouter.patch(
   "/product/update/:productId",
-  Middlewares.Auth.Authorization(["ADMIN", "MASTER", "SELLER"]),
-  Middlewares.Multer({ type: "any" }),
-  Middlewares.Request.Empty({ filesOrBody: true }),
-  Middlewares.JSONParser({
-    fieldsToParse: POSSIBLE_PARSED_FIELDS,
-  }),
-  Middlewares.Zod(updateProductZodSchema),
-  Middlewares.Response.Async.TryCatch(updateProductController),
+  middlewares.auth.authorized(["ADMIN", "MASTER", "SELLER"]),
+  middlewares.multer({ type: "any" }),
+  middlewares.request.empty({ filesOrBody: true }),
+  middlewares.toJSON(POSSIBLE_PARSED_FIELDS),
+  middlewares.zod(updateProductZodSchema),
+  middlewares.response.async.tryCatch(updateProductController),
 );
 
 productRouter.delete(
   "/product/delete/:productId",
-  Middlewares.Request.Empty({ params: true }),
-  Middlewares.Auth.Authorization(["ADMIN", "MASTER", "SELLER"]),
-  Middlewares.Response.Async.TryCatch(deleteProductController),
+  middlewares.request.empty({ params: true }),
+  middlewares.auth.authorized(["ADMIN", "MASTER", "SELLER"]),
+  middlewares.response.async.tryCatch(deleteProductController),
 );

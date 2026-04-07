@@ -2,7 +2,7 @@ import { Response } from "express";
 import { AuthorizedRequest } from "../../../types";
 import { CartProduct } from "../models";
 import { isValidMongoId } from "../../../utils";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 
 export const updateCartProductQuantityController = async (
   req: AuthorizedRequest,

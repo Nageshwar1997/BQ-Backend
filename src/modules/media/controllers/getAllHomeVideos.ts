@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { HomeVideo } from "../models";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 
 export const getAllHomeVideosController = async (
   req: Request,

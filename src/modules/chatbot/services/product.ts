@@ -1,5 +1,4 @@
-
-import { Configs } from "../../../Configs";
+import { configs } from "../../../configs";
 import { EmbeddedProduct } from "../models";
 import {
   IAggregatedEmbeddedProduct,
@@ -16,7 +15,7 @@ const removeHTMLTags = (text: string): string => {
 export const getEmbeddedProducts = async (
   message: string,
 ): Promise<IAggregatedEmbeddedProduct[]> => {
-  const queryVector = await Configs.Chatbot.Get.embedQuery(message);
+  const queryVector = await configs.Chatbot.Get.embedQuery(message);
 
   const products = await EmbeddedProduct.aggregate([
     // Vector search
@@ -202,7 +201,7 @@ export const createOrUpdateEmbeddedProduct = async ({
 }: TCreateOrUpdateEmbeddedProduct) => {
   try {
     const searchText = `${title} ${brand} ${category.grandParent} ${category.parent} ${category.child}`;
-    const embeddings = await Configs.Chatbot.Post.embedQuery(searchText);
+    const embeddings = await configs.Chatbot.Post.embedQuery(searchText);
 
     await EmbeddedProduct.findOneAndUpdate(
       { product: productId },

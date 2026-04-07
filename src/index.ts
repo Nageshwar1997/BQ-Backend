@@ -5,17 +5,17 @@ import { parse } from "qs";
 import http from "http";
 
 import router from "./routes";
-import { Configs } from "./Configs";
-import { Middlewares } from "./Middlewares";
-import { PORT } from "./Envs";
-import { mailService, redisService } from "./Classes";
+import { configs } from "./configs";
+import { middlewares } from "./middlewares";
+import { PORT } from "./envs";
+import { services } from "./services";
 
 const app = express();
 
 // ----------------- MIDDLEWARES ORDER -----------------
 
 // 1. Assign requestId first (for tracing logs)
-app.use(Middlewares.Request.Id);
+app.use(middlewares.request.id);
 
 // 2. Body parsers & static files
 app.use(express.json());
@@ -24,12 +24,12 @@ app.use(express.static(path.resolve("public")));
 app.set("query parser", (str: string) => parse(str));
 
 // 3. Logger (logs all requests)
-app.use(Middlewares.Logger.Request);
+app.use(middlewares.logger.request);
 
 // 4. Custom middlewares
-app.use(Middlewares.Response.Success);
-app.use(Middlewares.Cors);
-app.use(Middlewares.Database);
+app.use(middlewares.response.success);
+app.use(middlewares.cors);
+app.use(middlewares.database);
 
 // ----------------- ROUTES -----------------
 // Home Route
@@ -41,23 +41,26 @@ app.get("/", (_: Request, res: Response) =>
 app.use("/api", router);
 
 // ----------------- ERROR HANDLING -----------------
-app.use(Middlewares.Response.NotFound);
-app.use(Middlewares.Logger.Error);
-app.use(Middlewares.Response.Error);
+app.use(middlewares.response.notFound);
+app.use(middlewares.logger.error);
+app.use(middlewares.response.error);
 
 // ----------------- SERVER SETUP -----------------
 const server = http.createServer(app);
 
 // Initialize Socket.IO
-Configs.Socket.Init(server);
+configs.socket.init(server);
 
-Configs.Socket.Namespace("products");
-Configs.Socket.Namespace("orders");
+configs.socket.namespace("products");
+configs.socket.namespace("orders");
 
 (async () => {
   try {
-    await Configs.ConnectDB();
-    await Promise.all([redisService.connect(), mailService.checkConnection()]);
+    await configs.connectDB();
+    await Promise.all([
+      services.redis.connect(),
+      services.mail.checkConnection(),
+    ]);
 
     server.listen(PORT, () => {
       console.log(`Server running on port: ${PORT}`);

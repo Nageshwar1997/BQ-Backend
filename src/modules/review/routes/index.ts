@@ -6,7 +6,7 @@ import {
   likeDislikeHelpfulController,
   updateReviewController,
 } from "../controllers";
-import { Middlewares } from "../../../Middlewares";
+import { middlewares } from "../../../middlewares";
 import {
   createReviewZodSchema,
   updateLikeDislikeHelpfulSchema,
@@ -17,54 +17,52 @@ export const reviewRouter = Router();
 
 reviewRouter.post(
   "/:productId",
-  Middlewares.Multer({
+  middlewares.multer({
     type: "fields",
     fieldsConfig: [
       { name: "images", maxCount: 5 },
       { name: "videos", maxCount: 5 },
     ],
   }),
-  Middlewares.Request.Empty({ body: true }),
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Zod(createReviewZodSchema),
-  Middlewares.Response.Async.TryCatch(createReviewController),
+  middlewares.request.empty({ body: true }),
+  middlewares.auth.authenticated(false),
+  middlewares.zod(createReviewZodSchema),
+  middlewares.response.async.tryCatch(createReviewController),
 );
 
 reviewRouter.patch(
   "/:productId/:reviewId",
-  Middlewares.Multer({
+  middlewares.multer({
     type: "fields",
     fieldsConfig: [
       { name: "images", maxCount: 5 },
       { name: "videos", maxCount: 5 },
     ],
   }),
-  Middlewares.Request.Empty({ filesOrBody: true }),
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.JSONParser({
-    fieldsToParse: ["removedImages", "removedVideos"],
-  }),
-  Middlewares.Zod(updateReviewZodSchema),
-  Middlewares.Response.Async.TryCatch(updateReviewController),
+  middlewares.request.empty({ filesOrBody: true }),
+  middlewares.auth.authenticated(false),
+  middlewares.toJSON(["removedImages", "removedVideos"]),
+  middlewares.zod(updateReviewZodSchema),
+  middlewares.response.async.tryCatch(updateReviewController),
 );
 
 reviewRouter.patch(
   "/:reviewId",
-  Middlewares.Request.Empty({ body: true, params: true }),
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Zod(updateLikeDislikeHelpfulSchema),
-  Middlewares.Response.Async.TryCatch(likeDislikeHelpfulController),
+  middlewares.request.empty({ body: true, params: true }),
+  middlewares.auth.authenticated(false),
+  middlewares.zod(updateLikeDislikeHelpfulSchema),
+  middlewares.response.async.tryCatch(likeDislikeHelpfulController),
 );
 
 reviewRouter.delete(
   "/:productId/:reviewId",
-  Middlewares.Request.Empty({ params: true }),
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Response.Async.TryCatch(deleteReviewController),
+  middlewares.request.empty({ params: true }),
+  middlewares.auth.authenticated(false),
+  middlewares.response.async.tryCatch(deleteReviewController),
 );
 
 reviewRouter.get(
   "/:productId",
-  Middlewares.Request.Empty({ params: true }),
-  Middlewares.Response.Async.TryCatch(getReviewsByProductIdController),
+  middlewares.request.empty({ params: true }),
+  middlewares.response.async.tryCatch(getReviewsByProductIdController),
 );

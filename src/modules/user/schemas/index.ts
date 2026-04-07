@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
 import { IWishlist, SellerProps, UserProps } from "../types";
-import { Constants } from "../../../Constants";
+import { constants } from "../../../constants";
 
 export const userSchema = new Schema<UserProps>(
   {
@@ -9,7 +9,7 @@ export const userSchema = new Schema<UserProps>(
     phoneNumber: { type: String, trim: true },
     email: { type: String, trim: true, lowercase: true },
     profilePic: { type: String, default: "", trim: true },
-    role: { type: String, enum: Constants.Common.ROLES, default: "USER" },
+    role: { type: String, enum: constants.common.ROLES, default: "USER" },
     password: { type: String, trim: true },
     providers: { type: [String], default: ["MANUAL"] },
     // addresses: [{ type: Schema.Types.ObjectId, ref: "Address" }],
@@ -38,13 +38,13 @@ const businessAddressSchema = new Schema<SellerProps["businessAddress"]>(
     state: {
       type: String,
       required: true,
-      enum: Constants.Common.STATES_AND_UNION_TERRITORIES,
+      enum: constants.common.STATES_AND_UNION_TERRITORIES,
     },
     pinCode: { type: String, required: true, minlength: 6, maxlength: 6 },
     country: {
       type: String,
       required: true,
-      enum: Constants.Common.ALLOWED_COUNTRIES,
+      enum: constants.common.ALLOWED_COUNTRIES,
       default: "India",
     },
     pan: {
@@ -82,7 +82,7 @@ const businessDetailsSchema = new Schema<SellerProps["businessDetails"]>(
     category: {
       type: String,
       required: true,
-      enum: Constants.Common.ALLOWED_BUSINESSES,
+      enum: constants.common.ALLOWED_BUSINESSES,
     },
   },
   { versionKey: false, _id: false },

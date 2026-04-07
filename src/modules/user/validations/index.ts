@@ -1,6 +1,6 @@
 import z from "zod";
 import { validateZodEnums, validateZodString } from "../../../utils";
-import { Constants } from "../../../Constants";
+import { constants } from "../../../constants";
 
 export const sellerRequestZodSchema = z.object({
   businessAddress: z.object(
@@ -28,12 +28,12 @@ export const sellerRequestZodSchema = z.object({
       state: validateZodEnums({
         field: "state",
         parentField: "businessAddress",
-        enums: Constants.Common.STATES_AND_UNION_TERRITORIES,
+        enums: constants.common.STATES_AND_UNION_TERRITORIES,
       }),
       country: validateZodEnums({
         field: "country",
         parentField: "businessAddress",
-        enums: Constants.Common.ALLOWED_COUNTRIES,
+        enums: constants.common.ALLOWED_COUNTRIES,
       }).default("India"),
       pinCode: validateZodString({
         field: "pinCode",
@@ -42,7 +42,7 @@ export const sellerRequestZodSchema = z.object({
         max: 6,
         blockSingleSpace: true,
         customRegexes: [
-          { regex: Constants.Regex.pinCode, message: "must be valid" },
+          { regex: constants.common.regex.PIN_CODE, message: "must be valid" },
         ],
       }),
       pan: validateZodString({
@@ -52,7 +52,7 @@ export const sellerRequestZodSchema = z.object({
         max: 10,
         blockSingleSpace: true,
         customRegexes: [
-          { regex: Constants.Regex.pan, message: "must be valid" },
+          { regex: constants.common.regex.PAN, message: "must be valid" },
         ],
       }),
       gst: validateZodString({
@@ -62,7 +62,7 @@ export const sellerRequestZodSchema = z.object({
         max: 16,
         blockSingleSpace: true,
         customRegexes: [
-          { regex: Constants.Regex.gst, message: "must be valid" },
+          { regex: constants.common.regex.GST, message: "must be valid" },
         ],
       }),
     },
@@ -77,7 +77,7 @@ export const sellerRequestZodSchema = z.object({
         min: 2,
         customRegexes: [
           {
-            regex: Constants.Regex.name,
+            regex: constants.common.regex.NAME,
             message:
               "can only contain letters and only one space is allowed between words",
           },
@@ -90,7 +90,7 @@ export const sellerRequestZodSchema = z.object({
         lowerCase: true,
         customRegexes: [
           {
-            regex: Constants.Regex.email,
+            regex: constants.common.regex.EMAIL,
             message:
               "please provide a valid email address, like example@domain.com",
           },
@@ -104,7 +104,7 @@ export const sellerRequestZodSchema = z.object({
         max: 10,
         customRegexes: [
           {
-            regex: Constants.Regex.phone,
+            regex: constants.common.regex.PHONE,
             message:
               "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
           },
@@ -113,7 +113,7 @@ export const sellerRequestZodSchema = z.object({
       category: validateZodEnums({
         field: "category",
         parentField: "businessDetails",
-        enums: Constants.Common.ALLOWED_BUSINESSES,
+        enums: constants.common.ALLOWED_BUSINESSES,
       }),
     },
     { error: "businessDetails is required" },
@@ -130,7 +130,7 @@ export const updateUserZodSchema = z.object({
     max: 50,
     customRegexes: [
       {
-        regex: Constants.Regex.name,
+        regex: constants.common.regex.NAME,
         message:
           "can only contain letters and only one space is allowed between words",
       },
@@ -144,7 +144,7 @@ export const updateUserZodSchema = z.object({
     max: 50,
     customRegexes: [
       {
-        regex: Constants.Regex.name,
+        regex: constants.common.regex.NAME,
         message:
           "can only contain letters and only one space is allowed between words",
       },
@@ -157,7 +157,7 @@ export const updateUserZodSchema = z.object({
     isOptional: true,
     customRegexes: [
       {
-        regex: Constants.Regex.email,
+        regex: constants.common.regex.EMAIL,
         message:
           "please provide a valid email address, like example@domain.com",
       },
@@ -171,7 +171,7 @@ export const updateUserZodSchema = z.object({
     max: 10,
     customRegexes: [
       {
-        regex: Constants.Regex.phone,
+        regex: constants.common.regex.PHONE,
         message:
           "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
       },
@@ -188,7 +188,7 @@ export const updatePasswordZodSchema = z
       field: "password",
       customRegexes: [
         {
-          regex: Constants.Regex.password,
+          regex: constants.common.regex.PASSWORD,
           message:
             "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
         },
@@ -201,7 +201,7 @@ export const updatePasswordZodSchema = z
       field: "confirmPassword",
       customRegexes: [
         {
-          regex: Constants.Regex.password,
+          regex: constants.common.regex.PASSWORD,
           message:
             "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
         },
@@ -222,7 +222,7 @@ export const changePasswordZodSchema = z
       field: "oldPassword",
       customRegexes: [
         {
-          regex: Constants.Regex.password,
+          regex: constants.common.regex.PASSWORD,
           message:
             "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
         },
@@ -235,7 +235,7 @@ export const changePasswordZodSchema = z
       field: "password",
       customRegexes: [
         {
-          regex: Constants.Regex.password,
+          regex: constants.common.regex.PASSWORD,
           message:
             "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
         },
@@ -248,7 +248,7 @@ export const changePasswordZodSchema = z
       field: "confirmPassword",
       customRegexes: [
         {
-          regex: Constants.Regex.password,
+          regex: constants.common.regex.PASSWORD,
           message:
             "must be 6-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.",
         },

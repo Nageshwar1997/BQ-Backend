@@ -1,4 +1,4 @@
-import { CLOUDINARY_MAIN_FOLDER } from "../../../../Envs";
+import { CLOUDINARY_MAIN_FOLDER } from "../../../../envs";
 
 export const getSafeFileOriginalName = (originalname?: string) => {
   if (!originalname) return "file";

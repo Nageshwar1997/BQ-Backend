@@ -1,0 +1,30 @@
+import { NextFunction, Request, Response } from "express";
+import { classes } from "../../classes";
+
+declare module "express-serve-static-core" {
+  interface Response {
+    success: (statusCode: number, message: string, data?: object) => void;
+  }
+  interface Request {
+    requestId?: string;
+  }
+}
+
+export const successResponse = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  res.success = (statusCode: number, message: string, data: object = {}) => {
+    const response = new classes.AppSuccess(statusCode, message, data);
+
+    res.status(statusCode).json({
+      success: true,
+      error: false,
+      requestId: req.requestId,
+      ...response,
+    });
+  };
+
+  next();
+};

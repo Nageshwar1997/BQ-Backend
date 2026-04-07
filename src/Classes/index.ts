@@ -1,5 +1,15 @@
-export * from "./AppSuccess.Class";
-export * from "./AppError.Class";
-export * from "./MailService.Class";
-export * from "./RedisService.Class";
-export * from "./ErrorBuilder.Class";
+import { AppError } from "./AppError";
+import { AppSuccess } from "./AppSuccess";
+import { ErrorBuilder } from "./ErrorBuilder";
+import { Mail } from "./Mail";
+import { Redis } from "./Redis";
+
+export * from "./AppError";
+
+export const classes = {
+  AppError,
+  AppSuccess,
+  ErrorBuilder,
+  Mail,
+  Redis,
+};

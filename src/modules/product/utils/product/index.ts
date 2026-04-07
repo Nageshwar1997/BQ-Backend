@@ -1,5 +1,5 @@
 import { MediaModule } from "../../..";
-import { AppError } from "../../../../Classes";
+import { AppError } from "../../../../classes";
 import { validateZodNumber, validateZodString } from "../../../../utils";
 import { ValidateProductFieldConfigs } from "../../types";
 

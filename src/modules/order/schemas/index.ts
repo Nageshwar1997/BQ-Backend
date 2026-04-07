@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
 import { IOrder } from "../types";
-import { AddressModule, CartProductModule } from "../..";
+import { addressModule, CartProductModule } from "../..";
 import { TCartProduct } from "../../cartProduct/types";
 import {
   ALLOWED_PAYMENT_MODE,
@@ -13,13 +13,13 @@ import {
 
 // Sub-schema for addresses
 export const orderAddressSchema = new Schema<
-  Omit<AddressModule.Types.IAddress, "user">
->(AddressModule.Schemas.addressBaseFields, { versionKey: false, _id: false });
+  Omit<addressModule.Types.IAddress, "user">
+>(addressModule.Schemas.addressBaseFields, { versionKey: false, _id: false });
 
 // Sub-schema for products
 export const orderProductSchema = new Schema<Omit<TCartProduct, "cart">>(
   CartProductModule.Schemas.cartProductBaseFields,
-  { versionKey: false, timestamps: true, _id: false }
+  { versionKey: false, timestamps: true, _id: false },
 );
 
 // Transaction sub-schema
@@ -48,7 +48,7 @@ const transactionSchema = new Schema(
     netbanking_bank_transaction_id: String,
     netbanking_bank: String,
   },
-  { _id: false }
+  { _id: false },
 );
 
 // Addresses sub-schema
@@ -58,7 +58,7 @@ const addressesSchema = new Schema(
     billing: orderAddressSchema,
     both: orderAddressSchema,
   },
-  { _id: false }
+  { _id: false },
 );
 
 // Payment sub-schema
@@ -80,7 +80,7 @@ const paymentSchema = new Schema(
     amount: { type: Number, required: true, default: 0 },
     paid_at: Date,
   },
-  { _id: false }
+  { _id: false },
 );
 
 // Main order schema
@@ -101,5 +101,5 @@ export const orderSchema = new Schema<IOrder>(
     refunded_at: Date,
     refund_status: { type: String, enum: RAZORPAY_REFUND_PAYMENT_STATUS },
   },
-  { timestamps: true, versionKey: false }
+  { timestamps: true, versionKey: false },
 );

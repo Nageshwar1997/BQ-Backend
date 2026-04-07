@@ -1,5 +1,5 @@
 import { AuthenticatedRequest } from "../../../types";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { Cart } from "../models";
 import { IPopulatedCart } from "../types";
 

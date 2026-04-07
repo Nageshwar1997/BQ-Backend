@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { Order } from "../models";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { AuthenticatedRequest } from "../../../types";
 import { isValidMongoId } from "../../../utils";
 import { ChatbotModule } from "../..";

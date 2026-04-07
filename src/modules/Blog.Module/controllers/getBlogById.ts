@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { isValidMongoId } from "../../../utils";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { Blog } from "../models";
 
 export const getBlogByIdController = async (req: Request, res: Response) => {

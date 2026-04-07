@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { isValidMongoId } from "../../../utils";
 import { MediaModule, ProductModule } from "../..";
 import { Review } from "../models";
@@ -26,7 +26,7 @@ export const createReviewController = async (
   const images = files?.images;
   const videos = files?.videos;
 
-  const product = await ProductModule.Models.Product.findById(productId);
+  const product = await ProductModule.models.Product.findById(productId);
 
   if (!product) {
     throw new AppError({

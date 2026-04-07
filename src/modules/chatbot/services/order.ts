@@ -1,5 +1,5 @@
 import { ClientSession, Types } from "mongoose";
-import { Configs } from "../../../Configs";
+import { configs } from "../../../configs";
 import { EmbeddedOrder } from "../models";
 import { IAggregatedEmbeddedOrder } from "../types";
 
@@ -7,7 +7,7 @@ export const getEmbeddedOrders = async (
   message: string,
   userId: string,
 ): Promise<IAggregatedEmbeddedOrder[]> => {
-  const queryVector = await Configs.Chatbot.Get.embedQuery(message);
+  const queryVector = await configs.Chatbot.Get.embedQuery(message);
 
   const orders = await EmbeddedOrder.aggregate([
     {
@@ -192,7 +192,7 @@ export const createOrUpdateEmbeddedOrder = async ({
   });
 
   try {
-    const embeddings = await Configs.Chatbot.Post.embedQuery(searchText);
+    const embeddings = await configs.Chatbot.Post.embedQuery(searchText);
 
     await EmbeddedOrder.findOneAndUpdate(
       { order: order._id, user: order.user?._id || order.user },

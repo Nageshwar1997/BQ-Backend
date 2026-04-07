@@ -12,8 +12,8 @@ import {
   ZodCommonConfigs,
   TRole,
 } from "../types";
-import { AppError } from "../Classes";
-import { Constants } from "../Constants";
+import { AppError } from "../classes";
+import { constants } from "../constants";
 import {
   BACKEND_LOCALHOST_URL,
   BACKEND_PRODUCTION_URL,
@@ -27,7 +27,7 @@ import {
   GOOGLE_REDIRECT_ENDPOINT,
   IS_DEV_MODE,
   LINKEDIN_REDIRECT_ENDPOINT,
-} from "../Envs";
+} from "../envs";
 import { TAuthProvider } from "../Modules/user/types";
 
 export const STRINGIFY_DATA = (data: unknown): string => {
@@ -202,13 +202,16 @@ export const validateZodString = ({
 
   if (blockMultipleSpaces) {
     schema = schema.regex(
-      Constants.Regex.singleSpace,
+      constants.common.regex.SINGLE_SPACE,
       messages.multiple_spaces,
     );
   }
 
   if (blockSingleSpace) {
-    schema = schema.regex(Constants.Regex.noSpace, messages.single_space);
+    schema = schema.regex(
+      constants.common.regex.NO_SPACE,
+      messages.single_space,
+    );
   }
 
   if (lowerCase) {
@@ -229,7 +232,7 @@ export const validateZodUrl = ({ ...props }: ZodCommonConfigs) => {
     ...props,
     blockSingleSpace: true,
     customRegexes: [
-      { regex: Constants.Regex.url, message: "must be a valid URL" },
+      { regex: constants.common.regex.URL, message: "must be a valid URL" },
     ],
   });
 };
@@ -316,7 +319,7 @@ export const validateZodDate = ({
 
   const baseSchema = z
     .string({ error: messages.required })
-    .refine((val) => Constants.Regex.date.test(val), {
+    .refine((val) => constants.common.regex.DATE.test(val), {
       message: messages.invalid_format,
     })
     .transform((val) => {
@@ -408,7 +411,7 @@ export const getSocialAuthRedirectURL = (
 };
 
 export const escapeRegexSpecialChars = (value: string): string => {
-  return value.replace(Constants.Regex.escapeSpecialChars, "\\$&");
+  return value.replace(constants.common.regex.ESCAPE_SPECIAL_CHARS, "\\$&");
 };
 
 export const toArray = (value?: string | ParsedQs | (string | ParsedQs)[]) => {

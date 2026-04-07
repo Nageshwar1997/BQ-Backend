@@ -10,45 +10,38 @@ export interface AuthorizedRequest extends Request {
   user?: UserModule.Types.UserProps; // User object without password
 }
 
-import multer from "multer";
+import multer, { MulterError } from "multer";
 import { UserModule } from "../Modules";
 import { Types } from "mongoose";
 
 export type TRole = "USER" | "SELLER" | "ADMIN" | "MASTER";
 
-export type MulterType = "single" | "array" | "any" | "fields" | "none";
+type TMediaKey = "IMAGE" | "VIDEO" | "OTHER";
 
-export type CustomLimitsType = {
-  imageSize?: number;
-  videoSize?: number;
-  otherSize?: number;
+type TCommonMulterFileConfigs = {
+  format?: Partial<Record<TMediaKey, string[]>>;
+  size?: Partial<Record<TMediaKey, number>>;
 };
 
-export type CustomFileType = {
-  imageTypes?: string[];
-  videoTypes?: string[];
-  otherTypes?: string[];
-};
-
-export type FieldsConfigType = {
-  name: string;
-  maxCount: number;
-};
-
-export interface FileValidatorOptionsProps {
-  type: MulterType;
+export interface IMulterValidation extends TCommonMulterFileConfigs {
+  type: "single" | "array" | "any" | "fields" | "none";
   fieldName?: string;
   maxCount?: number;
-  fieldsConfig?: FieldsConfigType[];
+  fieldsConfig?: {
+    name: string;
+    maxCount: number;
+  }[];
   limits?: multer.Options["limits"];
-  customLimits?: CustomLimitsType;
-  customFileTypes?: CustomFileType;
 }
 
-export interface CustomFileErrorProps {
+export interface IMulterCustomError extends TCommonMulterFileConfigs {
   files: Express.Multer.File[];
-  customLimits?: CustomLimitsType;
-  customFileTypes?: CustomFileType;
+}
+export interface IMulterDefaultError extends Pick<
+  IMulterValidation,
+  "fieldName" | "maxCount"
+> {
+  err?: MulterError | Error;
 }
 
 export interface ValidateRequiredFileFieldsParams {

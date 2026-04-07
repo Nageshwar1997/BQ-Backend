@@ -12,7 +12,7 @@ import {
   IZodNumberConfigs,
   IZodStringConfigs,
 } from "../types";
-import { Constants } from "../Constants";
+import { constants } from "../constants";
 
 export const appendZodCustomIssue = (
   ctx: RefinementCtx,
@@ -31,23 +31,23 @@ export const passwordValidationOptions: IZodStringConfigs = {
   max: 20,
   customRegexes: [
     {
-      regex: Constants.Regex.atLeastOneUppercaseLetter,
+      regex: constants.common.regex.AT_LEAST_ONE_UPPERCASE_LETTER,
       message: "must contain at least one uppercase letter",
     },
     {
-      regex: Constants.Regex.atLeastOneLowercaseLetter,
+      regex: constants.common.regex.AT_LEAST_ONE_LOWERCASE_LETTER,
       message: "must contain at least one lowercase letter",
     },
     {
-      regex: Constants.Regex.atLeastOneDigit,
+      regex: constants.common.regex.AT_LEAST_ONE_DIGIT,
       message: "must contain at least one number",
     },
     {
-      regex: Constants.Regex.atLeastOneSpecialCharacter,
+      regex: constants.common.regex.AT_LEAST_ONE_SPECIAL_CHARACTER,
       message: "must contain at least one special character e.g. @$!%*?&#",
     },
     {
-      regex: Constants.Regex.password,
+      regex: constants.common.regex.PASSWORD,
       message:
         "must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
     },
@@ -61,7 +61,7 @@ export const nameValidationOptions: IZodStringConfigs = {
   max: 50,
   customRegexes: [
     {
-      regex: Constants.Regex.name,
+      regex: constants.common.regex.NAME,
       message:
         "can only contain letters and only one space is allowed between words",
     },
@@ -103,12 +103,12 @@ export const ValidateString = (props: IZodStringConfigs): ZodString => {
 
   if (allowSpace === "singleSpace") {
     schema = schema.regex(
-      Constants.Regex.singleSpace,
+      constants.common.regex.SINGLE_SPACE,
       `${name} must not contain multiple spaces.`,
     );
   } else if (allowSpace === "noSpace") {
     schema = schema.regex(
-      Constants.Regex.noSpace,
+      constants.common.regex.NO_SPACE,
       `${name} must not contain spaces.`,
     );
   }

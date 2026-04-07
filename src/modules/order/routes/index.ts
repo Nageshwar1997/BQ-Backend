@@ -6,40 +6,40 @@ import {
   getAllOrdersController,
   getOrderByIdController,
 } from "../controllers";
-import { Middlewares } from "../../../Middlewares";
+import { middlewares } from "../../../middlewares";
 
 export const orderRouter = Router();
 
 orderRouter.post(
   "/create",
-  Middlewares.Request.Empty({ query: true }),
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Response.Async.TryCatchWithSession(createOrderController),
+  middlewares.request.empty({ query: true }),
+  middlewares.auth.authenticated(false),
+  middlewares.response.async.tryCatchWithSession(createOrderController),
 );
 
 orderRouter.patch(
   "/cancel-payment/:orderId",
-  Middlewares.Request.Empty({ params: true }),
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Response.Async.TryCatch(cancelPaymentController),
+  middlewares.request.empty({ params: true }),
+  middlewares.auth.authenticated(false),
+  middlewares.response.async.tryCatch(cancelPaymentController),
 );
 
 orderRouter.get(
   "/",
-  Middlewares.Request.Empty({ query: false }), //LINK - Optional
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Response.Async.TryCatch(getAllOrdersController),
+  middlewares.request.empty({ query: false }), //LINK - Optional
+  middlewares.auth.authenticated(false),
+  middlewares.response.async.tryCatch(getAllOrdersController),
 );
 
 orderRouter.get(
   "/:orderId",
-  Middlewares.Request.Empty({ params: true }),
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Response.Async.TryCatch(getOrderByIdController),
+  middlewares.request.empty({ params: true }),
+  middlewares.auth.authenticated(false),
+  middlewares.response.async.tryCatch(getOrderByIdController),
 );
 orderRouter.patch(
   "/cancel/:orderId",
-  Middlewares.Request.Empty({ params: true, body: false }),
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Response.Async.TryCatchWithSession(cancelOrderController),
+  middlewares.request.empty({ params: true, body: false }),
+  middlewares.auth.authenticated(false),
+  middlewares.response.async.tryCatchWithSession(cancelOrderController),
 );

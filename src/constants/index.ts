@@ -1,11 +1,9 @@
-import { CommonConstants } from "./Common.Constant";
-import { FileConstants } from "./File.Constant";
-import { Regex } from "./Regex.Constant.ts";
-import { ZodConstants } from "./Zod.Constant.ts";
+import { commonConstants } from "./common.constants";
+import { fileConstants } from "./file.constants";
+import { zodConstants } from "./zod.constants";
 
-export const Constants = {
-  Common: CommonConstants,
-  File: FileConstants,
-  Regex,
-  Zod: ZodConstants,
+export const constants = {
+  common: commonConstants,
+  file: fileConstants,
+  zod: zodConstants,
 };

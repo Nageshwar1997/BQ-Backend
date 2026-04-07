@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { Response } from "express";
 import { AuthorizedRequest } from "../../../../types";
 import { Product, Shade } from "../../models";
-import { AppError } from "../../../../Classes";
+import { AppError } from "../../../../classes";
 import { PopulatedProduct, ProductProps, ShadeProps } from "../../types";
 import { findOrCreateCategory } from "../../services";
 import { checkUserPermission, isValidMongoId } from "../../../../utils";

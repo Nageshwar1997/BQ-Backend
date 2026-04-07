@@ -3,27 +3,27 @@ import { IRazorPayPayment } from "../types";
 
 export const canUpdateOrderStatus = (
   current: OrderModule.Types.IOrder["status"],
-  incoming: OrderModule.Types.IOrder["status"]
+  incoming: OrderModule.Types.IOrder["status"],
 ) =>
-  OrderModule.Constants.ORDER_STATUS_PRIORITY[incoming] >
-  OrderModule.Constants.ORDER_STATUS_PRIORITY[current];
+  OrderModule.constants.ORDER_STATUS_PRIORITY[incoming] >
+  OrderModule.constants.ORDER_STATUS_PRIORITY[current];
 
 export const canUpdatePaymentStatus = (
   current: OrderModule.Types.IOrder["payment"]["status"],
-  incoming: OrderModule.Types.IOrder["payment"]["status"]
+  incoming: OrderModule.Types.IOrder["payment"]["status"],
 ) =>
-  OrderModule.Constants.PAYMENT_STATUS_PRIORITY[incoming] >
-  OrderModule.Constants.PAYMENT_STATUS_PRIORITY[current];
+  OrderModule.constants.PAYMENT_STATUS_PRIORITY[incoming] >
+  OrderModule.constants.PAYMENT_STATUS_PRIORITY[current];
 
 export const canUpdateRefundStatus = (
   current: string | null | undefined,
-  incoming: string
+  incoming: string,
 ) => {
   const currentPriority = current
-    ? OrderModule.Constants.REFUND_STATUS_PRIORITY[current] ?? -1
+    ? (OrderModule.constants.REFUND_STATUS_PRIORITY[current] ?? -1)
     : -1;
   return (
-    OrderModule.Constants.REFUND_STATUS_PRIORITY[incoming] > currentPriority
+    OrderModule.constants.REFUND_STATUS_PRIORITY[incoming] > currentPriority
   );
 };
 
@@ -74,7 +74,7 @@ const handlePaymentSuccess = (
   order: OrderModule.Types.IOrder,
   payment: IRazorPayPayment,
   newPaymentStatus: OrderModule.Types.IOrder["payment"]["status"],
-  newOrderStatus: OrderModule.Types.IOrder["status"]
+  newOrderStatus: OrderModule.Types.IOrder["status"],
 ) => {
   // Remove previous reason
   update.reason = undefined;
@@ -88,9 +88,8 @@ const handlePaymentSuccess = (
 
   // Generate receipt if first-time
   if (!order.payment.rzp_payment_receipt) {
-    update[
-      "payment.rzp_payment_receipt"
-    ] = `payment_receipt_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+    update["payment.rzp_payment_receipt"] =
+      `payment_receipt_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
   }
 
   if (canUpdateOrderStatus(order.status, newOrderStatus)) {
@@ -104,7 +103,7 @@ export const get_rzp_OrderUpdateBody = (
   event: string,
   payment: IRazorPayPayment,
   receivedSignature: string,
-  order: OrderModule.Types.IOrder
+  order: OrderModule.Types.IOrder,
 ) => {
   let update: Record<string, unknown> = {};
   const transaction = getTransactionDetails(payment);
@@ -127,7 +126,7 @@ export const get_rzp_OrderUpdateBody = (
         order,
         payment,
         "CAPTURED",
-        "PROCESSING"
+        "PROCESSING",
       );
       break;
 
@@ -137,7 +136,7 @@ export const get_rzp_OrderUpdateBody = (
         order,
         payment,
         "PAID",
-        "CONFIRMED"
+        "CONFIRMED",
       );
       break;
 
@@ -192,7 +191,7 @@ export const get_rzp_OrderUpdateBody = (
   // Remove undefined/null fields before DB update
   Object.keys(update).forEach(
     (key) =>
-      (update[key] === undefined || update[key] === null) && delete update[key]
+      (update[key] === undefined || update[key] === null) && delete update[key],
   );
 
   return update;

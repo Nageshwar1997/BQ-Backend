@@ -2,7 +2,7 @@ import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { updateUser } from "../services";
 import { MediaModule } from "../..";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { User } from "../models";
 
 export const updateUserController = async (

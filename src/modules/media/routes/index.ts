@@ -8,7 +8,7 @@ import {
   uploadMultipleImagesController,
   uploadSingleImageController,
 } from "../controllers";
-import { Middlewares } from "../../../Middlewares";
+import { middlewares } from "../../../middlewares";
 import {
   removeMultipleImagesZodSchema,
   removeSingleImageZodSchema,
@@ -22,63 +22,63 @@ export const mediaRouter = Router();
 // For Single Image Upload
 mediaRouter.post(
   "/image/upload",
-  Middlewares.Auth.Authorization(["MASTER", "ADMIN", "SELLER"]),
-  Middlewares.Multer({
+  middlewares.auth.authorized(["MASTER", "ADMIN", "SELLER"]),
+  middlewares.multer({
     type: "single",
     fieldName: "image",
   }),
-  Middlewares.Request.Empty({ file: true, fileOrBody: true }),
-  Middlewares.Zod(uploadImageZodSchema),
-  Middlewares.Response.Async.TryCatch(uploadSingleImageController),
+  middlewares.request.empty({ file: true, fileOrBody: true }),
+  middlewares.zod(uploadImageZodSchema),
+  middlewares.response.async.tryCatch(uploadSingleImageController),
 );
 
 // For Multiple Images Upload
 mediaRouter.post(
   "/images/upload",
-  Middlewares.Auth.Authorization(["MASTER", "ADMIN", "SELLER"]),
-  Middlewares.Multer({
+  middlewares.auth.authorized(["MASTER", "ADMIN", "SELLER"]),
+  middlewares.multer({
     type: "array",
     fieldName: "images",
     maxCount: 10,
   }),
-  Middlewares.Request.Empty({ files: true, body: true }),
-  Middlewares.Zod(uploadImageZodSchema),
-  Middlewares.Response.Async.TryCatch(uploadMultipleImagesController),
+  middlewares.request.empty({ files: true, body: true }),
+  middlewares.zod(uploadImageZodSchema),
+  middlewares.response.async.tryCatch(uploadMultipleImagesController),
 );
 
 // For Single Image Remove
 mediaRouter.delete(
   "/image/delete",
-  Middlewares.Request.Empty({ body: true }),
-  Middlewares.Auth.Authorization(["MASTER", "ADMIN", "SELLER"]),
-  Middlewares.Zod(removeSingleImageZodSchema),
-  Middlewares.Response.Async.TryCatch(removeSingleImageController),
+  middlewares.request.empty({ body: true }),
+  middlewares.auth.authorized(["MASTER", "ADMIN", "SELLER"]),
+  middlewares.zod(removeSingleImageZodSchema),
+  middlewares.response.async.tryCatch(removeSingleImageController),
 );
 
 // For Multiple Images Remove
 mediaRouter.delete(
   "/images/delete",
-  Middlewares.Request.Empty({ body: true }),
-  Middlewares.Auth.Authorization(["MASTER", "ADMIN", "SELLER"]),
-  Middlewares.Zod(removeMultipleImagesZodSchema),
-  Middlewares.Response.Async.TryCatch(removeMultipleImagesController),
+  middlewares.request.empty({ body: true }),
+  middlewares.auth.authorized(["MASTER", "ADMIN", "SELLER"]),
+  middlewares.zod(removeMultipleImagesZodSchema),
+  middlewares.response.async.tryCatch(removeMultipleImagesController),
 );
 
 // ========== Video Upload ==========
 // For Home Carousel Video Upload
 mediaRouter.post(
   "/video/upload",
-  Middlewares.Auth.Authorization(["MASTER"]),
-  Middlewares.Multer({
+  middlewares.auth.authorized(["MASTER"]),
+  middlewares.multer({
     type: "fields",
     fieldsConfig: ["video", "poster"].map((name) => ({ name, maxCount: 1 })),
   }),
-  Middlewares.Zod(uploadHomeVideoZodSchema),
-  Middlewares.Response.Async.TryCatch(uploadHomeVideoController),
+  middlewares.zod(uploadHomeVideoZodSchema),
+  middlewares.response.async.tryCatch(uploadHomeVideoController),
 );
 
 // Home Carousel Video Routes
 mediaRouter.get(
   "/videos/home",
-  Middlewares.Response.Async.TryCatch(getAllHomeVideosController),
+  middlewares.response.async.tryCatch(getAllHomeVideosController),
 );

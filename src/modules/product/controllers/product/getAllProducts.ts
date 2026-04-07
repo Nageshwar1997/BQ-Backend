@@ -12,7 +12,7 @@ import {
   PRODUCT_POPULATE_FIELDS,
 } from "../../constants";
 import { isSafePopulateField } from "../../utils";
-import { AppError } from "../../../../Classes";
+import { AppError } from "../../../../classes";
 import { escapeRegexSpecialChars } from "../../../../utils";
 
 export const getAllProductsController = async (req: Request, res: Response) => {

@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express";
 import { ClientSession, Types } from "mongoose";
 import { AuthenticatedRequest } from "../../../types";
 import { Wishlist } from "../models";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { isValidMongoId } from "../../../utils";
 
 export const removeProductFromWishlistController = async (

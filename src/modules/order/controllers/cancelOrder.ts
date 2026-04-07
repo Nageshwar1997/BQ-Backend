@@ -3,10 +3,10 @@ import { ClientSession } from "mongoose";
 import { INormalizeError } from "razorpay/dist/types/api";
 import { AuthenticatedRequest } from "../../../types";
 import { Order } from "../models";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { isValidMongoId } from "../../../utils";
 import { ChatbotModule } from "../..";
-import { Configs } from "../../../Configs";
+import { configs } from "../../../configs";
 
 export const cancelOrderController = async (
   req: AuthenticatedRequest,
@@ -49,7 +49,7 @@ export const cancelOrderController = async (
 
   if (isPaid && paymentId) {
     try {
-      await Configs.Razorpay.payments.refund(paymentId, {
+      await configs.Razorpay.payments.refund(paymentId, {
         amount: order.payment.amount * 100,
         notes: {
           db_order_id: order._id.toString(),

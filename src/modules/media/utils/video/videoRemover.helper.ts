@@ -1,5 +1,5 @@
 import { UploadApiResponse } from "cloudinary";
-import { AppError } from "../../../../Classes";
+import { AppError } from "../../../../classes";
 import { CloudinaryConfigOption } from "../../types";
 import { cloudinaryConnection, myCloudinary } from "../../configs";
 import { extractPublicId } from "../common";

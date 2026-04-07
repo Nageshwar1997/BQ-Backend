@@ -1,7 +1,7 @@
 import { Response } from "express";
 
 import { isValidMongoId } from "../../../utils";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { BlogThumbnailType } from "../types";
 import { Blog } from "../models";
 import { BLOGS_THUMBNAILS, possibleEditBlogFields } from "../constants";

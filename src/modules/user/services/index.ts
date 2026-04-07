@@ -1,7 +1,8 @@
 import { Types } from "mongoose";
-import { AppError, redisService } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { User } from "../models";
 import { UserProps } from "../types";
+import { services } from "../../../services";
 
 export const getUserByEmail = async (email: string, lean?: boolean) => {
   let user = null;
@@ -30,7 +31,7 @@ export const updateUser = async (
     });
 
   if (user) {
-    await redisService.setCachedUser(user);
+    await services.redis.setCachedUser(user);
   }
 
   return user;

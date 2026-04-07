@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { Wishlist } from "../models";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { isValidMongoId } from "../../../utils";
 import { Types } from "mongoose";
 

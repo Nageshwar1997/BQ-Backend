@@ -10,7 +10,7 @@ import {
   getMinimalProductsForAiPrompt,
 } from "../services/product";
 import { IProductChatSession } from "../types";
-import { IS_DEV_MODE } from "../../../Envs";
+import { IS_DEV_MODE } from "../../../envs";
 import { getAiGeneratedSuggestedQuestion } from "../utils";
 
 const productChatHistory = new Map<string, IProductChatSession>();

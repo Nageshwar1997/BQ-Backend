@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { AddressModule, CartProductModule } from "../..";
+import { addressModule, CartProductModule } from "../..";
 import {
   ALLOWED_CURRENCIES,
   ALLOWED_PAYMENT_MODE,
@@ -14,9 +14,9 @@ export interface IOrder {
   user: Types.ObjectId;
   products: CartProductModule.Types.IPopulatedCartProduct[];
   addresses: {
-    shipping: Omit<AddressModule.Types.IAddress, "user"> | null;
-    billing: Omit<AddressModule.Types.IAddress, "user"> | null;
-    both: Omit<AddressModule.Types.IAddress, "user"> | null;
+    shipping: Omit<addressModule.Types.IAddress, "user"> | null;
+    billing: Omit<addressModule.Types.IAddress, "user"> | null;
+    both: Omit<addressModule.Types.IAddress, "user"> | null;
   };
   payment: {
     mode: (typeof ALLOWED_PAYMENT_MODE)[number];

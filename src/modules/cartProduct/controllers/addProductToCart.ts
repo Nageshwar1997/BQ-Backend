@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { CartModule } from "../..";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { isValidMongoId } from "../../../utils";
 import { CartProduct } from "../models";
 import { ObjectIdQueryTypeCasting } from "mongoose";
@@ -21,7 +21,7 @@ export const addProductToCartController = async (
   isValidMongoId(productId, "Invalid Product Id provided", 404);
 
   // 1️ Ensure cart exists (create if not)
-  const cart = await CartModule.Models.Cart.findOneAndUpdate(
+  const cart = await CartModule.models.Cart.findOneAndUpdate(
     { user: userId },
     { $setOnInsert: { user: userId, products: [], charges: 0 } },
     { new: true, upsert: true },

@@ -3,7 +3,7 @@ import { ClientSession, HydratedDocument } from "mongoose";
 import { getUserCart } from "../services";
 import { AuthenticatedRequest } from "../../../types";
 import { CartModule, CartProductModule, ProductModule } from "../..";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { IPopulatedCart } from "../types";
 
 export const getCartController = async (
@@ -23,7 +23,7 @@ export const clearCartController = async (
 ) => {
   const user = req.user;
 
-  const cart = (await CartModule.Models.Cart.findOne({
+  const cart = (await CartModule.models.Cart.findOne({
     user: user?._id,
   }).populate({
     path: "products", // All Products in the cart
@@ -50,14 +50,14 @@ export const clearCartController = async (
   }
 
   for (const item of cart.products) {
-    await ProductModule.Models.Product.updateOne(
+    await ProductModule.models.Product.updateOne(
       { _id: item.product._id },
       { $inc: { totalStock: -item.quantity } },
       { session },
     );
 
     if (item.shade?._id) {
-      await ProductModule.Models.Shade.updateOne(
+      await ProductModule.models.Shade.updateOne(
         { _id: item.shade._id },
         { $inc: { stock: -item.quantity } },
         { session },
@@ -65,7 +65,7 @@ export const clearCartController = async (
     }
   }
 
-  await CartProductModule.Models.CartProduct.deleteMany(
+  await CartProductModule.models.CartProduct.deleteMany(
     { _id: { $in: cart.products.map((p) => p._id) } },
     { session },
   );

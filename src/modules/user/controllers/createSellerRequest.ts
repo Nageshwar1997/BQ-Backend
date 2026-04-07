@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { Seller } from "../models";
 import { multipleImagesUploader } from "../../media/utils";
 

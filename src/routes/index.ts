@@ -10,13 +10,13 @@ import {
   UserModule,
   WebhookModule,
 } from "../Modules";
-import { AuthModule } from "../Modules/Auth.Module";
-import { AddressModule } from "../Modules/Address.Module";
+import { authModule } from "../modules/auth";
+import { addressModule } from "../modules/address";
 
 const router = Router();
 
 // Auth routes
-router.use("/auth", AuthModule.Router);
+router.use("/auth", authModule.router);
 
 // User routes
 router.use("/users", UserModule.Routes.userRouter);
@@ -40,7 +40,7 @@ router.use("/carts", CartModule.Routes.cartRouter);
 router.use("/cart-products", CartProductModule.Routes.cartProductRouter);
 
 // Address routes
-router.use("/addresses", AddressModule.Router);
+router.use("/addresses", addressModule.router);
 
 // Order routes
 router.use("/orders", OrderModule.Routes.orderRouter);

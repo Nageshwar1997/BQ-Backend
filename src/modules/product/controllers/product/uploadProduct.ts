@@ -2,7 +2,7 @@ import { Response } from "express";
 import { Types } from "mongoose";
 
 import { AuthorizedRequest } from "../../../../types";
-import { AppError } from "../../../../Classes";
+import { AppError } from "../../../../classes";
 import { Product, Shade } from "../../models";
 import { findOrCreateCategory } from "../../services";
 import { removeImages, uploadImages } from "../../utils";

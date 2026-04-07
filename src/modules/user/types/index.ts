@@ -1,6 +1,6 @@
 import { Document, Types } from "mongoose";
 import { TRole } from "../../../types";
-import { AddressModule, ProductModule } from "../..";
+import { ProductModule } from "../..";
 
 export type TAuthProvider = "GOOGLE" | "MANUAL" | "LINKEDIN" | "GITHUB";
 export interface UserProps extends Document {
@@ -27,7 +27,7 @@ export interface SellerProps {
   approvalStatus: "PENDING" | "APPROVED" | "REJECTED";
   businessDetails: BaseSellerProps & { category: string };
   businessAddress: Pick<
-    AddressModule.Types.IAddress,
+    addressModule.Types.IAddress,
     "address" | "landmark" | "city" | "state" | "pinCode" | "country"
   > & { gst: string; pan: string };
   requiredDocuments: {

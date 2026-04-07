@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { ValidateBlogFieldConfigs } from "../types";
 import { validateZodDate, validateZodString } from "../../../utils";
 

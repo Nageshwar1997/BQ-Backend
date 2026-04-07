@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express";
 import { AuthorizedRequest } from "../../../types";
 import { CartProduct } from "../models";
 import { isValidMongoId } from "../../../utils";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { CartModule } from "../..";
 import { ClientSession } from "mongoose";
 
@@ -24,7 +24,7 @@ export const removeProductFromCartController = async (
     });
   }
 
-  const cart = await CartModule.Models.Cart.findByIdAndUpdate(
+  const cart = await CartModule.models.Cart.findByIdAndUpdate(
     cartProduct.cart,
     { $pull: { products: cartProduct._id } },
     { new: true, session },

@@ -1,6 +1,6 @@
 import { UserModule } from "../..";
-import { AppError } from "../../../Classes";
-import { Configs } from "../../../Configs";
+import { AppError } from "../../../classes";
+import { configs } from "../../../configs";
 
 export const rzp_create_order = async (
   user: Omit<UserModule.Types.UserProps, "password">,
@@ -8,7 +8,7 @@ export const rzp_create_order = async (
   orderId: string,
 ) => {
   try {
-    const razorpayOrder = await Configs.Razorpay.orders.create({
+    const razorpayOrder = await configs.Razorpay.orders.create({
       amount: amount * 100, // Price in paise
       currency: "INR", // Currency
       receipt: `order_receipt_${Date.now()}_${Math.floor(

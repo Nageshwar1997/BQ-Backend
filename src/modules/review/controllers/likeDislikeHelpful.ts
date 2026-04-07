@@ -2,7 +2,7 @@ import { Response } from "express";
 import { AuthenticatedRequest } from "../../../types";
 import { isValidMongoId } from "../../../utils";
 import { Review } from "../models";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { Types } from "mongoose";
 
 export const likeDislikeHelpfulController = async (

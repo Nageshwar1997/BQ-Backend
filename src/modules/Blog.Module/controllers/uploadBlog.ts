@@ -1,7 +1,7 @@
 import { Response } from "express";
 
 import { BLOGS_THUMBNAILS } from "../constants";
-import { AppError } from "../../../Classes";
+import { AppError } from "../../../classes";
 import { Blog } from "../models";
 import { AuthorizedRequest } from "../../../types";
 import { validateRequiredFileFields } from "../../../utils";

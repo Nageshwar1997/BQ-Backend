@@ -17,123 +17,121 @@ import {
   forgotPasswordResendLinkController,
   checkPasswordTokenValidityController,
 } from "../controllers";
-import { Middlewares } from "../../../Middlewares";
+import { middlewares } from "../../../middlewares";
 import {
   changePasswordZodSchema,
   sellerRequestZodSchema,
   updatePasswordZodSchema,
   updateUserZodSchema,
 } from "../validations";
-import { Constants } from "../../../Constants";
+import { constants } from "../../../constants";
 
 export const userRouter = Router();
 
 // User Routes
-userRouter.get("/user", Middlewares.Response.Async.TryCatch(getUserController));
+userRouter.get("/user", middlewares.response.async.tryCatch(getUserController));
 
 userRouter.patch(
   "/user/update",
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Multer({ type: "single", fieldName: "profilePic" }),
-  Middlewares.Request.Empty({ fileOrBody: true }),
-  Middlewares.Zod(updateUserZodSchema),
-  Middlewares.Response.Async.TryCatch(updateUserController),
+  middlewares.auth.authenticated(false),
+  middlewares.multer({ type: "single", fieldName: "profilePic" }),
+  middlewares.request.empty({ fileOrBody: true }),
+  middlewares.zod(updateUserZodSchema),
+  middlewares.response.async.tryCatch(updateUserController),
 );
 
 userRouter.patch(
   "/user/update-password",
-  Middlewares.Auth.Authenticated(true),
-  Middlewares.Request.Empty({ body: true }),
-  Middlewares.Zod(updatePasswordZodSchema),
-  Middlewares.Response.Async.TryCatch(updatePasswordController),
+  middlewares.auth.authenticated(true),
+  middlewares.request.empty({ body: true }),
+  middlewares.zod(updatePasswordZodSchema),
+  middlewares.response.async.tryCatch(updatePasswordController),
 );
 
 userRouter.patch(
   "/user/send-reset-password-link",
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Response.Async.TryCatch(resetPasswordSendLinkController),
+  middlewares.auth.authenticated(false),
+  middlewares.response.async.tryCatch(resetPasswordSendLinkController),
 );
 
 userRouter.patch(
   "/user/reset-password",
-  Middlewares.Response.Async.TryCatch(resetPasswordController),
+  middlewares.response.async.tryCatch(resetPasswordController),
 );
 
 userRouter.get(
   "/user/reset-password-token-validity",
-  Middlewares.Response.Async.TryCatch(validResetPasswordTokenController),
+  middlewares.response.async.tryCatch(validResetPasswordTokenController),
 );
 
 userRouter.post(
   "/user/forgot-password",
-  Middlewares.Request.Empty({ query: true, body: true }),
-  Middlewares.Response.Async.TryCatch(forgotPasswordController),
+  middlewares.request.empty({ query: true, body: true }),
+  middlewares.response.async.tryCatch(forgotPasswordController),
 );
 
 userRouter.get(
   "/user/forgot-password-token-validity",
-  Middlewares.Response.Async.TryCatch(checkPasswordTokenValidityController),
+  middlewares.response.async.tryCatch(checkPasswordTokenValidityController),
 );
 
 userRouter.post(
   "/user/forgot-password-link",
-  Middlewares.Request.Empty({ body: true }),
-  Middlewares.Response.Async.TryCatch(forgotPasswordSendLinkController),
+  middlewares.request.empty({ body: true }),
+  middlewares.response.async.tryCatch(forgotPasswordSendLinkController),
 );
 
 userRouter.post(
   "/user/forgot-password-resend-link",
-  Middlewares.Response.Async.TryCatch(forgotPasswordResendLinkController),
+  middlewares.response.async.tryCatch(forgotPasswordResendLinkController),
 );
 
 userRouter.patch(
   "/user/change-password",
-  Middlewares.Auth.Authenticated(true),
-  Middlewares.Request.Empty({ body: true }),
-  Middlewares.Zod(changePasswordZodSchema),
-  Middlewares.Response.Async.TryCatch(changePasswordController),
+  middlewares.auth.authenticated(true),
+  middlewares.request.empty({ body: true }),
+  middlewares.zod(changePasswordZodSchema),
+  middlewares.response.async.tryCatch(changePasswordController),
 );
 
 // Seller Routes
 userRouter.post(
   "/seller/create",
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Multer({
+  middlewares.auth.authenticated(false),
+  middlewares.multer({
     fieldName: "requiredDocuments",
     type: "fields",
     fieldsConfig: ["gst", "itr", "addressProof", "geoTagging"].map((name) => ({
       name,
       maxCount: 1,
     })),
-    customLimits: { imageSize: 0.5 * Constants.File.MB },
+    customLimits: { imageSize: 0.5 * constants.file.size.MB },
   }),
-  Middlewares.Request.Empty({ body: true, files: true }),
-  Middlewares.JSONParser({
-    fieldsToParse: ["businessAddress", "businessDetails"],
-  }),
-  Middlewares.Zod(sellerRequestZodSchema),
-  Middlewares.Response.Async.TryCatch(createSellerRequestController),
+  middlewares.request.empty({ body: true, files: true }),
+  middlewares.toJSON(["businessAddress", "businessDetails"]),
+  middlewares.zod(sellerRequestZodSchema),
+  middlewares.response.async.tryCatch(createSellerRequestController),
 );
 
 // Wishlist Routes
 userRouter.get(
   "/wishlist",
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Response.Async.TryCatch(getWishlistController),
+  middlewares.auth.authenticated(false),
+  middlewares.response.async.tryCatch(getWishlistController),
 );
 
 userRouter.post(
   "/wishlist/add/:productId",
-  Middlewares.Request.Empty({ params: true }),
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Response.Async.TryCatch(addProductToWishlistController),
+  middlewares.request.empty({ params: true }),
+  middlewares.auth.authenticated(false),
+  middlewares.response.async.tryCatch(addProductToWishlistController),
 );
 
 userRouter.delete(
   "/wishlist/remove/:productId",
-  Middlewares.Request.Empty({ params: true }),
-  Middlewares.Auth.Authenticated(false),
-  Middlewares.Response.Async.TryCatchWithSession(
+  middlewares.request.empty({ params: true }),
+  middlewares.auth.authenticated(false),
+  middlewares.response.async.tryCatchWithSession(
     removeProductFromWishlistController,
   ),
 );
