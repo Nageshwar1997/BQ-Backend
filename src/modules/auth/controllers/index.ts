@@ -1,3 +1,6 @@
+export * as loginControllers from "./login";
+export * as registerControllers from "./register";
+export * as passwordControllers from "./password";
 import {
   githubCallbackController,
   githubRedirectController,
